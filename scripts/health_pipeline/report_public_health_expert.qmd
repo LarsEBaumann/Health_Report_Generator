@@ -1,0 +1,231 @@
+---
+title: "Viral and bacterial disease trends after COVID-19"
+subtitle: "Stakeholder report · public health expert"
+format:
+  html:
+    embed-resources: true
+    toc: true
+    code-fold: true
+    code-summary: "Show code"
+    theme: cosmo
+execute:
+  echo: false
+  warning: false
+jupyter: python3
+---
+
+```{python}
+#| tags: [parameters]
+stakeholder = "config/stakeholders/public_health_expert.json"
+classes_file = "config/pathogen_class.csv"
+out = "out"
+```
+
+```{python}
+# Setup: reads the outputs of harmonise.py / checks.py (run `bash run_all.sh data/Data out` first).
+# Series selection is shared with report.py, so the HTML and this Quarto report give identical numbers.
+import json
+from pathlib import Path
+import pandas as pd
+import matplotlib.pyplot as plt
+from IPython.display import Markdown, display
+from report import select_series, pct, fmt_pct, COL
+
+out = Path(out)
+cfg = json.loads(Path(stakeholder).read_text())
+classes = pd.read_csv(classes_file).set_index("topic").to_dict("index")
+d = pd.read_parquet(out / "harmonised.parquet")
+reg = pd.read_csv(out / "datasets.csv")
+checks = pd.read_csv(out / "checks.csv") if (out / "checks.csv").exists() else pd.DataFrame()
+
+y0, y1 = cfg["years"]; ref = cfg.get("reference_year"); years = list(range(y0, y1 + 1))
+xs = [ref] + years if ref else years
+excl = set(cfg.get("exclude_from_group_totals", []))
+sens = set(cfg.get("sensitivity_exclude", []))
+base_y = cfg.get("index_base_year", ref or y0)
+lab = lambda t: classes.get(t, {}).get("label", t)
+
+used, skipped, trace = select_series(d, cfg, classes)
+main_cls = cfg["classes_in_main_comparison"]
+main = [u for u in used if u["cls"] in main_cls]
+synd = [u for u in used if u["cls"] not in main_cls]
+order = sorted(main, key=lambda u: (u["cls"] != "viral", u["label"]))
+
+def group_sum(c, drop):
+    ss = [u["series"].value for u in main if u["cls"] == c and u["topic"] not in drop]
+    return pd.concat(ss, axis=1).sum(axis=1, min_count=1).reindex(xs) if ss else pd.Series(dtype=float)
+grp = {c: group_sum(c, excl) for c in main_cls}
+gv, gb = grp.get("viral"), grp.get("bacterial")
+
+tab = []
+for u in order:
+    s = u["series"]; v = {y: s.value.get(y) for y in xs}
+    ch = pct(v[y0], v[y1])
+    tab.append({"Disease": u["label"] + (" *" if u["topic"] in excl else ""), "Class": u["cls"],
+                **{str(y): v[y] for y in xs},
+                f"{y0}→{y1}": ch, f"vs {ref}": pct(v[ref], v[y1]),
+                f"per 100k ({y1})": s.inc100k.get(y1),
+                "Peak": int(s.value.reindex(years).idxmax()),
+                "Trend": "rising" if ch is not None and ch > 15 else "falling" if ch is not None and ch < -15 else "stable"})
+tdf = pd.DataFrame(tab)
+pub = reg.publishing_date.dropna().max()
+```
+
+```{python}
+#| output: asis
+print(f"**Question:** {cfg['question']}\n")
+print(f"*Source: FOPH Infectious Disease Dashboard (IDD) exports, published up to {pub}. "
+      f"National level (CH + FL), all ages, all sexes. Period {y0}–{y1}, reference year {ref}.*")
+```
+
+## Headline numbers
+
+```{python}
+#| output: asis
+cards = [
+    (f"Viral (excl. {', '.join(map(lab, excl))}) vs {ref}", fmt_pct(pct(gv.get(ref), gv.get(y1))),
+     f"{y0}→{y1}: {fmt_pct(pct(gv.get(y0), gv.get(y1)))}"),
+    (f"Bacterial vs {ref}", fmt_pct(pct(gb.get(ref), gb.get(y1))),
+     f"{y0}→{y1}: {fmt_pct(pct(gb.get(y0), gb.get(y1)))}"),
+]
+cov = next((u for u in main if u["topic"] in excl), None)
+if cov is not None:
+    cs = cov["series"].value
+    cards.append((f"{cov['label']} notifications", fmt_pct(pct(cs.get(y0), cs.get(y1))),
+                  f"peak {int(cs.reindex(years).idxmax())}: {cs.max():,.0f}"))
+top = tdf.sort_values(f"{y0}→{y1}", ascending=False).iloc[0]
+cards.append(("Strongest rise", top.Disease, f"{fmt_pct(top[f'{y0}→{y1}'])} since {y0}"))
+
+print("::: {.grid}")
+for k, v, s in cards:
+    print(f"::: {{.g-col-6 .g-col-md-3}}\n::: {{.callout-note appearance='minimal'}}\n"
+          f"{k}\n\n**{v}**\n\n<small>{s}</small>\n:::\n:::")
+print(":::")
+```
+
+## Key findings
+
+```{python}
+#| output: asis
+risers = tdf.sort_values(f"{y0}→{y1}", ascending=False).head(3)
+fallers = tdf.sort_values(f"{y0}→{y1}").head(2)
+bact_top = tdf[tdf.Class == "bacterial"].sort_values(f"{y0}→{y1}", ascending=False).Disease.head(3)
+b = [
+    f"Bacterial notifications changed {fmt_pct(pct(gb.get(y0), gb.get(y1)))} between {y0} and {y1} "
+    f"and are {fmt_pct(pct(gb.get(ref), gb.get(y1)))} vs {ref}. Main contributors: {', '.join(bact_top)}.",
+    f"Viral notifications excluding {', '.join(map(lab, excl))} changed {fmt_pct(pct(gv.get(y0), gv.get(y1)))} between {y0} and {y1}.",
+]
+if sens:
+    g2 = group_sum("viral", excl | sens)
+    b.append(f"Excluding {', '.join(map(lab, sens))} as well, viral notifications are "
+             f"{fmt_pct(pct(g2.get(ref), g2.get(y1)))} vs {ref}.")
+b.append("Largest relative increases: " + "; ".join(f"{r.Disease} {fmt_pct(r[f'{y0}→{y1}'])}" for _, r in risers.iterrows()) + ".")
+b.append("Largest decreases: " + "; ".join(f"{r.Disease} {fmt_pct(r[f'{y0}→{y1}'])}" for _, r in fallers.iterrows()) + ".")
+print("\n".join(f"- {x}" for x in b))
+```
+
+## Viral vs bacterial, indexed
+
+```{python}
+#| fig-cap: "Sum of notified cases per group, pre-COVID base year = 100. Dashed lines also remove the sensitivity-excluded topics (influenza)."
+plt.rcParams.update({"axes.spines.top": False, "axes.spines.right": False, "axes.grid": True, "grid.alpha": .25})
+f, ax = plt.subplots(figsize=(8, 3.8))
+for c, s in grp.items():
+    n = sum(1 for u in main if u["cls"] == c and u["topic"] not in excl)
+    ax.plot(xs, s / s.loc[base_y] * 100, marker="o", lw=2.2, color=COL[c], label=f"{c.title()} (n={n})")
+    sub_n = sum(1 for u in main if u["cls"] == c and u["topic"] not in excl | sens)
+    if sens and sub_n < n:
+        s2 = group_sum(c, excl | sens)
+        ax.plot(xs, s2 / s2.loc[base_y] * 100, ls="--", lw=1.6, color=COL[c], alpha=.7,
+                label=f"{c.title()} excl. {', '.join(map(lab, sens))}")
+ax.axhline(100, color=COL["ref"], lw=1, ls=":")
+ax.set_xticks(xs, [str(x) for x in xs]); ax.set_ylabel(f"Index {base_y} = 100")
+ax.legend(frameon=False, fontsize=8, loc="upper left")
+display(f); plt.close(f)
+```
+
+## Per disease: incidence per 100,000
+
+```{python}
+#| fig-cap: "Dotted line = reference-year level. Orange = viral, teal = bacterial."
+n = len(order); ncol = 3; nrow = -(-n // ncol)
+f, axs = plt.subplots(nrow, ncol, figsize=(8, 2.2 * nrow), squeeze=False)
+for ax, u in zip(axs.flat, order):
+    s = u["series"]; col = "inc100k" if s.inc100k.notna().any() else "value"
+    ax.plot(years, s[col].reindex(years), marker="o", ms=3, lw=1.8, color=COL[u["cls"]])
+    if ref in s.index:
+        ax.axhline(s.loc[ref, col], color=COL["ref"], lw=1, ls=":")
+    ax.set_title(u["label"], loc="left", fontsize=9, color=COL[u["cls"]], fontweight="bold")
+    ax.set_xticks(years, [str(y)[2:] for y in years]); ax.set_ylim(bottom=0); ax.tick_params(labelsize=7)
+for ax in list(axs.flat)[n:]: ax.axis("off")
+f.tight_layout(); display(f); plt.close(f)
+```
+
+## Change table
+
+```{python}
+fmt = {str(y): "{:,.0f}" for y in xs}
+fmt.update({f"{y0}→{y1}": "{:+.0f}%", f"vs {ref}": "{:+.0f}%", f"per 100k ({y1})": "{:.1f}"})
+(tdf.style.format(fmt, na_rep="–").hide(axis="index")
+    .map(lambda t: "color:#b91c1c;font-weight:600" if t == "rising" else
+                   "color:#15803d;font-weight:600" if t == "falling" else "", subset=["Trend"]))
+```
+
+\* excluded from group totals. Rising/falling = change of more than ±15%. Every value is listed with its source file and row in the trace table below.
+
+```{python}
+#| output: asis
+if synd:
+    print("## Context: GP consultations for respiratory syndromes\n")
+    print("Sentinella estimates; mixed viral and bacterial causes, so not assigned to either group.\n")
+```
+
+```{python}
+if synd:
+    f, ax = plt.subplots(figsize=(8, 3))
+    for u, c in zip(synd, ["#6b7280", "#a16207", "#1d4ed8"]):
+        ax.plot(years, u["series"].value.reindex(years) / 1000, marker="o", lw=2, color=c, label=u["label"])
+    ax.set_xticks(years); ax.set_ylabel("thousand (extrapolated)"); ax.legend(frameon=False, fontsize=8)
+    display(f); plt.close(f)
+```
+
+## Datasets not used, and why
+
+```{python}
+pd.DataFrame(skipped, columns=["dataset_id", "Topic", "Class", "Reason"]).drop(columns="dataset_id") \
+  .style.hide(axis="index")
+```
+
+## Data quality
+
+```{python}
+#| output: asis
+used_ids = {u["dataset_id"] for u in used}
+if len(checks):
+    qs = checks[checks.dataset_id.isin(used_ids)]
+    print(f"{(qs.status=='PASS').sum()} checks passed, {(qs.status=='WARN').sum()} warnings, "
+          f"{(qs.status=='FAIL').sum()} failures on the {len(used_ids)} datasets used.")
+```
+
+## Sources and traceability
+
+```{python}
+#| output: asis
+regv = reg[reg.status.str.startswith("ok")].copy()
+print(f"{len(regv)} unique datasets harmonised; {(reg.status == 'duplicate_skipped').sum()} duplicate downloads skipped by file fingerprint.")
+regv["used"] = regv.dataset_id.isin(used_ids).map({True: "yes", False: "no"})
+regv["file"] = regv.source_file.map(lambda p: f"{Path(p).parent.name}/data.csv")
+regv["sha256"] = regv.sha256.str[:12]
+regv["source_system"] = regv.source_system.str.replace("_", " ").str.replace("reporting system", "").str.strip()
+print(regv[["topic", "source_system", "publishing_date", "used", "file", "sha256", "rows"]]
+      .style.hide(axis="index").set_table_attributes('style="font-size:11px"').to_html())
+```
+
+::: {.callout-tip collapse="true"}
+## Trace: every number back to its source row
+
+```{python}
+trace.assign(source_file=trace.source_file.map(lambda p: f"{Path(p).parent.name}/data.csv")) \
+     .style.format({"value": "{:,.0f}"}).hide(axis="index")
+```
+:::
