@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 import marimo
 
+__generated_with = "0.25.1"
 app = marimo.App(width="medium")
 
 
@@ -12,10 +11,11 @@ def _():
 
     import marimo as mo
     import matplotlib.pyplot as plt
+    from matplotlib.ticker import MaxNLocator
     import pandas as pd
     import yaml
 
-    return Path, json, mo, pd, plt, yaml
+    return MaxNLocator, Path, json, mo, pd, plt, yaml
 
 
 @app.cell
@@ -45,35 +45,44 @@ def _(Path, yaml):
 @app.cell
 def _(dataset_ids, default_dataset, display_name, mo):
     audiences = ["Researcher", "Policy maker", "General public"]
+
     audience = mo.ui.dropdown(
         options=audiences,
         value="Researcher",
         label="Who is this report for?",
+        full_width=True,
     )
 
-    dataset_checks = mo.ui.array([
-        mo.ui.checkbox(
-            label=display_name(dataset_id),
-            value=(dataset_id == default_dataset),
-        )
+    dataset_options = {
+        display_name(dataset_id): dataset_id
         for dataset_id in dataset_ids
-    ])
+    }
+
+    default_label = next(
+        label
+        for label, dataset_id in dataset_options.items()
+        if dataset_id == default_dataset
+    )
+
+    datasets = mo.ui.multiselect(
+        options=dataset_options,
+        value=[default_label],
+        label="Diseases / datasets to include",
+        full_width=True,
+    )
 
     report_form = mo.ui.form(
         mo.md(
             """
-            ## Configure report
-
-            **Audience**
+            ## Configure your report
+            Choose an audience and the data to include.
 
             {audience}
 
-            **Diseases / datasets to include**
-
             {datasets}
             """
-        ).batch(audience=audience, datasets=dataset_checks),
-        submit_button_label="Show results",
+        ).batch(audience=audience, datasets=datasets),
+        submit_button_label="Generate report",
     )
 
     report_form
@@ -81,7 +90,7 @@ def _(dataset_ids, default_dataset, display_name, mo):
 
 
 @app.cell
-def _(Path, display_name, json, mo, pd, plt, report_form, dataset_ids):
+def _(MaxNLocator, Path, display_name, json, mo, pd, plt, report_form):
     def render_dataset(dataset_id):
         csv_path = Path("data/reference") / dataset_id / "data.csv"
         metadata_path = Path("data/reference") / dataset_id / "metadata.json"
@@ -146,6 +155,7 @@ def _(Path, display_name, json, mo, pd, plt, report_form, dataset_ids):
         ax.set_title(display_name(dataset_id))
         ax.set_xlabel("Time")
         ax.set_ylabel("Value (source units)")
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=6))
         ax.tick_params(axis="x", rotation=60)
         fig.tight_layout()
 
@@ -156,12 +166,7 @@ def _(Path, display_name, json, mo, pd, plt, report_form, dataset_ids):
         results = mo.md("Choose an audience and dataset, then click **Show results**.")
     else:
         audience_name = report_form.value["audience"]
-        included = report_form.value["datasets"]
-        selected_ids = [
-            dataset_id
-            for dataset_id, is_included in zip(dataset_ids, included)
-            if is_included
-        ]
+        selected_ids = report_form.value["datasets"]
 
         if not selected_ids:
             results = mo.md("Select at least one dataset.")
