@@ -1,0 +1,25 @@
+{
+  "dataset_id": "QFEVER_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/QFEVER_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:40.635095+00:00",
+  "sha256": "f4c9f645863ffff4f16fefcf38dbeb1423845b96aba1b259765593cc63d5eb57",
+  "row_count": 189,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}

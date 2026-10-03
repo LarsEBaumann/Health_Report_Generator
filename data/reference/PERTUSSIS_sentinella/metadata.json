@@ -1,0 +1,26 @@
+{
+  "dataset_id": "PERTUSSIS_sentinella",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/PERTUSSIS_sentinella/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:40.578076+00:00",
+  "sha256": "65ab62a68b2f9501407725eed5e5f81c1e11e9c24bb7aacbe6862bdc7118a3db",
+  "row_count": 13,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "value",
+    "popExtrapolation",
+    "totalConsultationsExtrapolation",
+    "pop",
+    "incValue",
+    "prctConsultations",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "trend"
+  ],
+  "snapshot_file": "data.csv"
+}

@@ -1,0 +1,32 @@
+{
+  "dataset_id": "LYME_sentinella",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/LYME_sentinella/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:40.434485+00:00",
+  "sha256": "86357493561be809fa850e49fd6d725da1136a1a5fea57d0fb5ed185e4209e40",
+  "row_count": 522,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "popExtrapolation",
+    "totalConsultationsExtrapolation",
+    "pop",
+    "incValue",
+    "prctConsultations",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

@@ -1,0 +1,31 @@
+{
+  "dataset_id": "SALMONELLOSIS_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/SALMONELLOSIS_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:44.225384+00:00",
+  "sha256": "ae527e089c278a1e59fd1729cd2beaf783197498dc8db63bc03502b59d2f3b59",
+  "row_count": 826,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

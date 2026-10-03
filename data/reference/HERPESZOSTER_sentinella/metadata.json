@@ -1,0 +1,26 @@
+{
+  "dataset_id": "HERPESZOSTER_sentinella",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HERPESZOSTER_sentinella/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:39.118675+00:00",
+  "sha256": "5ec5c29846724cca90c3f787697b5b1c31742e8f693130f76bef53a9d10675a2",
+  "row_count": 10,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "value",
+    "popExtrapolation",
+    "totalConsultationsExtrapolation",
+    "pop",
+    "incValue",
+    "prctConsultations",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "trend"
+  ],
+  "snapshot_file": "data.csv"
+}

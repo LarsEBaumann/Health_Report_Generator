@@ -1,0 +1,31 @@
+{
+  "dataset_id": "RESPVIRUSES_sentinella",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/RESPVIRUSES_sentinella/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:41.179180+00:00",
+  "sha256": "32f85c96135a700de620fde207e2e6703ec6fb76e5abbd3e70069b6528df045f",
+  "row_count": 5008,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "pathogen",
+    "type",
+    "subtype",
+    "testResult",
+    "testResult_type",
+    "value",
+    "prctPathogenType",
+    "prctPathogenSubtype",
+    "prctTypeSubtype",
+    "prctPathogen",
+    "lowerCiPathogen",
+    "upperCiPathogen",
+    "prctPathogenMean3w",
+    "prctSamples",
+    "dataComplete",
+    "defaultView"
+  ],
+  "snapshot_file": "data.csv"
+}
