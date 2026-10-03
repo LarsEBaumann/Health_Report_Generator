@@ -1,4 +1,4 @@
-name: Update Lyme reference data
+name: Update IDD reference data
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-lyme-reference-data
+  group: update-idd-reference-data
   cancel-in-progress: false
 
 jobs:
@@ -26,21 +26,21 @@ jobs:
           python-version: "3.14.8"
           enable-cache: true
 
-      - name: Install locked project dependencies
+      - name: Install locked dependencies
         run: uv sync --locked
 
-      - name: Fetch IDD data and update reference only if changed
-        run: uv run python src/update_idd_reference.py
+      - name: Sync all IDD export files
+        run: uv run python src/sync_idd_exports.py
 
-      - name: Commit changed snapshot and provenance
+      - name: Commit only changed exports
         shell: bash
         run: |
-          if git diff --quiet -- data/reference/lyme_sentinella/data.csv data/reference/lyme_sentinella/metadata.json; then
-            echo "IDD data unchanged; no commit needed."
+          git add -- data/reference
+          if git diff --cached --quiet -- data/reference; then
+            echo "IDD exports unchanged; no commit needed."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/reference/lyme_sentinella/data.csv data/reference/lyme_sentinella/metadata.json
-          git commit -m "Update Lyme reference data from IDD"
+          git commit -m "Update IDD reference data"
           git push
