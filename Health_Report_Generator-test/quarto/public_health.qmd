@@ -1,0 +1,463 @@
+---
+title: "Infectious disease situation report"
+subtitle: "For public health officials · Switzerland and Liechtenstein"
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    embed-resources: true
+    theme: cosmo
+    page-layout: article
+execute:
+  echo: false
+  warning: false
+jupyter: python3
+---
+
+<style>
+:root {
+  --risk-high: #c62828;
+  --risk-high-bg: #fde8e8;
+  --risk-elevated: #e6ac00;
+  --risk-elevated-bg: #fff8d6;
+  --risk-normal: #2e7d32;
+  --risk-normal-bg: #e8f5e9;
+  --neutral-blue: #245b8a;
+  --soft-grey: #f5f7fa;
+  --border-grey: #dde3ea;
+}
+
+body {
+  background: #fbfcfe;
+  color: #263238;
+}
+
+h1, h2, h3 {
+  color: #173f63;
+}
+
+/* Summary cards */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin: 0.6rem 0 1.3rem 0;
+}
+.summary-card {
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 1.05rem;
+  box-shadow: 0 3px 10px rgba(30, 55, 80, 0.10);
+  color: white;
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(30, 55, 80, 0.14);
+}
+.summary-card .label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: white !important;
+  opacity: 0.95;
+  font-weight: 650;
+}
+.summary-card .value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-top: 0.25rem;
+  color: white !important;
+}
+
+/* Full-card status colours (no coloured top line) */
+.summary-card.neutral  { background: var(--neutral-blue); }
+.summary-card.normal   { background: var(--risk-normal); }
+.summary-card.elevated { background: var(--risk-elevated); }
+.summary-card.high     { background: var(--risk-high); }
+/* yellow needs dark text */
+.summary-card.elevated .label,
+.summary-card.elevated .value { color: #3d3000 !important; }
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.25;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.status-high {
+  color: #9d1c1c;
+  background: var(--risk-high-bg);
+  border: 1px solid #efb7b7;
+}
+.status-elevated {
+  color: #7a5c00;
+  background: var(--risk-elevated-bg);
+  border: 1px solid #ecd67a;
+}
+.status-normal, .status-low {
+  color: #226b26;
+  background: var(--risk-normal-bg);
+  border: 1px solid #add9b0;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  background: white;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 1px solid var(--border-grey);
+  border-radius: 10px;
+  overflow: hidden;
+}
+thead th {
+  background: #173f63 !important;
+  color: white !important;
+  font-weight: 650;
+  padding: 0.65rem 0.75rem !important;
+}
+tbody td {
+  padding: 0.58rem 0.75rem !important;
+  border-bottom: 1px solid #edf0f3 !important;
+}
+tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+tbody tr:hover {
+  background: #eef5fb;
+}
+
+.callout-note {
+  border-left-color: var(--neutral-blue) !important;
+}
+
+@media (max-width: 800px) {
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+  }
+}
+
+/* Keep the card and badge colours when the report is printed or saved as PDF */
+@media print {
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .summary-card.neutral {
+    background-color: #245B8A !important;
+    color: white !important;
+  }
+
+  .summary-card.normal {
+    background-color: #2E7D32 !important;
+    color: white !important;
+  }
+
+  .summary-card.elevated {
+    background-color: #E6AC00 !important;
+    color: #2F2500 !important;
+  }
+
+  .summary-card.high {
+    background-color: #C62828 !important;
+    color: white !important;
+  }
+
+  .summary-card .label,
+  .summary-card .value {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .summary-card.neutral .label,
+  .summary-card.neutral .value,
+  .summary-card.normal .label,
+  .summary-card.normal .value,
+  .summary-card.high .label,
+  .summary-card.high .value {
+    color: white !important;
+  }
+
+  .summary-card.elevated .label,
+  .summary-card.elevated .value {
+    color: #2F2500 !important;
+  }
+
+  .status-badge {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+</style>
+
+```{python}
+import pandas as pd
+from IPython.display import Markdown, HTML, display
+
+import helpers as h
+
+d = h.load()
+st = h.status(d)
+above = st[st.level.isin(["high", "elevated"])]
+record = st[st.level == "high"]
+
+
+LEVEL_COLORS = {
+    "high": "#c62828",       # red: record/high level
+    "elevated": "#e6ac00",  # yellow: above normal
+    "normal": "#2e7d32",    # green: normal
+    "low": "#2e7d32",       # green: low/non-elevated
+}
+
+LEVEL_CELL_STYLES = {
+    "high": "background-color:#fde8e8;color:#9d1c1c;font-weight:700;",
+    "elevated": "background-color:#fff8d6;color:#7a5c00;font-weight:700;",
+    "normal": "background-color:#e8f5e9;color:#226b26;font-weight:700;",
+    "low": "background-color:#e8f5e9;color:#226b26;font-weight:700;",
+}
+
+
+def risk_color(level):
+    return LEVEL_COLORS.get(str(level).lower(), "#2e7d32")
+
+
+def status_badge(level, label):
+    level = str(level).lower()
+    css_level = level if level in {"high", "elevated", "normal", "low"} else "normal"
+    return f'<span class="status-badge status-{css_level}">{label}</span>'
+
+
+def show(frame, levels=None):
+    """Display a styled table; optionally colour the Level column by internal status level."""
+    styler = frame.style.hide(axis="index")
+    styler = styler.set_properties(**{
+        "text-align": "left",
+        "font-size": "0.92rem",
+    })
+
+    if levels is not None and "Level" in frame.columns:
+        level_list = [str(x).lower() for x in list(levels)]
+
+        def colour_level_column(_):
+            return [LEVEL_CELL_STYLES.get(level, LEVEL_CELL_STYLES["normal"])
+                    for level in level_list]
+
+        styler = styler.apply(colour_level_column, subset=["Level"], axis=0)
+
+    display(HTML(styler.to_html()))
+
+
+def colour_current_series(fig, level):
+    """Colour the reported series and its end marker by status; the grey band and the blue median line are left as they are.
+
+    The reported series is the solid line with a visible width (the band edges have width 0).
+    """
+    colour = risk_color(level)
+    for trace in fig.data:
+        mode = str(trace.mode or "")
+        if "markers" in mode:
+            trace.marker.color = colour
+        elif trace.fill in (None, "none") and trace.line.dash is None and (trace.line.width or 0) > 0:
+            trace.line.color = colour
+            trace.line.width = 3
+    fig.update_layout(
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        font=dict(color="#263238"),
+    )
+    return fig
+
+
+def colour_bar_figure(fig, level):
+    fig.update_traces(marker_color=risk_color(level))
+    fig.update_layout(
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        font=dict(color="#263238"),
+    )
+    return fig
+
+
+def num(x, digits=0):
+    return "-" if pd.isna(x) else f"{x:,.{digits}f}"
+
+
+def pct(x):
+    return "-" if x is None or pd.isna(x) else f"{x:+.0f}%"
+```
+
+## Situation at a glance
+
+```{python}
+normal_or_low = len(st) - len(above)
+summary_html = f"""
+<div class="summary-grid">
+  <div class="summary-card neutral">
+    <div class="label">Surveillance indicators monitored</div>
+    <div class="value">{len(st)}</div>
+  </div>
+  <div class="summary-card normal">
+    <div class="label">Normal / low</div>
+    <div class="value">{normal_or_low}</div>
+  </div>
+  <div class="summary-card elevated">
+    <div class="label">Above normal</div>
+    <div class="value">{len(st[st.level == 'elevated'])}</div>
+  </div>
+  <div class="summary-card high">
+    <div class="label">Record high</div>
+    <div class="value">{len(record)}</div>
+  </div>
+</div>
+"""
+display(HTML(summary_html))
+
+def latest_data(st):
+    """Latest period per reporting frequency; monthly series do not all end in the same month."""
+    weekly = st[st.frequency.isin(["iso_week", "week"])]
+    parts = [f"{weekly.period_label.iloc[weekly.period.argmax()]} for the {len(weekly)} weekly series"]
+    monthly = st[st.frequency == "month"]
+    for period, rows in sorted(monthly.groupby("period"), reverse=True):
+        parts.append(f"{rows.period_label.iloc[0]} for {len(rows)} monthly series ({', '.join(rows.disease)})")
+    for row in st[st.frequency == "year"].itertuples():
+        parts.append(f"{row.period_label} for {row.disease} (yearly)")
+    return "; ".join(parts)
+
+
+names = ", ".join(record.disease)
+record_text = f" Record-high indicators: **{names}**." if len(record) else ""
+display(Markdown(
+    f"**{len(above)} of {len(st)}** monitored surveillance indicators are above their usual level for the time of year."
+    f"{record_text}\n\n"
+    f"Each indicator is compared with its comparison window: the same week or month in previous years. "
+    f"Latest data: {latest_data(st)}."))
+```
+
+```{python}
+table = pd.DataFrame({
+    "Indicator": st.disease,
+    "Level": st.level_label,
+    "Latest": st.value.map(num),
+    "Period": st.period_label,
+    "Usual (median)": st["median"].map(num),
+    "Compared with usual": st.ratio.map(h.versus_usual),
+})
+show(table, levels=st.level)
+```
+
+**Colour guide:** <span class="status-badge status-high">Record high</span> latest value is the highest for this period in the comparison window. <span class="status-badge status-elevated">Above normal</span> at least 20% and at least 3 cases above the comparison-window median. <span class="status-badge status-normal">Normal / low</span> not currently above the usual level.
+
+## Indicators above the usual level
+
+The **coloured line** is the reported series: **red** for record-high status and **yellow** for above-normal status. The dashed blue line is the median and the grey band the minimum to maximum of the **comparison window**: the same week or month in previous years (5 or 10 years; FOPH's own windows also include the current value).
+
+```{python}
+for row in above.itertuples():
+    s = h.series(d, row.topic)
+    unit = "cases were reported" if row.measure == "cases" else "GP consultations are estimated"
+    ytd = (f" Calendar year to date: {num(row.ytd)} ({pct(row.ytd_pct)} on the same period last year)."
+           if not pd.isna(row.ytd_pct) else "")
+    small = " Counts are small, so the level can change on a few cases." if row.value < 60 else ""
+    badge = status_badge(row.level, row.level_label)
+    display(Markdown(
+        f"### {row.disease} {badge}\n\n"
+        f"**{num(row.value)}** {unit} in {row.period_label}, {h.versus_usual(row.ratio)} for this time of year "
+        f"(median {num(row.median)}, range {num(row.min)} to {num(row.max)}).{ytd}{small}"))
+    fig = h.trend_figure(s)
+    colour_current_series(fig, row.level).show()
+```
+
+## Where: cantons with the highest incidence
+
+Cases per 100,000 residents. Cantons with fewer than 5 cases are left out because their rates are unstable. Canton figures are published for the last full year for most infections, and weekly for influenza and COVID-19.
+
+```{python}
+shown = 0
+for row in above.itertuples():
+    regions, when = h.regional(d, row.topic)
+    regions = regions[regions.cases >= 5].head(10) if len(regions) else regions
+    if len(regions) < 3:
+        continue
+    shown += 1
+    fig = h.bar_figure(regions, "incidence", "canton", f"{row.disease}: top cantons, {when}",
+                       "Cases per 100,000")
+    colour_bar_figure(fig, row.level).show()
+if not shown:
+    display(Markdown("No canton-level data for the indicators currently above normal."))
+```
+
+## Burden this year compared with last year
+
+Cumulative total from January to the latest period, against the same span one year earlier.
+
+```{python}
+ytd = st.dropna(subset=["ytd_pct"]).sort_values("ytd_pct", ascending=False)
+show(pd.DataFrame({
+    "Indicator": ytd.disease,
+    "Category": ytd.group,
+    "Calendar year to date": ytd.ytd.map(num),
+    "Same period last year": ytd.ytd_prev.map(num),
+    "Change": ytd.ytd_pct.map(pct),
+    "Data up to": ytd.period_label,
+}))
+```
+
+## Respiratory season watch
+
+Weekly respiratory indicators at the start of the season. The recent change compares the last 4 weeks with the 4 weeks before.
+
+```{python}
+resp = st[st.group == "Respiratory"]
+show(pd.DataFrame({
+    "Indicator": resp.disease,
+    "Level": resp.level_label,
+    "Latest week": resp.value.map(num),
+    "Per 100,000": resp.incidence.map(lambda x: num(x, 1)),
+    "Change, last 4 weeks": resp.change_pct.map(pct),
+}), levels=resp.level)
+```
+
+```{python}
+for topic in resp.topic:
+    if topic not in set(above.topic):
+        r = resp[resp.topic == topic].iloc[0]
+        fig = h.trend_figure(h.series(d, topic), height=260)
+        colour_current_series(fig, r.level).show()
+```
+
+## How to read this report
+
+- **Source.** Federal Office of Public Health (FOPH) surveillance data, cleaned and merged by the project pipeline into `results/harmonised.csv`.
+- **Colour coding.** Red indicates the report's existing `high` / record-high category, yellow the existing `elevated` / above-normal category, and green normal or low categories. The colours are visual cues; they do not introduce a new clinical risk classification.
+- **Reported cases are not all infections.** They depend on who gets tested and reported. COVID-19 case counts in particular under-estimate infections.
+- **GP figures are estimates** extrapolated from the Sentinella network of practices.
+- **Comparison window.** The same week or month in previous years: FOPH's published 5- or 10-year minimum, median and maximum where available (these include the current value), otherwise the previous 5 years of the series. "Usual" in this report means the median of that window.
+- **The COVID-19 comparison window includes pandemic years**, so "low" there is relative to an exceptional period.
+- **Sexually transmitted infections lag by several months** in publication.
+- **No statistical testing is applied.** Levels are descriptive comparisons with the comparison window.
+
+## Provenance
+
+```{python}
+import provenance
+
+display(Markdown(provenance.section("public_health.qmd", parameters={
+    "Audience": "public health officials",
+    "Age": "all",
+    "Sex": "all",
+    "Geography": "CHFL (Switzerland + Liechtenstein) where published, otherwise CH",
+    "Period": "latest available per indicator",
+})))
+```

@@ -1,0 +1,145 @@
+{
+  "metaVariables": {
+    "topic": "shigellosis",
+    "source": "mandatory_reporting_system",
+    "publishingDate": "2026-09-09",
+    "sourceDate": "2026-09-08",
+    "publicationFrequency": {
+      "frequency": "monthly",
+      "frequencyDescription": "First Wednesday after day 7 of every month. The exact weekday can vary due to public holidays."
+    },
+    "expectedPublicationDelay": {
+      "delay": 7,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 7 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": ["cases", "min_value_10y", "median_value_10y", "max_value_10y", "cases_10y_mean", "cases_10y_cumsum"]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": ["month", "year"]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "CHFL": {
+          "valueSet": "CHFL",
+          "allValue": "all"
+        },
+        "canton": {
+          "valueSet": ["AG", "AI", "AR", "BE", "BL", "BS", "FR", "GE", "GL", "GR", "JU", "LU", "NE", "NW", "OW", "SG", "SH", "SO", "SZ", "TG", "TI", "UR", "VD", "VS", "ZG", "ZH"],
+          "allValue": "all"
+        },
+        "country": {
+          "valueSet": ["CH", "FL"],
+          "allValue": "all"
+        }
+      }
+    },
+    "agegroup": {
+      "column": "agegroup",
+      "columnDescription": "Age range brackets used for grouping.",
+      "typeColumn": "agegroup_type",
+      "typeColumnDescription": "Specifies the type of agegroup in the property 'agegroup'.",
+      "typeValues": {
+        "agegroup_food": {
+          "valueSet": ["0 - 16", "17 - 24", "25 - 44", "45 - 64", "65+", "unknown"],
+          "allValue": "all"
+        }
+      }
+    },
+    "sex": {
+      "column": "sex",
+      "columnDescription": "Sex specification used for grouping.",
+      "valueSet": ["female", "male", "unknown"],
+      "allValue": "all"
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [0, 1007],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueYearCumSum": {
+      "description": "Cumulative sum of the property 'value' within a year.",
+      "valueSetOrRange": [4, 248],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean3y": {
+      "description": "Right-aligned, rolling 3-year average of the property 'value' within the grouping described in the property name.",
+      "valueSetOrRange": [0, 207.7],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [15778, 9091915],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "prct": {
+      "description": "Proportion of the entry in the property 'value' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [0, 100],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValue": {
+      "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
+      "valueSetOrRange": [0, 8.73],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaValue": {
+      "description": "Absolute difference in the metric 'value' comparing the current year to the last one.",
+      "valueSetOrRange": [-156, 103],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaIncValue": {
+      "description": "Absolute difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [-1.81, 1.19],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValuePrctChange": {
+      "description": "Percentage difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [-73, 92],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean5y": {
+      "description": "Right-aligned, rolling 5-year average of the property 'value'.",
+      "valueSetOrRange": [148, 192.8],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {
+    "dataComplete": {
+      "description": "Can data be assumed to be complete (few late reportings to be expected)?",
+      "valueSetOrRange": true,
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "trend": {
+      "description": "Indicates a trend of an entry with respect to previous entries. The trend is calculated using a poisson and poisson glm with a log-link with a right-aligned window of size 3 and 4 for the temporal_type year and month, respectively. For data by year the trend is adjusted by population size. For data by month the trend is not adjusted by population size.",
+      "valueSetOrRange": ["stagnant", "falling", "rising"],
+      "nullValue": "NA",
+      "type": "character"
+    }
+  }
+}
