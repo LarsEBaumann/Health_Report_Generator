@@ -1,0 +1,25 @@
+{
+  "dataset_id": "MONKEYPOX_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/MONKEYPOX_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:40.551065+00:00",
+  "sha256": "dd36c649779a68f49ae02b458fbbbd01a024ce9b373d88c125d932ffec51c065",
+  "row_count": 8,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}

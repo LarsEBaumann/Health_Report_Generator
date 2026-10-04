@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .DS_Store
 __pycache__/
 *.pyc
@@ -13,3 +14,16 @@ renv/staging/
 .RData
 .r-library/
 .r-bootstrap/
+=======
+.venv/
+.env
+__pycache__/
+*.py[cod]
+data/raw/
+data/processed/
+outputs/
+.cache/
+
+# Marimo session snapshots
+/src/__marimo__/session/
+>>>>>>> origin/feat/lyme-reports

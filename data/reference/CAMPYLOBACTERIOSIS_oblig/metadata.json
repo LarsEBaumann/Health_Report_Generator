@@ -1,0 +1,30 @@
+{
+  "dataset_id": "CAMPYLOBACTERIOSIS_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CAMPYLOBACTERIOSIS_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:31.513613+00:00",
+  "sha256": "19b915920c0f6ffc6fa456300ab5138b98b180d38ce5a29bc959ece7d414503b",
+  "row_count": 755,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

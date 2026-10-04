@@ -1,0 +1,28 @@
+{
+  "dataset_id": "AIDS_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/AIDS_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:31.417227+00:00",
+  "sha256": "906ec0d77eba7d1d8b75e3d451e822230fe416c55f0ffbb419e3ab6ee2a3c1fb",
+  "row_count": 13,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueMean3y",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

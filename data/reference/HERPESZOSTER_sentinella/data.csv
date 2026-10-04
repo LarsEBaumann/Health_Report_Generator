@@ -1,0 +1,11 @@
+valueCategory,temporal,temporal_type,georegion,georegion_type,value,popExtrapolation,totalConsultationsExtrapolation,pop,incValue,prctConsultations,deltaValue,deltaIncValue,incValuePrctChange,valueMean5y,trend
+consultations,2016,year,CH,country,20712.1,161379.7,603303,8419550,246,0.066,NA,NA,NA,NA,NA
+consultations,2017,year,CH,country,21089,162932.8,576232,8484130,248.57,0.07,376.9,2.57,1,NA,stagnant
+consultations,2018,year,CH,country,25474.7,151604.3,567510,8544527,298.14,0.08,4385.7,49.57,19.9,NA,rising
+consultations,2019,year,CH,country,23621.8,158480.7,585079,8606033,274.48,0.074,-1852.9,-23.66,-7.9,NA,falling
+consultations,2020,year,CH,country,19750.9,172081.2,566796,8670300,227.8,0.069,-3870.9,-46.68,-17,22129.7,falling
+consultations,2021,year,CH,country,17606.9,195550.4,605347,8738791,201.48,0.065,-2144,-26.32,-11.6,21508.66,falling
+consultations,2022,year,CH,country,16836.5,195294.5,574685,8815385,190.99,0.065,-770.4,-10.49,-5.2,20658.16,falling
+consultations,2023,year,CH,country,19905.2,187749.1,542532,8962258,222.1,0.077,3068.7,31.11,16.3,19544.26,rising
+consultations,2024,year,CH,country,17318.2,183444.2,533748,9051029,191.34,0.066,-2587,-30.76,-13.8,18283.54,falling
+consultations,2025,year,CH,country,21023.7,193303.8,559769,9051029,232.28,0.08,3705.5,40.94,21.4,18538.1,rising

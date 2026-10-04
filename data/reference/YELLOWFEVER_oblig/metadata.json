@@ -1,0 +1,24 @@
+{
+  "dataset_id": "YELLOWFEVER_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/YELLOWFEVER_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:44.560260+00:00",
+  "sha256": "93ea5bbd144129372c793a52f0c8d4e5317d0af9afd38e8c0e0f95bec60b34c5",
+  "row_count": 13,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "trend"
+  ],
+  "snapshot_file": "data.csv"
+}
