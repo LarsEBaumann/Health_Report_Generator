@@ -2,123 +2,87 @@ import os
 import shutil
 import tempfile
 import zipfile
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 
 import requests
 
 API = "https://api.github.com"
-TOKEN = os.environ["GITHUB_TOKEN"]
-OWNER = os.environ["GITHUB_OWNER"]
-REPO = os.environ["GITHUB_REPO"]
-WORKFLOW = os.environ["GITHUB_WORKFLOW"]  # e.g. workflow.yml
-BRANCH = os.getenv("GITHUB_BRANCH", "main")
-ARTIFACT_NAME = os.getenv("GITHUB_ARTIFACT_NAME")  # optional filter
-CACHE = Path(os.getenv("ARTIFACT_CACHE", ".cache/github-artifact"))
-
-
-def headers():
-    return {
-        "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {TOKEN}",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
-
-
-def get_json(url, **params):
-    response = requests.get(
-        url, headers=headers(), params=params, timeout=30
-    )
-    response.raise_for_status()
-    return response.json()
-
-
-def latest_run():
-    url = f"{API}/repos/{OWNER}/{REPO}/actions/workflows/{WORKFLOW}/runs"
-    data = get_json(
-        url, branch=BRANCH, status="success", per_page=20
-    )
-    runs = [
-        run for run in data["workflow_runs"]
-        if run.get("conclusion") == "success"
-    ]
-    if not runs:
-        raise RuntimeError(
-            f"No successful runs found for {WORKFLOW} on {BRANCH}"
-        )
-    return max(runs, key=lambda run: run["run_number"])
 
 
 def download_latest_report():
-    run = latest_run()
+    token = os.getenv("GITHUB_TOKEN")
+    if not token:
+        raise RuntimeError("Set GITHUB_TOKEN with Actions read and write access.")
+
+    owner = os.getenv("GITHUB_OWNER", "LarsEBaumann")
+    repo = os.getenv("GITHUB_REPO", "Health_Report_Generator")
+    workflow = os.getenv("GITHUB_WORKFLOW", "update-lyme-data.yml")
+    branch = os.getenv("GITHUB_BRANCH", "main")
+    stakeholder = os.getenv("REPORT_DATA_STAKEHOLDER", "public_health_expert")
+    cache = Path(os.getenv("ARTIFACT_CACHE", ".cache/github-artifact"))
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {token}",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    url = f"{API}/repos/{owner}/{repo}/actions/workflows/{workflow}/runs"
+    response = requests.get(
+        url, headers=headers,
+        params={"branch": branch, "status": "success", "per_page": 20},
+        timeout=30,
+    )
+    response.raise_for_status()
+    runs = response.json().get("workflow_runs", [])
+    runs = [r for r in runs if r.get("conclusion") == "success"]
+    if not runs:
+        raise RuntimeError(f"No successful {workflow} runs found on {branch}.")
+    run = max(runs, key=lambda r: r["run_number"])
     run_id = run["id"]
 
-    artifacts_url = (
-        f"{API}/repos/{OWNER}/{REPO}/actions/runs/{run_id}/artifacts"
-    )
-    artifacts = get_json(artifacts_url, per_page=100)["artifacts"]
-    candidates = [
-        artifact for artifact in artifacts
-        if not artifact.get("expired")
-        and (
-            ARTIFACT_NAME is None
-            or artifact["name"] == ARTIFACT_NAME
-        )
+    url = f"{API}/repos/{owner}/{repo}/actions/runs/{run_id}/artifacts"
+    response = requests.get(url, headers=headers, params={"per_page": 100}, timeout=30)
+    response.raise_for_status()
+    artifact_name = f"health-report-{run_id}"
+    artifacts = [
+        a for a in response.json().get("artifacts", [])
+        if a.get("name") == artifact_name and not a.get("expired")
     ]
-    if not candidates:
-        raise RuntimeError(
-            f"No non-expired artifact found for workflow run {run_id}. "
-            "Set GITHUB_ARTIFACT_NAME if the run has multiple artifacts."
-        )
+    if not artifacts:
+        raise RuntimeError(f"Artifact {artifact_name} is missing or expired.")
+    artifact = artifacts[0]
 
-    artifact = max(candidates, key=lambda item: item["created_at"])
-    if artifact.get("workflow_run", {}).get("id") not in (None, run_id):
-        raise RuntimeError("Selected artifact does not belong to the chosen run")
-
-    marker = CACHE / f"run-{run_id}-{artifact['id']}.complete"
-    if not marker.exists():
-        CACHE.mkdir(parents=True, exist_ok=True)
-        response = requests.get(
-            artifact["archive_download_url"],
-            headers=headers(),
-            timeout=120,
-        )
+    extracted = cache / f"run-{run_id}-artifact-{artifact['id']}"
+    marker = extracted / ".download-complete"
+    if not marker.is_file():
+        cache.mkdir(parents=True, exist_ok=True)
+        response = requests.get(artifact["archive_download_url"], headers=headers, timeout=120)
         response.raise_for_status()
-
-        with tempfile.TemporaryDirectory(dir=CACHE) as temp_dir:
-            temp_dir = Path(temp_dir)
-            archive = temp_dir / "artifact.zip"
+        with tempfile.TemporaryDirectory(dir=cache) as temp:
+            temp = Path(temp)
+            archive = temp / "artifact.zip"
             archive.write_bytes(response.content)
-
-            extract_dir = temp_dir / "extracted"
-            extract_dir.mkdir()
+            dest = temp / "extracted"
+            dest.mkdir()
             with zipfile.ZipFile(archive) as zf:
-                for member in zf.infolist():
-                    target = (extract_dir / member.filename).resolve()
-                    if not target.is_relative_to(extract_dir.resolve()):
-                        raise RuntimeError("Unsafe path in artifact archive")
-                zf.extractall(extract_dir)
+                base = dest.resolve()
+                for item in zf.infolist():
+                    if not (dest / item.filename).resolve().is_relative_to(base):
+                        raise RuntimeError("Unsafe path in artifact archive.")
+                zf.extractall(dest)
+            if extracted.exists():
+                shutil.rmtree(extracted)
+            shutil.copytree(dest, extracted)
+            marker.write_text("ok", encoding="utf-8")
 
-            final_dir = CACHE / f"run-{run_id}-{artifact['id']}"
-            if final_dir.exists():
-                shutil.rmtree(final_dir)
-            shutil.copytree(extract_dir, final_dir)
-            marker.write_text("complete")
-
-    extracted = CACHE / f"run-{run_id}-{artifact['id']}"
-    parquet_files = list(extracted.rglob("harmonised.parquet"))
-    if not parquet_files:
-        raise FileNotFoundError(
-            f"harmonised.parquet not found in downloaded artifact: {extracted}"
+    bundles = [p.parent for p in extracted.rglob("series.csv")
+               if (p.parent / "selection.csv").is_file()]
+    preferred = [p for p in bundles if stakeholder in p.parts]
+    if preferred:
+        bundles = preferred
+    if len(bundles) != 1:
+        raise RuntimeError(
+            "Expected one series.csv/selection.csv bundle; check artifact layout "
+            "and REPORT_DATA_STAKEHOLDER."
         )
-
-    parquet = parquet_files[0]
-    reports_dir = parquet.parent
-    if not (reports_dir / "report.html").exists():
-        html_files = list(extracted.rglob("report.html"))
-        if html_files:
-            reports_dir = html_files[0].parent
-
-    return reports_dir, run, artifact
-
-
-
+    return bundles[0], run, artifact
