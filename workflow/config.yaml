@@ -1,5 +1,5 @@
 # Paths are relative to the repository root. Override with --config key=value.
-data_root: Data
+data_root: data/reference
 out: results
 quarto: quarto
 stakeholders:
