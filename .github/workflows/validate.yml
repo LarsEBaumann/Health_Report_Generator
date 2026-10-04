@@ -28,7 +28,7 @@ jobs:
           tinytex: true
       - run: pip install -r scripts/health_pipeline/requirements.lock.txt
       - run: python -m pytest -q
-      - run: snakemake --cores 2
+      - run: snakemake --config data_root=Data --cores 2
       - run: Rscript tests/shiny_smoke.R results/reports/public_health_expert/app
       - run: Rscript tests/dashboard_smoke.R results/reports/public_health_expert/app
       - name: Upload only a successful complete release
