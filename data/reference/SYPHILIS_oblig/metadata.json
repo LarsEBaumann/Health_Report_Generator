@@ -1,32 +1,230 @@
 {
-  "dataset_id": "SYPHILIS_oblig",
-  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/SYPHILIS_oblig/csv",
-  "retrieved_at_utc": "2026-10-03T16:01:44.306923+00:00",
-  "sha256": "7ad4b1256bfc78672fed309dd52a6ddabb1948c370099f88346e7212fc5e8af6",
-  "row_count": 380,
-  "columns": [
-    "valueCategory",
-    "temporal",
-    "temporal_type",
-    "georegion",
-    "georegion_type",
-    "agegroup",
-    "agegroup_type",
-    "sex",
-    "type",
-    "value",
-    "pop",
-    "incValue",
-    "valueYearCumSum",
-    "incValueMean3m",
-    "valueMean3y",
-    "trend",
-    "prct",
-    "deltaValue",
-    "deltaIncValue",
-    "incValuePrctChange",
-    "valueMean5y",
-    "dataComplete"
-  ],
-  "snapshot_file": "data.csv"
+  "metaVariables": {
+    "topic": "syphilis",
+    "source": "mandatory_reporting_system",
+    "publishingDate": "2026-09-02",
+    "sourceDate": "2026-09-01",
+    "publicationFrequency": {
+      "frequency": "monthly",
+      "frequencyDescription": "First Wednesday after day 1 of every month. The exact weekday can vary due to public holidays. Because of reporting delays, there is a gap of 3 months between the publication date and published data."
+    },
+    "expectedPublicationDelay": {
+      "delay": 90,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 90 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": [
+        "cases",
+        "min_value_5y",
+        "median_value_5y",
+        "max_value_5y"
+      ]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": [
+      "month",
+      "year"
+    ]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "CHFL": {
+          "valueSet": "CHFL",
+          "allValue": "all"
+        },
+        "country": {
+          "valueSet": [
+            "CH",
+            "FL"
+          ],
+          "allValue": "all"
+        },
+        "grossregion": {
+          "valueSet": [
+            "espace_mittelland",
+            "nordwestschweiz",
+            "ostschweiz",
+            "région_lémanique",
+            "ticino",
+            "zentralschweiz",
+            "zürich"
+          ],
+          "allValue": "all"
+        }
+      }
+    },
+    "agegroup": {
+      "column": "agegroup",
+      "columnDescription": "Age range brackets used for grouping.",
+      "typeColumn": "agegroup_type",
+      "typeColumnDescription": "Specifies the type of agegroup in the property 'agegroup'.",
+      "typeValues": {
+        "agegroup_sti": {
+          "valueSet": [
+            "0 - 14",
+            "15 - 24",
+            "25 - 34",
+            "35 - 44",
+            "45 - 54",
+            "55 - 64",
+            "65+",
+            "unknown"
+          ],
+          "allValue": "all"
+        }
+      }
+    },
+    "sex": {
+      "column": "sex",
+      "columnDescription": "Sex specification used for grouping.",
+      "valueSet": [
+        "female",
+        "male",
+        "unknown"
+      ],
+      "allValue": "all"
+    },
+    "type": {
+      "column": "type",
+      "columnDescription": "Type specification used for grouping. Distinguishes between different types of disease stages. Classification of the disease distinguishes between 'early' syphilis (less than one year after infection: primary, secondary and early latent stage) and 'late' syphilis (more than one year after infection: late latent and tertiary stage).",
+      "valueSet": [
+        "early",
+        "late",
+        "unknown"
+      ],
+      "allValue": "all"
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        1158
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueYearCumSum": {
+      "description": "Cumulative sum of the property 'value' within a year.",
+      "valueSetOrRange": [
+        70,
+        1158
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean3y": {
+      "description": "Right-aligned, rolling 3-year average of the property 'value' within the grouping described in the property name.",
+      "valueSetOrRange": [
+        2,
+        1139
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        38747,
+        9091915
+      ],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "prct": {
+      "description": "Proportion of the entry in the property 'value' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0.1,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValue": {
+      "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop. For the grouping 'type', the population count corresponds to the CHFL population",
+      "valueSetOrRange": [
+        0,
+        25.69
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValueMean3m": {
+      "description": "Right-aligned, rolling 3-month mean of the property 'incValue' within the grouping described in the property name.",
+      "valueSetOrRange": [
+        0.69,
+        1.23
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaValue": {
+      "description": "Absolute difference in the metric 'value' comparing the current year to the last one.",
+      "valueSetOrRange": [
+        -246,
+        145
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaIncValue": {
+      "description": "Absolute difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [
+        -2.92,
+        1.58
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValuePrctChange": {
+      "description": "Percentage difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [
+        -23.4,
+        16.5
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean5y": {
+      "description": "Right-aligned, rolling 5-year average of the property 'value'.",
+      "valueSetOrRange": [
+        1022,
+        1097.4
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {
+    "dataComplete": {
+      "description": "Can data be assumed to be complete (few late reportings to be expected)?",
+      "valueSetOrRange": true,
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "trend": {
+      "description": "Indicates a trend of an entry with respect to previous entries. The trend is calculated using a poisson glm with a log-link with a right-aligned window of size 2 for the temporal_type year. For data by year the trend is adjusted by population size.",
+      "valueSetOrRange": [
+        "falling",
+        "rising",
+        "stagnant"
+      ],
+      "nullValue": "NA",
+      "type": "character"
+    }
+  }
 }

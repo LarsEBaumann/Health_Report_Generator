@@ -1,0 +1,26 @@
+{
+  "dataset_id": "CHOLERA_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CHOLERA_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CHOLERA_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:30:13.562905+00:00",
+  "csv_sha256": "83af76042bf6eaaa52829a5871b23d2f706b9f385c6a016831408acf4d420e9f",
+  "metadata_sha256": "994a7bb6141ca0aaea1b027e6ef0be99d0610c6f2dc0a88a80d56986d724c924",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

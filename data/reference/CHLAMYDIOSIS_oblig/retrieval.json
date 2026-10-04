@@ -1,0 +1,32 @@
+{
+  "dataset_id": "CHLAMYDIOSIS_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CHLAMYDIOSIS_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CHLAMYDIOSIS_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:30:13.300359+00:00",
+  "csv_sha256": "33301a7f552e26c546e2c27f0f4a73dc5bfa664eb06967a996d7c0553af2d3f8",
+  "metadata_sha256": "8e28c2899dd66875d0f6111ed5f7c43d11146fc13b2e1e773c8ef818f0f5e4cb",
+  "row_count": 783,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "incValueMean3m",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ]
+}

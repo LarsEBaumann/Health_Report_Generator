@@ -1,0 +1,26 @@
+{
+  "dataset_id": "MALARIA_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/MALARIA_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/MALARIA_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:54.005867+00:00",
+  "csv_sha256": "2ede30f22f8ea837e262cc12b078d00020d507afdfd47a7fcef6cfa13fb0d619",
+  "metadata_sha256": "cb14b5a7c6d6bfacf466cca3f5ec74b35444eb72e272428dcf9fe7b7261ec1a2",
+  "row_count": 189,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

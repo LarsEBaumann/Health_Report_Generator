@@ -1,0 +1,33 @@
+{
+  "dataset_id": "RESPVIRUSES_wastewater",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/RESPVIRUSES_wastewater/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/RESPVIRUSES_wastewater/metadata",
+  "retrieved_at_utc": "2026-10-04T09:32:39.558571+00:00",
+  "csv_sha256": "98e92f9a90204b1d06955797ea94021be7973e4d8a297bba483731f865051f04",
+  "metadata_sha256": "fed79e2afe54cec7950aa10682e9855764a7223c6cce6cd3df0d4e1e6af8aeea",
+  "row_count": 74580,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion1",
+    "georegion1_type",
+    "georegion2",
+    "georegion2_type",
+    "flow",
+    "conc",
+    "pop",
+    "value",
+    "valuePercentile7d",
+    "valueMean7d",
+    "valuePercentileMean7d",
+    "trend",
+    "delay7d",
+    "dataExpected",
+    "belowLoq",
+    "loq",
+    "methodDateFrom",
+    "methodDateTo",
+    "dataComplete"
+  ]
+}

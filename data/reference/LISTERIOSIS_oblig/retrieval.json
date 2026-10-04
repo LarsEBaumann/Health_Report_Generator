@@ -1,0 +1,26 @@
+{
+  "dataset_id": "LISTERIOSIS_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/LISTERIOSIS_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/LISTERIOSIS_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:53.088666+00:00",
+  "csv_sha256": "92316f0a14f5145aede2b1056cfcb495dd1069c5a3286cc801d28f3d72dff260",
+  "metadata_sha256": "deb94c288436e178f87f37eaf0268632bb6e6afbe167a7b7a1f6cfc8bea82678",
+  "row_count": 189,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

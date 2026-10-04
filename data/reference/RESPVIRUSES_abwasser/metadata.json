@@ -1,32 +1,221 @@
 {
-  "dataset_id": "RESPVIRUSES_abwasser",
-  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/RESPVIRUSES_abwasser/csv",
-  "retrieved_at_utc": "2026-10-03T16:01:41.007255+00:00",
-  "sha256": "148f41f550cb7a2507249a5a92151e774b95659f1911a4e2fe8e287beedecb13",
-  "row_count": 8792,
-  "columns": [
-    "valueCategory",
-    "temporal",
-    "temporal_type",
-    "georegion1",
-    "georegion1_type",
-    "georegion2",
-    "georegion2_type",
-    "flow",
-    "conc",
-    "pop",
-    "value",
-    "valuePercentile7d",
-    "valueMean7d",
-    "valuePercentileMean7d",
-    "delay7d",
-    "dataExpected",
-    "belowLoq",
-    "loq",
-    "methodDateFrom",
-    "methodDateTo",
-    "dataComplete",
-    "trend"
-  ],
-  "snapshot_file": "data.csv"
+  "metaVariables": {
+    "topic": "wastewater_viral_load",
+    "source": "swiss_federal_institute_of_aquatic_science_and_technology",
+    "publishingDate": "2023-12-05",
+    "sourceDate": "2023-12-05",
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": [
+        "influenza_a",
+        "influenza_b",
+        "respiratory_syncytial_virus",
+        "sars-cov-2"
+      ]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": [
+      "date"
+    ]
+  },
+  "groupingVariables": {
+    "georegion1": {
+      "column": "georegion1",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion1_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion1'.",
+      "typeValues": {
+        "canton": {
+          "valueSet": [
+            "LU",
+            "SZ",
+            "SO",
+            "ZH",
+            "BS",
+            "SG",
+            "BE",
+            "GR",
+            "TI",
+            "VD",
+            "NE",
+            "GE",
+            "JU"
+          ],
+          "allValue": "all"
+        }
+      }
+    },
+    "georegion2": {
+      "column": "georegion2",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion2_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion2'.",
+      "typeValues": {
+        "wastewater_treatment_plant": {
+          "valueSet": [
+            "buholz",
+            "schwyz",
+            "zuchwil",
+            "werdhoelzli",
+            "basel",
+            "altenrhein",
+            "bern",
+            "chur",
+            "lugano",
+            "lausanne",
+            "neuchatel",
+            "aire",
+            "laupen",
+            "porrentruy"
+          ],
+          "allValue": "all"
+        }
+      }
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        739011530163198
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        16500,
+        471000
+      ],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "flow": {
+      "description": "Flow rate on the day of sample collection in cubic metres (1000 litres) per day.",
+      "valueSetOrRange": [
+        3814,
+        474323
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "conc": {
+      "description": "Measured concentration of gene copies per cubic meter (1000 litres) in the sample.",
+      "valueSetOrRange": [
+        0,
+        18162399.6421
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valuePercentile7d": {
+      "description": "Percentile value (0-100%) of the current days viral load value where the maximum of 100% is based off the historical maximum value of the rolling 7 day average (valueMean7d).",
+      "valueSetOrRange": [
+        0,
+        500
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean7d": {
+      "description": "Rolling 7 day average (-3 days/ +3 days from the current day) of the viral load values. At least 4 values need to be present in the 7 day window in order to calculate the rolling 7 day average.",
+      "valueSetOrRange": [
+        0,
+        191398910383370
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valuePercentileMean7d": {
+      "description": "Rolling 7 day average (-3 days/ +3 days from the current day) of the property 'valuePercentile7d'. At least 4 values need to be present in the 7 day window in order to calculate the rolling 7 day average.",
+      "valueSetOrRange": [
+        0,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "loq": {
+      "description": "Limit of quantification in gene copies per litre",
+      "valueSetOrRange": [
+        32880,
+        54800
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {
+    "methodDateFrom": {
+      "description": "Start date of measurement method change.",
+      "valueSetOrRange": [
+        "Inf",
+        "-Inf"
+      ],
+      "nullValue": "NA",
+      "type": "date"
+    },
+    "methodDateTo": {
+      "description": "End date of method, NA if current method.",
+      "valueSetOrRange": [
+        "Inf",
+        "-Inf"
+      ],
+      "nullValue": "NA",
+      "type": "date"
+    },
+    "dataComplete": {
+      "description": "Can data be assumed to be complete (few late reportings to be expected)?Defined as TRUE up to the date where a centred rolling mean can be calculated.",
+      "valueSetOrRange": [
+        true,
+        false
+      ],
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "delay7d": {
+      "description": "Indicates if the property 'valueMean7d' entries are to be considered up-to-date or delayed (as viewed from the date of data processing, see metadata property 'sourceDate'). valueMean7d that are older than 10 days are considered to be delayed.",
+      "valueSetOrRange": [
+        true,
+        false
+      ],
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "dataExpected": {
+      "description": "Indicates if data is expected from this facility for this date (depending on the facility participating in waste water surveillance project at the that time etc.).",
+      "valueSetOrRange": true,
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "belowLoq": {
+      "description": "Indicates if the measured concentration is below the property 'loq' (limit of quantification).",
+      "valueSetOrRange": [
+        false,
+        true
+      ],
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "trend": {
+      "description": "Indicates a trend of an entry with respect to previous entries. Trends for wastewater viral loads are calculated by applying a generalised linear model with a gamma log link to viral loads ('value') of the last 14 days. The confidence intervals (CI) for the growth rate estimates define whether the trend is rising (CI above 0), falling (CI below 0) or stagnant (CI contains 0). Sharply rising/falling is defined as the CI of the doubling/halving time being below 21 days.",
+      "valueSetOrRange": [
+        "stagnant",
+        "falling",
+        "rising",
+        "sharply_rising",
+        "sharply_falling"
+      ],
+      "nullValue": "NA",
+      "type": "character"
+    }
+  }
 }

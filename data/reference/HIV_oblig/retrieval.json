@@ -1,0 +1,31 @@
+{
+  "dataset_id": "HIV_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HIV_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HIV_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:37.232321+00:00",
+  "csv_sha256": "a382cd7fa6bd50a8dd62088af4b99a20ba72460a5d5e6c30f44075935e030968",
+  "metadata_sha256": "ddf5d3f653a260b6f34d431c3a89b4dc809483326073fca85151530c10fec36e",
+  "row_count": 777,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ]
+}

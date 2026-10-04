@@ -1,0 +1,26 @@
+{
+  "dataset_id": "TUBERCULOSIS_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TUBERCULOSIS_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TUBERCULOSIS_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:32:42.913801+00:00",
+  "csv_sha256": "27cd46d91cc8dd936ca7fa9d60bcb6b25c8b6150531d3ea92764ce3bb586a3eb",
+  "metadata_sha256": "7b5c187a6c355917a068f48895f4e0114aec6d1db5e8a2407262a0677b89b0eb",
+  "row_count": 188,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

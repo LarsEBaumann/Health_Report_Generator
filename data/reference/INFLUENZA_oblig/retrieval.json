@@ -1,0 +1,31 @@
+{
+  "dataset_id": "INFLUENZA_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/INFLUENZA_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/INFLUENZA_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:47.055097+00:00",
+  "csv_sha256": "b99973369aad25e243c3ad8e17ee112c29c72f18eb2e715a3f2fb5d091d7a1ad",
+  "metadata_sha256": "47b32e950f582de070de1bf650eabcdd87a12bfc2aecdb41e1f4f584647f8cc9",
+  "row_count": 31028,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "prct",
+    "inc14d",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ]
+}
