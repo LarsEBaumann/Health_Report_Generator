@@ -1,0 +1,31 @@
+{
+  "dataset_id": "EHEC_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/EHEC_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:38.815847+00:00",
+  "sha256": "8f9109a49ed04e697191fcc302176c37e5f5a66478749d9bcfef2c21e578c73f",
+  "row_count": 771,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

@@ -1,0 +1,20 @@
+topic,pathogen_class,label,note
+aids,viral,AIDS,HIV-related; stage of HIV infection
+hiv,viral,HIV,
+covid19,viral,COVID-19,
+influenza,viral,Influenza,lab-confirmed
+hepatitis_a,viral,Hepatitis A,
+hepatitis_b,viral,Hepatitis B,
+hepatitis_c,viral,Hepatitis C,
+hepatitis_e,viral,Hepatitis E,
+campylobacteriosis,bacterial,Campylobacteriosis,
+chlamydiosis,bacterial,Chlamydia,
+ehec,bacterial,EHEC,
+gonorrhea,bacterial,Gonorrhoea,
+shigellosis,bacterial,Shigellosis,
+lyme_borreliosis,bacterial,Lyme borreliosis,sentinel estimate (extrapolated)
+influenza-like_illness,syndromic,Influenza-like illness,GP consultations; mixed causes
+acute_respiratory_infection,syndromic,Acute respiratory infection,GP consultations; mixed causes
+respiratory_pathogens,surveillance_signal,Respiratory pathogens (lab),test positivity; not case counts
+wastewater_viral_load,surveillance_signal,Wastewater viral load,not case counts
+wastewater_sequencing,surveillance_signal,Wastewater sequencing,variant shares; not case counts

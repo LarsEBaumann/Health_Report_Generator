@@ -1,0 +1,30 @@
+{
+  "dataset_id": "SHIGELLOSIS_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/SHIGELLOSIS_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:44.268798+00:00",
+  "sha256": "f3b6c8f59d399934990b638e6c1194d0d3ca26bde0f9f8ba1fa85b888e74ad1c",
+  "row_count": 745,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

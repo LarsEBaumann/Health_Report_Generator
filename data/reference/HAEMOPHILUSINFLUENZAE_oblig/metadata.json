@@ -1,0 +1,25 @@
+{
+  "dataset_id": "HAEMOPHILUSINFLUENZAE_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HAEMOPHILUSINFLUENZAE_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:38.890028+00:00",
+  "sha256": "23b9b1d5d1a989f6d470f1a4a9708e964fb15fc63a24c831ab264972387206a7",
+  "row_count": 189,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}

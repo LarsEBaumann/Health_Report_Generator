@@ -1,0 +1,31 @@
+{
+  "dataset_id": "COVID19_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:32.097823+00:00",
+  "sha256": "884387436099e6982a6c5da6e0a765666bf62599a9789961acdd4947091de185",
+  "row_count": 13501,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "testResult",
+    "testResult_type",
+    "value",
+    "pop",
+    "incValue",
+    "prct",
+    "inc14d",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

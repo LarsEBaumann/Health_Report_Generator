@@ -1,0 +1,23 @@
+{
+  "dataset_id": "COVID19_genomic_surveillance",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_genomic_surveillance/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:31.684346+00:00",
+  "sha256": "8440ae29f194fdd5cdd7adcdcd922aa76ffcad1e299d3a12424034da4aa3fb86",
+  "row_count": 198,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "subtype",
+    "testResult",
+    "testResult_type",
+    "value",
+    "prct",
+    "lowerCi",
+    "upperCi",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

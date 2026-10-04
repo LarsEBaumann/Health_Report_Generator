@@ -1,0 +1,64 @@
+{
+  "id": "public_health_expert",
+  "title": "Viral vs bacterial notifiable diseases after COVID-19",
+  "question": "How have viral and bacterial infectious diseases in Switzerland developed in the years after COVID (2021-2025)?",
+  "needs_roles": [
+    "time",
+    "measure",
+    "place"
+  ],
+  "period_type": "year",
+  "years": [
+    2021,
+    2025
+  ],
+  "reference_year": 2019,
+  "geography": "CHFL",
+  "measures_preferred": [
+    "cases",
+    "consultations"
+  ],
+  "compare_by": "pathogen_class",
+  "classes_in_main_comparison": [
+    "viral",
+    "bacterial"
+  ],
+  "exclude_from_group_totals": [
+    "covid19",
+    "aids"
+  ],
+  "outputs": [
+    "headline",
+    "group_index",
+    "group_totals",
+    "small_multiples",
+    "change_table",
+    "excluded",
+    "quality",
+    "sources"
+  ],
+  "index_base_year": 2019,
+  "sensitivity_exclude": [
+    "influenza"
+  ],
+  "source_priority": [
+    "mandatory_reporting_system",
+    "sentinella_reporting_system"
+  ],
+  "group_source_systems": [
+    "mandatory_reporting_system"
+  ],
+  "dimension_filters": {
+    "covid19": {
+      "values": {
+        "testResult": "positive"
+      },
+      "reason": "Explicit positive-case definition; do not infer a total from a singleton testResult."
+    }
+  },
+  "exclusion_notes": {
+    "aids": "HIV-related disease stage; excluded from group sums to avoid presenting HIV and AIDS as independent infections.",
+    "covid19": "Excluded from group sums by stakeholder policy.",
+    "sentinella_reporting_system": "Estimated consultations or cases remain context series; not summed with mandatory notifications."
+  }
+}

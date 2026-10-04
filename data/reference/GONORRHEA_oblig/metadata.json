@@ -1,0 +1,31 @@
+{
+  "dataset_id": "GONORRHEA_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/GONORRHEA_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:38.857896+00:00",
+  "sha256": "e8da3a7b21d8a58929726e1230a80d9225563563280cf857c9aea190afd53407",
+  "row_count": 777,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "incValueMean3m",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}
