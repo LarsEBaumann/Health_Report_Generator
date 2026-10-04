@@ -1,13 +1,9 @@
-# IDD harmonisation pipeline
-pip install -r requirements.txt
-bash run_all.sh data/Data out          # harmonise -> checks -> one HTML report per stakeholder
-python mock_test.py data/Data --fast   # automated mock test -> mock_test/mock_test_report.html
-Add a stakeholder: copy config/stakeholders/public_health_expert.json and edit it.
-Classify a new disease: add a line to config/pathogen_class.csv.
+# Health report pipeline
 
-## Quarto version of the report
-report_public_health_expert.qmd rebuilds the same report with Quarto (same numbers as report.py).
-Needs Quarto (https://quarto.org) plus: pip install jupyter matplotlib jinja2
-bash run_all.sh data/Data out                          # creates out/harmonised.parquet etc.
-quarto render report_public_health_expert.qmd          # -> report_public_health_expert.html
-Another output folder: quarto render report_public_health_expert.qmd -P out:my_out
+See the [repository README](../../README.md) for setup, Snakemake targets, reproducibility, quality policy and outputs.
+
+The processing stages are `inventory.py`, `harmonise.py`, `checks.py`, `analyse.py`, `publish.py`, and `release.py`. `report.py` is a compatibility entry point using the same analysis and QMD. It requires a successfully validated output directory. `mock_test.py` now runs the correctness regression suite; it no longer labels merely surviving damaged input as a pass.
+
+`report_public_health_expert.qmd` is a generic presentation template despite its historical filename. The workflow copies it as `report.qmd` beside the validated CSVs and shared R helpers in each app bundle. Render that packaged copy, not this source file without its data.
+
+Schema and lineage: [SCHEMA.md](SCHEMA.md).

@@ -1,5 +1,1 @@
-pandas
-pyarrow
-matplotlib
-jupyter
-jinja2
+-r requirements.lock.txt

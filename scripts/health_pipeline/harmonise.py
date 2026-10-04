@@ -31,28 +31,21 @@ def sha256(p):
 def find_datasets(root):
     """Any folder containing a data.csv and a JSON description file."""
     for csv in sorted(Path(root).rglob("data.csv")):
-        jsons = [j for j in csv.parent.glob("*.json")]
-        meta = next((j for j in jsons if "meta" in j.name.lower()), jsons[0] if jsons else None)
+        jsons = sorted(csv.parent.glob("*.json"))
+        meta = csv.parent / "metadata.json" if (csv.parent / "metadata.json").exists() else (jsons[0] if len(jsons) == 1 else None)
         yield csv, meta
 
 
 def load_meta(path):
-    if path is None or not path.exists():
-        return {}
-    txt = path.read_text(encoding="utf-8", errors="replace")
-    try:
-        return json.loads(txt)
-    except json.JSONDecodeError:
-        # repair truncated JSON by closing open brackets
-        opens = []
-        for ch in txt:
-            if ch in "{[": opens.append(ch)
-            elif ch in "}]" and opens: opens.pop()
-        txt += "".join("}" if c == "{" else "]" for c in reversed(opens))
-        try:
-            return json.loads(txt)
-        except Exception:
-            return {}
+    if path is None:
+        raise ValueError("missing metadata; ambiguous dataset quarantined")
+    meta = json.loads(Path(path).read_text(encoding="utf-8"))
+    for key in ("metaVariables", "temporalVariables", "groupingVariables", "valueVariables"):
+        if not isinstance(meta.get(key), dict):
+            raise ValueError(f"missing/invalid metadata section: {key}")
+    if not meta["temporalVariables"].get("column") or not meta["temporalVariables"].get("typeColumn"):
+        raise ValueError("metadata must describe time and time type")
+    return meta
 
 
 def period_start(temporal, ttype):
@@ -115,7 +108,7 @@ def all_values(meta):
     out = {}
     for name, g in meta.get("groupingVariables", {}).items():
         col = g.get("column", name)
-        vals = {"all"}
+        vals = set()
         if "allValue" in g: vals.add(str(g["allValue"]))
         for tv in (g.get("typeValues") or {}).values():
             if isinstance(tv, dict) and "allValue" in tv: vals.add(str(tv["allValue"]))
@@ -142,10 +135,18 @@ def harmonise_one(csv, meta_path, ds_id):
         raise ValueError("no time column found")
 
     alls = all_values(meta)
-    # a grouping column with a single distinct value is not a real split -> treat as total
-    for c in list(alls) + brk_c:
-        if c in df.columns and df[c].nunique(dropna=True) <= 1:
-            alls.setdefault(c, {"all"}).update(df[c].dropna().astype(str).unique())
+    declared = [v.get("column", k) for k, v in meta["groupingVariables"].items()]
+    required = declared + [time_c, ttype_c, meas_c] + [c for c in meta["valueVariables"] if c in KEEP_VALUE_COLS]
+    missing = [c for c in required if c is None or c not in df.columns]
+    if missing:
+        raise ValueError(f"missing metadata-declared columns: {missing}")
+    # Unknown columns may hide an unmodelled dimension; do not silently collapse them.
+    known = set(meta["valueVariables"]) | set(meta.get("entryVariables", {})) | set(declared)
+    known.update([time_c, ttype_c, meas_c])
+    known.update(v.get("typeColumn") for v in meta["groupingVariables"].values())
+    unknown = set(df.columns) - known
+    if unknown:
+        raise ValueError(f"undescribed columns: {sorted(unknown)}")
     out = pd.DataFrame({
         "dataset_id": ds_id,
         "topic": mv.get("topic", csv.parent.name),
@@ -171,6 +172,9 @@ def harmonise_one(csv, meta_path, ds_id):
     for c in grp_cols:
         is_tot &= df[c].isin(alls[c])
     out["is_total"] = is_tot
+    out["groups_json"] = df[declared].apply(lambda r: json.dumps({k: None if pd.isna(v) else str(v) for k,v in r.items()}, sort_keys=True), axis=1)
+    out["data_complete"] = df["dataComplete"].str.upper().map({"TRUE": True, "FALSE": False}) if "dataComplete" in df else pd.NA
+    out["invalid_value"] = (df["value"].notna() & pd.to_numeric(df["value"], errors="coerce").isna()) if "value" in df else False
     out["is_stat_row"] = out["measure"].astype(str).str.contains(STAT_PATTERN)
     uniq = out["period"].drop_duplicates()
     starts = {p: period_start(p, None) for p in uniq}
@@ -182,43 +186,55 @@ def harmonise_one(csv, meta_path, ds_id):
 
 
 def main(argv=None):
+    from common import digest, write_json
+    from inventory import verify
     ap = argparse.ArgumentParser()
-    ap.add_argument("root")
+    ap.add_argument("root", nargs="?")
+    ap.add_argument("--snapshot")
     ap.add_argument("--out", default="out")
     a = ap.parse_args(argv)
     outdir = Path(a.out); outdir.mkdir(parents=True, exist_ok=True)
-
+    (outdir / "validated.json").unlink(missing_ok=True)
+    if not a.snapshot:
+        from inventory import build
+        if not a.root: ap.error("root or --snapshot is required")
+        build(a.root, outdir)
+        a.snapshot = str(outdir / "snapshot.json")
+    root, manifest = verify(a.snapshot)
+    write_json(outdir / "harmonised_snapshot.json", manifest)
     frames, logs, registry, seen = [], [], [], {}
-    for csv, meta in find_datasets(a.root):
-        h = sha256(csv)
-        rec = dict(source_file=str(csv), metadata_file=str(meta) if meta else "", sha256=h)
-        if h in seen:
-            registry.append({**rec, "dataset_id": seen[h], "status": "duplicate_skipped"}); continue
+    for csv, meta in find_datasets(root):
+        h = digest(csv); mh = digest(meta) if meta else ""
+        source = csv.relative_to(root).as_posix()
+        rec = dict(source_file=source, metadata_file=meta.relative_to(root).as_posix() if meta else "",
+                   sha256=h, metadata_sha256=mh, snapshot_id=manifest["snapshot_id"])
+        identity = (h, mh)
+        if identity in seen:
+            registry.append({**rec, "dataset_id": seen[identity], "status": "duplicate_skipped"}); continue
         try:
-            m = load_meta(meta)
-            mv = m.get("metaVariables", {})
-            ds_id = f"{mv.get('topic', csv.parent.name)}__{mv.get('source', 'unknown')}__{h[:8]}"
+            m = load_meta(meta); mv = m["metaVariables"]
+            if not mv.get("topic") or not mv.get("source"):
+                raise ValueError("metadata must identify topic and source")
+            ds_id = f"{mv['topic']}__{mv['source']}__{h[:12]}_{mh[:12]}"
             df, log, m, n = harmonise_one(csv, meta, ds_id)
-            seen[h] = ds_id
-            frames.append(df); logs += log
-            registry.append({**rec, "dataset_id": ds_id, "topic": mv.get("topic"),
-                             "source_system": mv.get("source"), "publishing_date": mv.get("publishingDate"),
-                             "rows": n, "status": "ok" if m else "ok_no_metadata"})
-            print(f"  ok   {ds_id}  ({n:,} rows)")
+            df["source_file"] = source
+            df["sha256"] = h; df["metadata_sha256"] = mh
+            df["snapshot_id"] = manifest["snapshot_id"]
+            seen[identity] = ds_id; frames.append(df); logs += log
+            registry.append({**rec, "dataset_id": ds_id, "topic": mv["topic"],
+                             "source_system": mv["source"], "publishing_date": mv.get("publishingDate"),
+                             "rows": n, "status": "ok", "detail": ""})
         except Exception as e:
-            registry.append({**rec, "dataset_id": "", "status": f"error: {e}"})
-            print(f"  FAIL {csv}: {e}", file=sys.stderr)
-
-    if not frames:
-        sys.exit("no datasets harmonised")
-    allh = pd.concat(frames, ignore_index=True)
-    for c in ["value", "pop", "incValue", "prct"]:
-        allh[c] = pd.to_numeric(allh[c], errors="coerce")
-    allh.to_parquet(outdir / "harmonised.parquet", index=False)
+            registry.append({**rec, "dataset_id": "", "status": "quarantined", "detail": str(e)})
     pd.DataFrame(registry).to_csv(outdir / "datasets.csv", index=False)
     pd.DataFrame(logs).to_csv(outdir / "role_log.csv", index=False)
-    print(f"harmonised {allh.dataset_id.nunique()} datasets, {len(allh):,} rows -> {outdir}")
-
+    if not frames:
+        sys.exit("no datasets harmonised; inspect datasets.csv")
+    allh = pd.concat(frames, ignore_index=True)
+    for c in KEEP_VALUE_COLS:
+        allh[c] = pd.to_numeric(allh[c], errors="coerce")
+    allh.to_parquet(outdir / "harmonised.parquet", index=False)
+    print(f"harmonised {allh.dataset_id.nunique()} datasets, {len(allh):,} rows")
 
 if __name__ == "__main__":
     main()

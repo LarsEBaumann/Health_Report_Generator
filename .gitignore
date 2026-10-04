@@ -1,0 +1,15 @@
+.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.snakemake/
+results/
+reproduced/
+out/
+renv/library/
+renv/staging/
+.Rhistory
+.RData
+.r-library/
+.r-bootstrap/
