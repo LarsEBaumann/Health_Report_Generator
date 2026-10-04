@@ -1,12 +1,23 @@
 #!/usr/bin/env python3
 """Validate harmonised data. A failed gate always exits nonzero."""
 import argparse
+import json
 from pathlib import Path
 import pandas as pd
 from common import digest, write_json
 
 KEY = ['dataset_id', 'measure', 'period', 'period_type', 'groups_json']
 COUNT_MEASURES = {'cases', 'consultations'}
+
+
+def canonical_metadata(out, row):
+    path = Path(out) / 'snapshots' / str(row.snapshot_id) / str(row.metadata_file)
+    try:
+        value = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError, TypeError):
+        return f"unreadable:{row.metadata_sha256}"
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False)
+
 
 
 def run(d):
@@ -61,7 +72,9 @@ def validate(out):
         extra.append(dict(dataset_id=x.source_file, check='metadata_schema', status='FAIL', detail=x.detail))
     for h, g in reg.groupby('sha256'):
         if g.metadata_sha256.nunique() > 1:
-            extra.append(dict(dataset_id=h, check='metadata_conflict', status='FAIL', detail='Identical data bytes have different metadata; resolve explicitly'))
+            semantic_metadata = {canonical_metadata(out, row) for row in g.itertuples()}
+            if len(semantic_metadata) > 1:
+                extra.append(dict(dataset_id=h, check='metadata_conflict', status='FAIL', detail='Identical data bytes have different metadata; resolve explicitly'))
     r = pd.concat([r, pd.DataFrame(extra)], ignore_index=True)
     r.to_csv(out / 'checks.csv', index=False)
     if (r.status == 'FAIL').any():
