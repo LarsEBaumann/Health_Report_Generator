@@ -2,3 +2,5 @@ shiny	1.14.0
 knitr	1.52
 rmarkdown	2.32
 jsonlite	2.0.0
+digest	0.6.39
+ggplot2	4.0.3

@@ -17,8 +17,8 @@ CONFIGS = {s: f'{P}/config/stakeholders/{s}.json' for s in STAKEHOLDERS}
 BUNDLE_NAMES = ['series.csv','metrics.csv','lineage.csv','selection.csv','sources.csv','checks.csv',
                 'snapshot.json','stakeholder.json','pathogen_class.csv','bundle.json']
 ANALYSIS = expand(OUT+'/reports/{s}/data/{n}',s=STAKEHOLDERS,n=BUNDLE_NAMES)
-HTML = expand(OUT+'/reports/{s}/report.html',s=STAKEHOLDERS)
-PDF = expand(OUT+'/reports/{s}/report.pdf',s=STAKEHOLDERS)
+HTML = expand(OUT+'/reports/{s}/{doc}.html',s=STAKEHOLDERS,doc=['report','methods'])
+PDF = expand(OUT+'/reports/{s}/{doc}.pdf',s=STAKEHOLDERS,doc=['report','methods'])
 APPS = expand(OUT+'/reports/{s}/app/package.json',s=STAKEHOLDERS)
 ENVIRONMENT = [f'{P}/requirements.lock.txt', 'workflow/environment.yml', 'workflow/r-packages.tsv', 'renv.lock', '.Rprofile']
 
@@ -77,20 +77,20 @@ rule analyse:
     shell: '{PYTHON:q} {P}/analyse.py --out {params.out:q} --stakeholder {input.stakeholder:q} --classes {input.classes:q} --dest {params.dest:q}'
 
 rule render_html:
-    input: bundle=[OUT+'/reports/{s}/data/'+n for n in BUNDLE_NAMES], code=[f'{P}/publish.py',f'{P}/common.py',f'{P}/report_public_health_expert.qmd',f'{P}/templates/report_helpers.R',f'{P}/templates/app.R'], env=ENVIRONMENT
-    output: OUT+'/reports/{s}/report.html'
+    input: bundle=[OUT+'/reports/{s}/data/'+n for n in BUNDLE_NAMES], code=[f'{P}/publish.py',f'{P}/common.py',f'{P}/report_public_health_expert.qmd',f'{P}/templates/report_helpers.R',f'{P}/templates/app.R',f'{P}/templates/dashboard.css',f'{P}/templates/methods.qmd'], env=ENVIRONMENT
+    output: report=OUT+'/reports/{s}/report.html', methods=OUT+'/reports/{s}/methods.html'
     params: bundle=lambda w:f'{OUT}/reports/{w.s}/data'
-    shell: '{PYTHON:q} {P}/publish.py html --bundle {params.bundle:q} --output {output:q} --quarto {QUARTO:q}'
+    shell: '{PYTHON:q} {P}/publish.py html --bundle {params.bundle:q} --output {output.report:q} --quarto {QUARTO:q}'
 
 rule render_pdf:
-    input: bundle=[OUT+'/reports/{s}/data/'+n for n in BUNDLE_NAMES], code=[f'{P}/publish.py',f'{P}/common.py',f'{P}/report_public_health_expert.qmd',f'{P}/templates/report_helpers.R',f'{P}/templates/app.R'], env=ENVIRONMENT
-    output: OUT+'/reports/{s}/report.pdf'
+    input: bundle=[OUT+'/reports/{s}/data/'+n for n in BUNDLE_NAMES], code=[f'{P}/publish.py',f'{P}/common.py',f'{P}/report_public_health_expert.qmd',f'{P}/templates/report_helpers.R',f'{P}/templates/app.R',f'{P}/templates/dashboard.css',f'{P}/templates/methods.qmd'], env=ENVIRONMENT
+    output: report=OUT+'/reports/{s}/report.pdf', methods=OUT+'/reports/{s}/methods.pdf'
     params: bundle=lambda w:f'{OUT}/reports/{w.s}/data'
-    shell: '{PYTHON:q} {P}/publish.py pdf --bundle {params.bundle:q} --output {output:q} --quarto {QUARTO:q}'
+    shell: '{PYTHON:q} {P}/publish.py pdf --bundle {params.bundle:q} --output {output.report:q} --quarto {QUARTO:q}'
 
 rule package_shiny:
-    input: bundle=[OUT+'/reports/{s}/data/'+n for n in BUNDLE_NAMES], code=[f'{P}/publish.py',f'{P}/common.py',f'{P}/report_public_health_expert.qmd',f'{P}/templates/report_helpers.R',f'{P}/templates/app.R'], env=ENVIRONMENT
-    output: manifest=OUT+'/reports/{s}/app/package.json', files=[OUT+'/reports/{s}/app/'+n for n in BUNDLE_NAMES+['report.qmd','report_helpers.R','app.R']]
+    input: bundle=[OUT+'/reports/{s}/data/'+n for n in BUNDLE_NAMES], code=[f'{P}/publish.py',f'{P}/common.py',f'{P}/report_public_health_expert.qmd',f'{P}/templates/report_helpers.R',f'{P}/templates/app.R',f'{P}/templates/dashboard.css',f'{P}/templates/methods.qmd'], env=ENVIRONMENT
+    output: manifest=OUT+'/reports/{s}/app/package.json', files=[OUT+'/reports/{s}/app/'+n for n in BUNDLE_NAMES+['report.qmd','report_helpers.R','app.R','dashboard.css','methods.qmd']]
     params: bundle=lambda w:f'{OUT}/reports/{w.s}/data',dest=lambda w:f'{OUT}/reports/{w.s}/app'
     shell: '{PYTHON:q} {P}/publish.py package --bundle {params.bundle:q} --output {params.dest:q}'
 

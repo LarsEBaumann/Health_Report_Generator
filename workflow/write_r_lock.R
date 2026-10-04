@@ -1,5 +1,5 @@
 # Run explicitly after reviewing a dependency upgrade, never on ordinary builds.
-roots <- c('shiny','knitr','rmarkdown','jsonlite','digest')
+roots <- c('shiny','knitr','rmarkdown','jsonlite','digest','ggplot2')
 installed <- installed.packages()
 deps <- tools::package_dependencies(roots,db=installed,which=c('Depends','Imports','LinkingTo'),recursive=TRUE)
 names_all <- sort(unique(c(roots,unlist(deps))))

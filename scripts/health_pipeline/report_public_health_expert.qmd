@@ -1,12 +1,12 @@
 ---
-title: "Infectious disease surveillance report"
+title: "Disease notifications | Findings"
 format:
   html:
     embed-resources: true
-    toc: true
-    theme: cosmo
+    toc: false
+    page-layout: full
+    css: dashboard.css
   pdf:
-    toc: true
     documentclass: scrartcl
     papersize: a4
     geometry: margin=22mm
@@ -24,90 +24,56 @@ params:
 ```{r}
 source('report_helpers.R')
 b <- read_bundle(params$data_dir)
-knitr::opts_chunk$set(fig.width=7, fig.height=3.6)
-emit_table <- function(x) {
-  names(x) <- gsub('_',' ',names(x),fixed=TRUE)
-  print(knitr::kable(x, digits=2, row.names=FALSE))
+knitr::opts_chunk$set(fig.width=7,fig.height=3.8)
+```
+
+```{r}
+#| results: asis
+if(knitr::is_html_output()) cat(findings_html(b))
+if(knitr::is_latex_output()) {
+  cat('## What changed since ',b$cfg$reference_year,'?\n\n',sep='')
+  cat('**',if(b$cfg$geography=='CHFL') 'Switzerland + Liechtenstein' else 'Switzerland',' · ',paste(b$cfg$years,collapse='–'),'**\n\n',sep='')
+  cat('Snapshot: `',substr(b$manifest$snapshot_id,1,16),'`.\n\n',sep='')
+  if(show_section(b,'headline')) {
+    for(subject in c('viral:main','bacterial:main','viral:sensitivity')) {
+      if(subject=='viral:sensitivity' && !length(b$cfg$sensitivity_exclude)) next
+      label <- switch(subject,'viral:main'='Viral notifications','bacterial:main'='Bacterial notifications','viral:sensitivity'=paste('Viral without',sensitivity_label(b)))
+      cat('- **',label,': ',format_pct(metric_value(b,paste0(subject,':reference_change'))),'** in ',report_year(b),' compared with ',b$cfg$reference_year,'.\n',sep='')
+    }
+  }
+  cat('\nFull selection rules, source records and calculation references are in the companion [Methods & sources report](methods.pdf).\n\n')
 }
 ```
 
 ```{r}
 #| results: asis
-cat('**', b$cfg$title, '**\n\n', b$cfg$question, '\n\n', sep='')
-cat('Geography: **', b$cfg$geography, '**. Reporting period: ',paste(b$cfg$years,collapse=' to '),
-    '. Reference year: ', b$cfg$reference_year, '.\n\n',sep='')
-cat('Snapshot: `',substr(b$manifest$snapshot_id,1,16),'`. Schema: ',b$manifest$schema_version,'.\n\n',sep='')
-cat('Rates are calculated from exported counts and populations and may differ from published rates based on unrounded figures.\n\n')
-cat('These are surveillance counts and estimates, not an estimate of all infections or a causal assessment of pandemic effects. Group comparisons use a fixed set of complete disease series and mandatory case notifications only.\n\n')
-for(n in names(b$cfg$exclusion_notes)) cat('- ',n,': ',b$cfg$exclusion_notes[[n]],'\n',sep='')
+if(knitr::is_latex_output() && show_section(b,'group_totals')) {
+  cat('\n## How many cases were reported?\n\n')
+  print(plot_group_totals(b))
+  cat('\nSource: FOPH national annual case series, summed over the selected diseases. COVID-19, AIDS and sentinel estimates are excluded from the default group totals. Only configured reporting and reference years are shown.\n\n')
+}
 ```
 
 ```{r}
 #| results: asis
-if(show_section(b,'headline')) {
-  cat('\n## Headline changes\n\n')
-  h <- headline_table(b)
-  # Full identifiers remain in the companion CSV; short references fit printed pages.
-  h$reference <- paste0('M',match(h$metric_id,b$metrics$metric_id))
-  emit_table(h[,c('reference','subject','metric_type','value')])
-  cat('\nChanges are percentages; a missing value indicates an undefined zero-baseline comparison.\n')
+if(knitr::is_latex_output() && show_section(b,'group_index')) {
+  cat('\n## How have the groups changed?\n\n')
+  print(plot_groups(b))
+  cat('\nSource: the same selected case series. Each line shows percentage change from its own ',b$cfg$index_base_year,' total; zero means unchanged. This compares trends, not absolute disease burden.\n\n',sep='')
 }
-if(show_section(b,'group_index')) cat('\n## Viral and bacterial indices\n\n')
-```
-
-```{r}
-if(show_section(b,'group_index')) plot_groups(b)
 ```
 
 ```{r}
 #| results: asis
-if(show_section(b,'group_totals')) {
-  cat('\n## Group totals\n\n')
-  x <- b$metrics[b$metrics$metric_type=='group_total' & grepl(':main$',b$metrics$subject),]
-  emit_table(x[,c('subject','year','value')])
+#| fig-height: 4.7
+if(knitr::is_latex_output() && show_section(b,'small_multiples')) {
+  cat('\n## Which diseases changed most?\n\n')
+  print(plot_changes(b))
+  cat('\nSource: selected FOPH national case counts. Right of zero means more notifications; left means fewer. Percentages do not indicate severity or statistical significance.\n\n')
 }
-if(show_section(b,'small_multiples')) cat('\n## Disease trends\n\n')
-```
-
-```{r}
-#| fig-height: 8
-#| fig-cap: "Calculated rates per 100,000. Horizontal axes show years; vertical axes show rates and vary between diseases."
-if(show_section(b,'small_multiples')) plot_small_multiples(b)
-```
-
-```{r}
-#| results: asis
-if(show_section(b,'change_table')) {
-  cat('\n## Change table\n\n')
-  x <- change_table(b)
-  x$reference <- paste0('M',match(x$metric_id,b$metrics$metric_id))
-  emit_table(x[,c('reference','subject','metric_type','value')])
-  cat('\nDescriptive changes are not statistical significance tests.\n')
-}
-if(show_section(b,'excluded')) {
-  cat('\n## Dataset selection\n\n')
-  x <- b$selection
-  # Keep long exclusion reasons in a readable list for both PDF and HTML.
-  for(i in seq_len(nrow(x))) cat('- **',x$topic[i],'** (',x$status[i],'): ',x$reason[i],'.\n',sep='')
-}
-if(show_section(b,'quality')) {
-  cat('\n## Data quality\n\n')
-  emit_table(as.data.frame(table(b$checks$status)))
-  x <- b$checks[b$checks$status=='WARN',]
-  if(nrow(x)) for(i in seq_len(nrow(x))) cat('- ',x$check[i],': ',x$detail[i],'\n',sep='')
-  cat('\nSKIP means a check was not applicable or lacked compatible data, not that it passed.\n')
-}
-if(show_section(b,'sources')) {
-  cat('\n## Sources and traceability\n\n')
-  cat('Each chart point and number has a metric ID in `series.csv` or `metrics.csv`. `lineage.csv` links derived metrics to input metrics and raw records, including the population denominator. Raw record numbers are one-based CSV record positions including the header; they are not physical text line numbers for multiline CSV fields.\n\n')
-  cat('The companion bundle contains full source and metadata SHA-256 hashes and the snapshot manifest. Keep the archived snapshot with the report to reproduce its values.\n\n')
-  x <- b$sources[b$sources$status=='ok',]
-  emit_table(x[,c('topic','publishing_date','used')])
-  cat('\n### Printed metric references\n\n')
-  ids <- unique(c(headline_table(b)$metric_id,change_table(b)$metric_id))
-  refs <- paste0('M',match(ids,b$metrics$metric_id))
-  n <- ceiling(length(ids)/2)
-  length(ids) <- length(refs) <- n*2
-  emit_table(data.frame(Ref=refs[seq_len(n)],Metric=ids[seq_len(n)],Ref2=refs[n+seq_len(n)],Metric2=ids[n+seq_len(n)]))
+if(knitr::is_latex_output() && show_section(b,'change_table')) {
+  cat('\n## Supporting figures\n\n')
+  print(knitr::kable(friendly_table(b),row.names=FALSE))
+  cat('\nSource: selected FOPH annual national case counts. Change = (latest count − baseline count) ÷ baseline count × 100. Values are rounded for display.\n\n')
 }
 ```

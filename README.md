@@ -96,3 +96,15 @@ CI runs tests, builds all outputs, checks Shiny server outputs, and uploads a re
 The Python lock pins transitive packages; `renv.lock` records R dependencies. The R setup script restores those into `.r-library/`; `.Rprofile` and the renderer use that isolated library. A pre-existing global R installation can also run the workflow, and its actual versions are recorded, but use the restored library for reproduction. `workflow/environment.yml` describes the base Python/R environment, not a platform-specific binary lock. Reproducing identical metric tables is tested; bit-identical PDF bytes across platforms/toolchain versions are not claimed. Quarto and TeX versions are recorded in release metadata. Upgrade locks intentionally and rerun tests; `workflow/write_r_lock.R` records the current R dependency set when explicitly invoked.
 
 Legacy files in `scripts/health_pipeline/example_output/` are historical examples, not results from this workflow. Existing untracked files and raw datasets are not modified by the implementation.
+
+## Demo dashboard and companion report
+
+The findings report now uses the approved visual dashboard with **ggplot2** charts, summary cards, case-count bars, percentage change from the baseline, and a disease comparison plot. Supporting numbers are in an expandable table with descriptive column headings. Every chart and table has a source/method note.
+
+Open `results/reports/public_health_expert/report.html` for the demo. Use **Methods & sources** to open `methods.html`; the navigation also links to their PDF versions (`report.pdf` and `methods.pdf`). Audit files are available from the methods report. Keep the entire stakeholder folder together when sharing it so report and download links work.
+
+Shiny uses the same ggplot2 helpers and keeps Findings, Methods & sources, and Explore a disease on separate tabs. No disease-selection or statistical calculation was moved into the presentation layer. The chart formerly labelled an index now shows percentage change from the baseline (index minus 100); zero is the baseline level.
+
+After pulling these changes, run `Rscript workflow/restore_r.R` to restore the updated lock including ggplot2. Then run Snakemake normally. Rendering each format builds both companion reports, and a rendering error stops the pair from being published by the renderer.
+
+The alternate editorial briefing is preserved in `design/report-mockups.html` for later iteration. The dashboard is the active production design.

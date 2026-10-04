@@ -1,28 +1,31 @@
 library(shiny)
 source('report_helpers.R')
 b <- read_bundle('.')
+# Static dashboard visuals and reactive exploration share the same ggplot2 helpers.
+# Navigation inside Shiny is handled by tabsetPanel; file downloads use handlers.
+findings <- findings_html(b,navigation=FALSE)
+findings <- gsub('<a href="methods.html[^"]*">[^<]*</a>','See the Methods & sources tab.',findings)
+methods <- methods_html(b,navigation=FALSE,prefix='')
+methods <- gsub('<a[^>]*>[^<]*</a>','',methods)
 ui <- fluidPage(
-  titlePanel(b$cfg$title),
-  p(b$cfg$question),
-  p(paste('Geography:',b$cfg$geography,'| Snapshot:',substr(b$manifest$snapshot_id,1,16))),
-  p('Uses the same precomputed metrics as the HTML and PDF reports. Filters change the display, not the analysis.'),
-  if(show_section(b,'headline')) tableOutput('headlines'),
-  if(show_section(b,'group_index')) plotOutput('groups'),
-  if(show_section(b,'small_multiples')) tagList(selectInput('topic','Disease',setNames(unique(b$series$topic),b$series$label[match(unique(b$series$topic),b$series$topic)])),plotOutput('disease')),
-  if(show_section(b,'group_totals')) tableOutput('totals'),
-  if(show_section(b,'change_table')) tableOutput('changes'),
-  if(show_section(b,'excluded')) tableOutput('selection'),
-  if(show_section(b,'quality')) tableOutput('quality'),
-  if(show_section(b,'sources')) tagList(h3('Trace a number'),selectInput('metric','Metric',b$metrics$metric_id),tableOutput('metric_value'),tableOutput('lineage'),p('For derived inputs, select the input metric ID to follow the next step.'),downloadButton('download_metrics','Download metrics'),downloadButton('download_lineage','Download lineage'))
+  tags$head(tags$style(HTML(paste(readLines('dashboard.css'),collapse='\n')))),
+  div(style='max-width:1200px;margin:auto;padding:20px',
+    tabsetPanel(
+      tabPanel('Findings',HTML(findings)),
+      tabPanel('Methods & sources',HTML(methods),
+        div(class='trace-controls',h3('Follow a calculation'),
+          selectInput('metric','Choose a named metric',setNames(b$metrics$metric_id,paste(b$metrics$subject,b$metrics$metric_type,ifelse(is.na(b$metrics$year),'',b$metrics$year),sep=' · '))),
+          tableOutput('metric_value'),tableOutput('lineage'),
+          p('For derived inputs, select their metric name to follow the next step.'),
+          downloadButton('download_metrics','Download metrics'),downloadButton('download_lineage','Download lineage'))),
+      tabPanel('Explore a disease',
+        selectInput('topic','Disease',setNames(unique(b$series$topic),b$series$label[match(unique(b$series$topic),b$series$topic)])),
+        plotOutput('disease'),p('Source: selected national annual series. Rates are calculated from exported counts and population and may differ slightly from publisher rates based on unrounded counts.'))
+    )
+  )
 )
 server <- function(input,output,session) {
-  output$headlines <- renderTable(headline_table(b),digits=2)
-  output$groups <- renderPlot(plot_groups(b))
-  output$disease <- renderPlot({req(input$topic);plot_disease(b,input$topic)})
-  output$totals <- renderTable(b$metrics[b$metrics$metric_type=='group_total',c('metric_id','subject','year','value')])
-  output$changes <- renderTable(change_table(b),digits=2)
-  output$selection <- renderTable(b$selection[,c('topic','status','reason','group_eligible')])
-  output$quality <- renderTable(as.data.frame(table(b$checks$status)))
+  output$disease <- renderPlot({req(input$topic);print(plot_disease(b,input$topic))})
   output$metric_value <- renderTable({req(input$metric);b$metrics[b$metrics$metric_id==input$metric,]})
   output$lineage <- renderTable({req(input$metric);b$lineage[b$lineage$metric_id==input$metric,]})
   output$download_metrics <- downloadHandler(filename=function() 'metrics.csv',content=function(file) file.copy('metrics.csv',file))

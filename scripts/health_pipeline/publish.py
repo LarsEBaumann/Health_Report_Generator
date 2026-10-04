@@ -21,7 +21,7 @@ def package(bundle,dest):
     for n in [*m['files'],'bundle.json']:
         shutil.copyfile(bundle/n,dest/n)
     shutil.copyfile(HERE/'report_public_health_expert.qmd',dest/'report.qmd')
-    for n in ['report_helpers.R','app.R']:
+    for n in ['report_helpers.R','app.R','dashboard.css','methods.qmd']:
         shutil.copyfile(HERE/'templates'/n,dest/n)
     write_json(dest/'package.json',{'schema_version':'2.0','files':{p.name:digest(p) for p in sorted(dest.iterdir()) if p.is_file() and p.name!='package.json'}})
 
@@ -34,8 +34,14 @@ def render(bundle,output,fmt,quarto='quarto'):
         project = HERE.parents[1]
         env['HEALTH_REPORT_PROJECT'] = str(project)
         env['R_PROFILE_USER'] = str(project / '.Rprofile')
-        subprocess.run([quarto,'render','report.qmd','--to',fmt],cwd=tmp,check=True,env=env)
+        for document in ['report','methods']:
+            command = [quarto,'render',f'{document}.qmd','--to',fmt]
+            if document == 'methods':
+                command += ['-P', 'download_prefix:data/']
+            subprocess.run(command,cwd=tmp,check=True,env=env)
+        # Publish the pair only after both have rendered successfully.
         shutil.copyfile(Path(tmp)/f'report.{fmt}',output)
+        shutil.copyfile(Path(tmp)/f'methods.{fmt}',output.parent/f'methods.{fmt}')
 
 if __name__=='__main__':
     ap=argparse.ArgumentParser(); ap.add_argument('action',choices=['package','html','pdf']); ap.add_argument('--bundle',required=True); ap.add_argument('--output',required=True); ap.add_argument('--quarto',default='quarto')

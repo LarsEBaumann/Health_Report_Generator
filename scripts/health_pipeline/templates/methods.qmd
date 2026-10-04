@@ -1,0 +1,62 @@
+---
+title: "Disease notifications | Methods & sources"
+format:
+  html:
+    embed-resources: true
+    toc: false
+    page-layout: full
+    css: dashboard.css
+  pdf:
+    documentclass: scrartcl
+    papersize: a4
+    geometry: margin=22mm
+    fontsize: 10pt
+    colorlinks: true
+    latex-auto-install: false
+execute:
+  echo: false
+  warning: false
+  message: false
+params:
+  data_dir: "."
+  download_prefix: ""
+---
+
+```{r}
+source('report_helpers.R')
+b <- read_bundle(params$data_dir)
+```
+
+```{r}
+#| results: asis
+if(knitr::is_html_output())cat(methods_html(b,prefix=params$download_prefix))
+if(knitr::is_latex_output()) {
+  cat('## Where the findings come from\n\n')
+  cat('Geography: **',b$cfg$geography,'**. Reporting period: ',paste(b$cfg$years,collapse='–'),'. Reference year: ',b$cfg$reference_year,'.\n\n',sep='')
+  cat('Snapshot: `',substr(b$manifest$snapshot_id,1,16),'`. Full fingerprint is available in the companion snapshot manifest.\n\n',sep='')
+  cat('Source: FOPH Infectious Disease Dashboard exports. Group totals use the same selected mandatory-reporting disease series across all displayed years. A reported annual total is preferred; otherwise 12 distinct complete months are required.\n\n')
+  cat('## How calculations work\n\n')
+  definitions <- data.frame(Figure=c('Reported cases','Change from baseline','Disease comparison'),Meaning=c('Sum of selected annual counts','Percentage above or below the baseline count','Each disease compared with its own baseline'))
+  print(knitr::kable(definitions,row.names=FALSE))
+  cat('\nSource: the saved stakeholder policy and metric formulas. Change = (latest count − baseline count) ÷ baseline count × 100. Zero change means unchanged; +100% means twice as many. These are descriptive comparisons, not causal or significance tests.\n\n')
+  cat('### Trace a finding\n\n')
+  y<-report_year(b);ref<-b$cfg$reference_year;a<-metric_value(b,paste0('viral:main:',ref,':total'));z<-metric_value(b,paste0('viral:main:',y,':total'))
+  cat('Viral notifications: **',format(z,big.mark=','),'** in ',y,' versus **',format(a,big.mark=','),'** in ',ref,', a change of **',format_pct(metric_value(b,'viral:main:reference_change'),1),'**. Each total links to disease counts and original source records in lineage.csv.\n\n',sep='')
+  if(show_section(b,'excluded')) {
+    cat('## Dataset selection\n\n')
+    for(i in seq_len(nrow(b$selection)))cat('- **',label_topic(b,b$selection$topic[i]),'** (',b$selection$status[i],'): ',b$selection$reason[i],'.\n',sep='')
+    cat('\nSource: saved series-selection decisions. Disease-level inclusion does not automatically imply inclusion in a group sum.\n\n')
+  }
+  if(show_section(b,'quality')) {
+    cat('## Data quality\n\n');q<-as.data.frame(table(b$checks$status));names(q)<-c('Result','Number of checks');print(knitr::kable(q,row.names=FALSE))
+    cat('\nSource: automated checks on the full snapshot. WARN needs interpretation; SKIP means a check lacked compatible data. Critical failures block publication.\n\n')
+  }
+  if(show_section(b,'sources')) {
+    cat('## Sources and traceability\n\n')
+    s<-b$sources[b$sources$status=='ok',c('topic','publishing_date','used')];names(s)<-c('Disease or signal','Published','Used');print(knitr::kable(s,row.names=FALSE))
+    cat('\nSource: dataset registry and publisher metadata. Full data and metadata hashes, paths, and source record references are in sources.csv and lineage.csv. Original CSV record positions include the header as record 1.\n\n')
+    cat('The companion bundle contains metrics.csv (full named metric identifiers and formulas), lineage.csv (input relationships), selection.csv (decisions), checks.csv (quality results), and snapshot.json (archived input fingerprints). Keep these files with the archived inputs and versioned code to reproduce the report.\n\n')
+  }
+  cat('[Return to the findings report](report.pdf).\n')
+}
+```
