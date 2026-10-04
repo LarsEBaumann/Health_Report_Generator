@@ -52,7 +52,7 @@ def _(download_latest_report, pd):
 
 
 @app.cell
-def _(datasets, mo, ready, source_run):
+def _(datasets, message, mo, ready, source_artifact, source_run):
     audience_widget = mo.ui.dropdown(
         options={"Researcher": "researcher", "Policy maker": "policy_maker", "General public": "general_public"},
         value="Researcher",
@@ -74,6 +74,16 @@ def _(datasets, mo, ready, source_run):
         submit_button_label="Generate report",
         submit_button_disabled=not ready or source_run is None,
     )
+    if ready:
+        status = mo.md(
+            f"Data ready: {len(datasets)} eligible datasets from source run "
+            f"`{source_run['run_number']}` (artifact `{source_artifact['name']}`)."
+        )
+    else:
+        status = mo.callout(
+            mo.md(f"Could not load report data: `{message}`"), kind="warn"
+        )
+    mo.vstack([status, report_form])
     return audience_widget, disease_widget, report_form
 
 
