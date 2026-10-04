@@ -11,7 +11,7 @@
   "Packages": {
     "base64enc": {
       "Package": "base64enc",
-      "Version": "0.1.6",
+      "Version": "0.1-6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": []
@@ -235,7 +235,7 @@
     },
     "RColorBrewer": {
       "Package": "RColorBrewer",
-      "Version": "1.1.3",
+      "Version": "1.1-3",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": []
@@ -291,7 +291,7 @@
     },
     "sourcetools": {
       "Package": "sourcetools",
-      "Version": "0.1.7.2",
+      "Version": "0.1.7-2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": []
@@ -333,7 +333,7 @@
     },
     "xtable": {
       "Package": "xtable",
-      "Version": "1.8.8",
+      "Version": "1.8-8",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": []
