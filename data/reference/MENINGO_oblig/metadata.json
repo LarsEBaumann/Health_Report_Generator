@@ -1,0 +1,25 @@
+{
+  "dataset_id": "MENINGO_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/MENINGO_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:40.524507+00:00",
+  "sha256": "1e155d30edc098657d9054cd3c642b02dbdbdb3120a2df350e3539f17a712b9f",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}

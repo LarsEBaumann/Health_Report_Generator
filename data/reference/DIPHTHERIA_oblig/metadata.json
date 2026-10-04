@@ -1,0 +1,25 @@
+{
+  "dataset_id": "DIPHTHERIA_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/DIPHTHERIA_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:38.772073+00:00",
+  "sha256": "b7c753c0a7a0d45c58051b1c5dff947b22f17982a3d8430f59954d53c92e5c04",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}

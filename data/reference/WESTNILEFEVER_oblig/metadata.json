@@ -1,0 +1,25 @@
+{
+  "dataset_id": "WESTNILEFEVER_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/WESTNILEFEVER_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:44.536613+00:00",
+  "sha256": "c38cb7ceb3c268276fcedb71b0b7a2f3753093e58a353454ef79246fb053b595",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}

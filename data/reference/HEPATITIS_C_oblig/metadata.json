@@ -1,0 +1,32 @@
+{
+  "dataset_id": "HEPATITIS_C_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HEPATITIS_C_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:39.057744+00:00",
+  "sha256": "dafc82712a5261d499802187abf8b80ffa1f1b68c2a247bcabd9ffcab2f76332",
+  "row_count": 829,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "incValueMean3m",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

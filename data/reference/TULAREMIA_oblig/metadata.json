@@ -1,0 +1,30 @@
+{
+  "dataset_id": "TULAREMIA_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TULAREMIA_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:44.470335+00:00",
+  "sha256": "8e2a4f79e50d510b75ff5a169b02374c642e6bd78ae3140c6af67fb0e15d8bc8",
+  "row_count": 741,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

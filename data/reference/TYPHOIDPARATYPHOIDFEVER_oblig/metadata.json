@@ -1,0 +1,25 @@
+{
+  "dataset_id": "TYPHOIDPARATYPHOIDFEVER_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TYPHOIDPARATYPHOIDFEVER_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:44.501102+00:00",
+  "sha256": "d4dfb160b111321ebc11a215494a3b932522efe61fb8528f2d805eae5f66a8a2",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}

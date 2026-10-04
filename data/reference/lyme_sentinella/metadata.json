@@ -1,0 +1,149 @@
+{
+  "metaVariables": {
+    "topic": "lyme_borreliosis",
+    "source": "sentinella_reporting_system",
+    "publishingDate": "2026-09-16",
+    "sourceDate": "2026-09-15",
+    "publicationFrequency": {
+      "frequency": "monthly",
+      "frequencyDescription": "First Wednesday after day 14 of every month. The exact weekday can vary due to public holidays."
+    },
+    "expectedPublicationDelay": {
+      "delay": 14,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 14 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": ["consultations", "min_value_10y", "median_value_10y", "max_value_10y", "cases"]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'. The sentinella month or year are derived from the sentinella week. Before 2024-05-27 (2024-W22) the sentinella week was used, thereafter the ISO week is used. The 'temporal_type' was adapted from month_sentinella/year_sentinella to month/year. ",
+    "typeValues": ["month", "year"]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "country": {
+          "valueSet": "CH",
+          "allValue": "all"
+        }
+      }
+    },
+    "agegroup": {
+      "column": "agegroup",
+      "columnDescription": "Age range brackets used for grouping.",
+      "typeColumn": "agegroup_type",
+      "typeColumnDescription": "Specifies the type of agegroup in the property 'agegroup'.",
+      "typeValues": {
+        "agegroup_tick": {
+          "valueSet": [],
+          "allValue": "all"
+        }
+      }
+    },
+    "sex": {
+      "column": "sex",
+      "columnDescription": "Sex specification used for grouping.",
+      "valueSet": [],
+      "allValue": "all"
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping. While the Sentinella system gathers data on doctors' consultations, consultations published for Lyme disease are restricted to records fulfilling defined clinical criteria and therefore likely reflect actual cases.",
+      "valueSetOrRange": [0, 17189.9],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueYearCumSum": {
+      "description": "Cumulative sum of the property 'value' within a year.",
+      "valueSetOrRange": [0, 17190],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean3y": {
+      "description": "Right-aligned, rolling 3-year average of the property 'value' within the grouping described in the property name.",
+      "valueSetOrRange": [7809.7, 13901.6],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [8139631, 9051029],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "incValue": {
+      "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
+      "valueSetOrRange": [0, 201.18],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "prctConsultations": {
+      "description": "Percentage of doctors' consultations due to either influenza-like illness or acute respiratory infection (defined in the property 'valueCategory'). Based on property 'value'.",
+      "valueSetOrRange": [0, 0.054],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "popExtrapolation": {
+      "description": "Extrapolated population number within the given temporal unit and grouping. For the current year, 'popExtrapolation' is extrapolated to a full year based on the number of days that have passed.",
+      "valueSetOrRange": [151604.3, 208288],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "totalConsultationsExtrapolation": {
+      "description": "Extrapolated total patient doctor consultations within the given temporal unit and grouping.",
+      "valueSetOrRange": [533748, 650696],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaValue": {
+      "description": "Absolute difference in the metric 'value' comparing the current year to the last one.",
+      "valueSetOrRange": [-7034.8, 8234.1],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaIncValue": {
+      "description": "Absolute difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [-83.18, 95.62],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValuePrctChange": {
+      "description": "Percentage difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [-46.9, 90.6],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean5y": {
+      "description": "Right-aligned, rolling 5-year average of the property 'value'.",
+      "valueSetOrRange": [9152.78, 12229.42],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {
+    "dataComplete": {
+      "description": "Can data be assumed to be complete (few late reportings to be expected)?",
+      "valueSetOrRange": true,
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "trend": {
+      "description": "Indicates a trend of an entry with respect to previous entries. The trend is calculated using a poisson glm with a log-link with a right-aligned window of size 3 for the temporal_type year. For data by year the trend is adjusted by population size.",
+      "valueSetOrRange": ["rising", "stagnant", "falling"],
+      "nullValue": "NA",
+      "type": "character"
+    }
+  }
+}

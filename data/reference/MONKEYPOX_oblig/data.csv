@@ -1,0 +1,9 @@
+valueCategory,temporal,temporal_type,georegion,georegion_type,type,value,pop,incValue,valueYearCumSum,trend,deltaValue,deltaIncValue,incValuePrctChange,valueMean5y
+cases,2022,year,CHFL,CHFL,all,552,8855062,6.23,NA,NA,NA,NA,NA,NA
+cases,2023,year,CHFL,CHFL,all,13,9002273,0.14,NA,NA,-539,-6.09,-97.8,NA
+cases,2024,year,CHFL,CHFL,all,36,9091915,0.4,NA,falling,23,0.26,185.7,NA
+cases,2025,year,CHFL,CHFL,all,68,9091915,0.75,NA,rising,32,0.35,87.5,NA
+cases,2022,year,CH,country,all,552,8855062,6.23,NA,NA,NA,NA,NA,NA
+cases,2023,year,CH,country,all,13,9002273,0.14,NA,NA,-539,-6.09,-97.8,NA
+cases,2024,year,CH,country,all,36,9091915,0.4,NA,falling,23,0.26,185.7,NA
+cases,2025,year,CH,country,all,68,9091915,0.75,NA,rising,32,0.35,87.5,NA

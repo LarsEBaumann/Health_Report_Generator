@@ -1,0 +1,30 @@
+{
+  "dataset_id": "INFLUENZA_sentinella",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/INFLUENZA_sentinella/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:40.307979+00:00",
+  "sha256": "880cad3cb3d996018678b50bb971968e3f062123cf285f2a8958c748d91fdc06",
+  "row_count": 12366,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "popExtrapolation",
+    "totalConsultationsExtrapolation",
+    "incValue",
+    "prctConsultations",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ],
+  "snapshot_file": "data.csv"
+}

@@ -1,0 +1,25 @@
+{
+  "dataset_id": "CJD_oblig",
+  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CJD_oblig/csv",
+  "retrieved_at_utc": "2026-10-03T16:01:31.652375+00:00",
+  "sha256": "d6596a31edc885abacda4b30ec1eb81dd650002b5e5759dd64278031c84adaaa",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ],
+  "snapshot_file": "data.csv"
+}
