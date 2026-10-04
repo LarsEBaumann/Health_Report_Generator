@@ -1,192 +1,144 @@
+import json
+import os
+import uuid
+from pathlib import Path
+
 import marimo
 
 __generated_with = "0.25.1"
 app = marimo.App(width="medium")
 
 
+def lineage_root() -> Path:
+    root = Path(os.getenv("LINEAGE_DIR", "data/lineage"))
+    matches = sorted(root.rglob("harmonised.parquet"), key=lambda p: len(p.parts))
+    if not matches:
+        raise FileNotFoundError(
+            "No downloaded lineage artifact. Set LINEAGE_DIR to an extracted health-report artifact."
+        )
+    return matches[0].parent
+
+
+def catalog(root: Path):
+    import pandas as pd
+
+    bundle = root / "reports/public_health_expert/data"
+    series = pd.read_csv(bundle / "series.csv").fillna("")
+    selection = pd.read_csv(bundle / "selection.csv").fillna("")
+    allowed = set(
+        selection.loc[
+            selection.status.astype(str).str.lower().eq("included")
+            & selection.group_eligible.astype(str).str.lower().isin(["true", "1"]),
+            "dataset_id",
+        ].astype(str)
+    )
+    return series[
+        series.dataset_id.astype(str).isin(allowed)
+        & series.pathogen_class.isin(["viral", "bacterial"])
+    ].drop_duplicates("dataset_id").sort_values(["pathogen_class", "label"])
+
+
 @app.cell
 def _():
-    import json
-    from pathlib import Path
-
     import marimo as mo
-    import matplotlib.pyplot as plt
-    from matplotlib.ticker import MaxNLocator
-    import pandas as pd
-    import yaml
+    import requests
 
-    return MaxNLocator, Path, json, mo, pd, plt, yaml
+    return mo, requests
 
 
 @app.cell
-def _(Path, yaml):
-    data_root = Path("data/reference")
-    config_path = Path("configs/report.yml")
-
-    config = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
-    default_dataset = config.get("dataset_id", "LYME_sentinella")
-
-    dataset_ids = sorted(
-        folder.name
-        for folder in data_root.iterdir()
-        if folder.is_dir() and (folder / "data.csv").is_file()
-    ) if data_root.exists() else []
-
-    def display_name(dataset_id):
-        known = {
-            "LYME_sentinella": "Lyme disease — Sentinella",
-            "AIDS_oblig": "AIDS — mandatory reporting",
-        }
-        return known.get(dataset_id, dataset_id.replace("_", " — "))
-
-    return dataset_ids, default_dataset, display_name
+def _(mo):
+    try:
+        root = lineage_root()
+        datasets = catalog(root)
+        ready = True
+        message = None
+    except Exception as exc:
+        root, datasets, ready, message = None, None, False, str(exc)
+    return datasets, message, ready, root
 
 
 @app.cell
-def _(dataset_ids, default_dataset, display_name, mo):
-    audiences = ["Researcher", "Policy maker", "General public"]
-
+def _(datasets, mo, ready):
     audience = mo.ui.dropdown(
-        options=audiences,
-        value="Researcher",
+        options={
+            "Researcher": "researcher",
+            "Policy maker": "policy_maker",
+            "General public": "general_public",
+        },
+        value="researcher",
         label="Who is this report for?",
         full_width=True,
     )
-
-    dataset_options = {
-        display_name(dataset_id): dataset_id
-        for dataset_id in dataset_ids
-    }
-
-    default_label = next(
-        label
-        for label, dataset_id in dataset_options.items()
-        if dataset_id == default_dataset
+    options = (
+        {f"{row.label} ({row.pathogen_class})": row.dataset_id for row in datasets.itertuples()}
+        if ready
+        else {}
     )
-
-    datasets = mo.ui.multiselect(
-        options=dataset_options,
-        value=[default_label],
-        label="Diseases / datasets to include",
+    selected = mo.ui.multiselect(
+        options=options,
+        label="Diseases to include",
         full_width=True,
     )
-
     report_form = mo.ui.form(
-        mo.md(
-            """
-            ## Configure your report
-            Choose an audience and the data to include.
-
-            {audience}
-
-            {datasets}
-            """
-        ).batch(audience=audience, datasets=datasets),
+        mo.md("## Create a report\n\n{audience}\n\n{selected}").batch(
+            audience=audience, selected=selected
+        ),
         submit_button_label="Generate report",
+        submit_button_disabled=not ready,
     )
-
-    report_form
-    return (report_form,)
+    return audience, report_form, selected
 
 
 @app.cell
-def _(MaxNLocator, Path, display_name, json, mo, pd, plt, report_form):
-    def render_dataset(dataset_id):
-        csv_path = Path("data/reference") / dataset_id / "data.csv"
-        metadata_path = Path("data/reference") / dataset_id / "metadata.json"
-
-        if not csv_path.is_file():
-            return [mo.md(f"Could not find `{csv_path}`.")]
-
-        data = pd.read_csv(csv_path)
-        output = []
-
-        if metadata_path.is_file():
-            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-            retrieved = metadata.get("retrieved_at_utc", "unknown")
-            output.append(mo.md(f"Source snapshot retrieved: `{retrieved}`."))
-
-        if not {"temporal", "value"}.issubset(data.columns):
-            output.append(
-                mo.md("This dataset has no `temporal` and `value` pair for the prototype plot.")
-            )
-            output.append(mo.ui.table(data.head(15)))
-            return output
-
-        plot_data = data.copy()
-
-        if "valueCategory" in plot_data.columns:
-            categories = plot_data["valueCategory"].dropna().astype(str)
-            if "cases" in categories.values:
-                plot_data = plot_data[plot_data["valueCategory"].astype(str) == "cases"]
-
-        if "temporal_type" in plot_data.columns:
-            time_types = plot_data["temporal_type"].dropna().astype(str)
-            if "month" in time_types.values:
-                plot_data = plot_data[plot_data["temporal_type"].astype(str) == "month"]
-
-        for column, preferred in [
-            ("georegion", "CH"),
-            ("agegroup", "all"),
-            ("sex", "all"),
-        ]:
-            if column in plot_data.columns:
-                values = plot_data[column].dropna().astype(str)
-                if preferred in values.values:
-                    plot_data = plot_data[plot_data[column].astype(str) == preferred]
-
-        plot_data["value"] = pd.to_numeric(plot_data["value"], errors="coerce")
-        plot_data = plot_data.dropna(subset=["temporal", "value"])
-        plot_data["temporal"] = plot_data["temporal"].astype(str)
-
-        if plot_data.empty or plot_data["temporal"].duplicated().any():
-            output.append(
-                mo.md(
-                    "A single unambiguous time series could not be selected automatically. "
-                    "Showing sample rows instead."
-                )
-            )
-            output.append(mo.ui.table(data.head(15)))
-            return output
-
-        plot_data = plot_data.sort_values("temporal")
-        fig, ax = plt.subplots(figsize=(9, 4))
-        ax.plot(plot_data["temporal"], plot_data["value"], marker="o", linewidth=1.5)
-        ax.set_title(display_name(dataset_id))
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Value (source units)")
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=6))
-        ax.tick_params(axis="x", rotation=60)
-        fig.tight_layout()
-
-        output.append(fig)
-        return output
-
-    if report_form.value is None:
-        results = mo.md("Choose an audience and dataset, then click **Show results**.")
+def _(message, mo, ready, report_form, requests):
+    if not ready:
+        result = mo.callout(mo.md(f"**Lineage artifact required:** `{message}`"), kind="warn")
+    elif report_form.value is None:
+        result = mo.md("Choose a stakeholder and one or more diseases, then select **Generate report**.")
     else:
-        audience_name = report_form.value["audience"]
-        selected_ids = report_form.value["datasets"]
-
-        if not selected_ids:
-            results = mo.md("Select at least one dataset.")
+        audience = report_form.value["audience"]
+        dataset_ids = report_form.value["selected"]
+        if not dataset_ids:
+            result = mo.callout(mo.md("Select at least one disease."), kind="warn")
         else:
-            panels = [
-                mo.md(
-                    f"## {audience_name} view\n"
-                    "The report content is currently shared across audiences; "
-                    "audience-specific versions are a future step."
+            token = os.getenv("GITHUB_TOKEN")
+            run_id = os.getenv("LINEAGE_RUN_ID")
+            repository = os.getenv("GITHUB_REPOSITORY", "LarsEBaumann/Health_Report_Generator")
+            request_id = uuid.uuid4().hex
+            if not token or not run_id:
+                result = mo.callout(
+                    mo.md("Set `GITHUB_TOKEN` and `LINEAGE_RUN_ID` before generating a report."),
+                    kind="warn",
                 )
-            ]
-
-            for dataset_id in selected_ids:
-                panels.append(mo.md(f"### {display_name(dataset_id)}"))
-                panels.extend(render_dataset(dataset_id))
-
-            results = mo.vstack(panels)
-
-    results
-    return
+            else:
+                response = requests.post(
+                    f"https://api.github.com/repos/{repository}/actions/workflows/render-selected-report.yml/dispatches",
+                    headers={"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"},
+                    json={
+                        "ref": "connector",
+                        "inputs": {
+                            "request_id": request_id,
+                            "lineage_run_id": str(run_id),
+                            "audience": audience,
+                            "dataset_ids_json": json.dumps(dataset_ids),
+                        },
+                    },
+                    timeout=30,
+                )
+                if response.status_code == 204:
+                    result = mo.callout(
+                        mo.md(
+                            f"Report requested (`{request_id}`). Open [GitHub Actions](https://github.com/{repository}/actions/workflows/render-selected-report.yml) to retrieve the generated HTML artifact when the run completes."
+                        ),
+                        kind="success",
+                    )
+                else:
+                    result = mo.callout(
+                        mo.md(f"GitHub Actions request failed ({response.status_code}): `{response.text}`"),
+                        kind="danger",
+                    )
+    result
 
 
 if __name__ == "__main__":

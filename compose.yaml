@@ -8,3 +8,7 @@ services:
       - ./.cache/uv:/tmp/uv-cache
     environment:
       UV_CACHE_DIR: /tmp/uv-cache
+      LINEAGE_DIR: ${LINEAGE_DIR:-/app/data/lineage}
+      LINEAGE_RUN_ID: ${LINEAGE_RUN_ID:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_REPOSITORY: ${GITHUB_REPOSITORY:-LarsEBaumann/Health_Report_Generator}
