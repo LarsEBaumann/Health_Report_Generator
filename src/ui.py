@@ -1,5 +1,5 @@
 import json
-import os
+#import os
 import uuid
 from pathlib import Path
 
@@ -8,17 +8,29 @@ import marimo
 __generated_with = "0.25.1"
 app = marimo.App(width="medium")
 
+@app.cell
+def _():
+    import os
+    from pathlib import Path
 
-def lineage_root() -> Path:
+    import marimo as mo
+    import requests
+
+    return Path, mo, os, requests
+
+from artifact_download import download_latest_report
+
+reports_dir, run, artifact = download_latest_report()
+
+'''def lineage_root() -> Path:
     root = Path(os.getenv("LINEAGE_DIR", "data/lineage"))
     matches = sorted(root.rglob("harmonised.parquet"), key=lambda p: len(p.parts))
     if not matches:
         raise FileNotFoundError(
             "No downloaded lineage artifact. Set LINEAGE_DIR to an extracted health-report artifact."
         )
-    return matches[0].parent
-
-
+    return matches[0].parent'''
+'''
 def catalog(root: Path):
     import pandas as pd
 
@@ -36,18 +48,47 @@ def catalog(root: Path):
         series.dataset_id.astype(str).isin(allowed)
         & series.pathogen_class.isin(["viral", "bacterial"])
     ].drop_duplicates("dataset_id").sort_values(["pathogen_class", "label"])
-
-
+'''
+'''
 @app.cell
-def _():
-    import marimo as mo
-    import requests
+def _(Path, mo, os):
+    import pandas as pd
 
-    return mo, requests
+    def lineage_root():
+        root = Path(os.getenv("LINEAGE_DIR", "data/lineage"))
+        matches = sorted(
+            root.rglob("harmonised.parquet"),
+            key=lambda path: len(path.parts),
+        )
+        if not matches:
+            raise FileNotFoundError(
+                "No downloaded lineage artifact. "
+                "Set LINEAGE_DIR to an extracted health-report artifact."
+            )
+        return matches[0].parent
 
+    def catalog(root):
+        bundle = root / "reports/public_health_expert/data"
+        series = pd.read_csv(bundle / "series.csv").fillna("")
+        selection = pd.read_csv(bundle / "selection.csv").fillna("")
 
-@app.cell
-def _(mo):
+        allowed = set(
+            selection.loc[
+                selection.status.astype(str).str.lower().eq("included")
+                & selection.group_eligible.astype(str)
+                .str.lower()
+                .isin(["true", "1"]),
+                "dataset_id",
+            ].astype(str)
+        )
+'''
+        return series[
+            series.dataset_id.astype(str).isin(allowed)
+            & series.pathogen_class.isin(["viral", "bacterial"])
+        ].drop_duplicates("dataset_id").sort_values(
+            ["pathogen_class", "label"]
+        )
+
     try:
         root = lineage_root()
         datasets = catalog(root)
@@ -55,18 +96,18 @@ def _(mo):
         message = None
     except Exception as exc:
         root, datasets, ready, message = None, None, False, str(exc)
-    return datasets, message, ready, root
 
+    return datasets, message, ready, root
 
 @app.cell
 def _(datasets, mo, ready):
-    audience = mo.ui.dropdown(
+    audience_widget = mo.ui.dropdown(
         options={
             "Researcher": "researcher",
             "Policy maker": "policy_maker",
             "General public": "general_public",
         },
-        value="researcher",
+        value="Researcher",
         label="Who is this report for?",
         full_width=True,
     )
@@ -82,12 +123,12 @@ def _(datasets, mo, ready):
     )
     report_form = mo.ui.form(
         mo.md("## Create a report\n\n{audience}\n\n{selected}").batch(
-            audience=audience, selected=selected
+            audience=audience_widget, selected=selected
         ),
         submit_button_label="Generate report",
         submit_button_disabled=not ready,
     )
-    return audience, report_form, selected
+    return audience_widget, report_form, selected
 
 
 @app.cell
@@ -97,7 +138,7 @@ def _(message, mo, ready, report_form, requests):
     elif report_form.value is None:
         result = mo.md("Choose a stakeholder and one or more diseases, then select **Generate report**.")
     else:
-        audience = report_form.value["audience"]
+        audience_name = report_form.value["audience"]
         dataset_ids = report_form.value["selected"]
         if not dataset_ids:
             result = mo.callout(mo.md("Select at least one disease."), kind="warn")
@@ -120,7 +161,7 @@ def _(message, mo, ready, report_form, requests):
                         "inputs": {
                             "request_id": request_id,
                             "lineage_run_id": str(run_id),
-                            "audience": audience,
+                            "audience": audience_name,
                             "dataset_ids_json": json.dumps(dataset_ids),
                         },
                     },
