@@ -1,0 +1,212 @@
+{
+  "report": "researcher.qmd",
+  "generated_at": "2026-10-04T12:20:44+00:00",
+  "source": "Federal Office of Public Health (FOPH) surveillance exports: one data.csv and metadata.json per dataset",
+  "data_retrieved": {
+    "earliest": "2026-10-03T16:17+02:00",
+    "latest": "2026-10-04T14:15+02:00",
+    "basis": "file timestamps of the downloaded raw exports"
+  },
+  "report_parameters": {
+    "Audience": "researcher",
+    "Age": "all (age groups only in the Age distribution section)",
+    "Sex": "all",
+    "Geography": "CHFL where available; CH for Sentinella (cantons only in the Regional incidence section)",
+    "Frequency": "finest available"
+  },
+  "input": {
+    "file": "results/harmonised.csv",
+    "sha256": "8cd4b20798b9605284f32038ebfb0d700c879f678f54aef943ecb813c4a40865",
+    "bytes": 120746409,
+    "modified": "2026-10-04T12:15:59+00:00",
+    "produced_by": "scripts/health_pipeline/harmonise.py"
+  },
+  "raw_snapshot": {
+    "snapshot_id": "f1484622df74831453d66fb36cfc9fab002bd0695385195143930328d4f74653",
+    "raw_files": 74
+  },
+  "datasets": [
+    {
+      "topic": "acute_respiratory_infection",
+      "source_system": "sentinella_reporting_system",
+      "publishing_date": "2026-09-30",
+      "rows": 5229,
+      "source_file": "COVID19_sentinella/data.csv",
+      "sha256": "39c3d85333675c70de4820b7046efe72ae7f7f5821ac1205a694bdd9e6bcec04"
+    },
+    {
+      "topic": "aids",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-02",
+      "rows": 13,
+      "source_file": "AIDS_oblig/data.csv",
+      "sha256": "906ec0d77eba7d1d8b75e3d451e822230fe416c55f0ffbb419e3ab6ee2a3c1fb"
+    },
+    {
+      "topic": "campylobacteriosis",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-09",
+      "rows": 755,
+      "source_file": "CAMPYLOBACTERIOSIS_oblig/data.csv",
+      "sha256": "19b915920c0f6ffc6fa456300ab5138b98b180d38ce5a29bc959ece7d414503b"
+    },
+    {
+      "topic": "chlamydiosis",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-02",
+      "rows": 783,
+      "source_file": "CHLAMYDIOSIS_oblig/data.csv",
+      "sha256": "33301a7f552e26c546e2c27f0f4a73dc5bfa664eb06967a996d7c0553af2d3f8"
+    },
+    {
+      "topic": "covid19",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-30",
+      "rows": 13501,
+      "source_file": "COVID19_oblig/data.csv",
+      "sha256": "884387436099e6982a6c5da6e0a765666bf62599a9789961acdd4947091de185"
+    },
+    {
+      "topic": "covid19",
+      "source_system": "swiss_pathogen_surveillance_platform",
+      "publishing_date": "2026-09-30",
+      "rows": 198,
+      "source_file": "COVID19_genomic_surveillance/data.csv",
+      "sha256": "8440ae29f194fdd5cdd7adcdcd922aa76ffcad1e299d3a12424034da4aa3fb86"
+    },
+    {
+      "topic": "ehec",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-09",
+      "rows": 771,
+      "source_file": "EHEC_oblig/data.csv",
+      "sha256": "8f9109a49ed04e697191fcc302176c37e5f5a66478749d9bcfef2c21e578c73f"
+    },
+    {
+      "topic": "gonorrhea",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-02",
+      "rows": 777,
+      "source_file": "GONORRHEA_oblig/data.csv",
+      "sha256": "e8da3a7b21d8a58929726e1230a80d9225563563280cf857c9aea190afd53407"
+    },
+    {
+      "topic": "hepatitis_a",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-09",
+      "rows": 745,
+      "source_file": "HEPATITIS_A_oblig/data.csv",
+      "sha256": "af364adc8c31f0256cefc3b275a4fd443f387b4efeac97820f26c081710ff94a"
+    },
+    {
+      "topic": "hepatitis_b",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-02",
+      "rows": 829,
+      "source_file": "HEPATITIS_B_oblig/data.csv",
+      "sha256": "efca8a94f34e227f06a27691417d0a44aef1acd2ec3dc39bae1093446f36634a"
+    },
+    {
+      "topic": "hepatitis_c",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-02",
+      "rows": 829,
+      "source_file": "HEPATITIS_C_oblig/data.csv",
+      "sha256": "dafc82712a5261d499802187abf8b80ffa1f1b68c2a247bcabd9ffcab2f76332"
+    },
+    {
+      "topic": "hepatitis_e",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-09",
+      "rows": 536,
+      "source_file": "HEPATITIS_E_oblig/data.csv",
+      "sha256": "9f9612b834280eab711a73c2a38dae0affb51d0c33847f7a9a978608fa4331bd"
+    },
+    {
+      "topic": "hiv",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-02",
+      "rows": 777,
+      "source_file": "HIV_oblig/data.csv",
+      "sha256": "a382cd7fa6bd50a8dd62088af4b99a20ba72460a5d5e6c30f44075935e030968"
+    },
+    {
+      "topic": "influenza",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-30",
+      "rows": 31028,
+      "source_file": "INFLUENZA_oblig/data.csv",
+      "sha256": "b99973369aad25e243c3ad8e17ee112c29c72f18eb2e715a3f2fb5d091d7a1ad"
+    },
+    {
+      "topic": "influenza-like_illness",
+      "source_system": "sentinella_reporting_system",
+      "publishing_date": "2026-09-30",
+      "rows": 12366,
+      "source_file": "INFLUENZA_sentinella/data.csv",
+      "sha256": "880cad3cb3d996018678b50bb971968e3f062123cf285f2a8958c748d91fdc06"
+    },
+    {
+      "topic": "lyme_borreliosis",
+      "source_system": "sentinella_reporting_system",
+      "publishing_date": "2026-09-16",
+      "rows": 522,
+      "source_file": "LYME_sentinella/data.csv",
+      "sha256": "86357493561be809fa850e49fd6d725da1136a1a5fea57d0fb5ed185e4209e40"
+    },
+    {
+      "topic": "respiratory_pathogens",
+      "source_system": "national_reference_center_for_influenza",
+      "publishing_date": "2026-09-30",
+      "rows": 5008,
+      "source_file": "RESPVIRUSES_sentinella/data.csv",
+      "sha256": "32f85c96135a700de620fde207e2e6703ec6fb76e5abbd3e70069b6528df045f"
+    },
+    {
+      "topic": "shigellosis",
+      "source_system": "mandatory_reporting_system",
+      "publishing_date": "2026-09-09",
+      "rows": 745,
+      "source_file": "RESPVIRUSES_wastewater (1)/SHIGELLOSIS_oblig/data.csv",
+      "sha256": "f3b6c8f59d399934990b638e6c1194d0d3ca26bde0f9f8ba1fa85b888e74ad1c"
+    },
+    {
+      "topic": "wastewater_sequencing",
+      "source_system": "swiss_federal_institute_of_technology",
+      "publishing_date": "2026-09-30",
+      "rows": 226596,
+      "source_file": "COVID19_wastewater_sequencing/data.csv",
+      "sha256": "ca4ca4fc3a11d6ee919116d7c9bf8e9c058eed4d605eea3cace2ea8376e4afc2"
+    },
+    {
+      "topic": "wastewater_viral_load",
+      "source_system": "swiss_federal_institute_of_aquatic_science_and_technology",
+      "publishing_date": "2026-09-30",
+      "rows": 74580,
+      "source_file": "RESPVIRUSES_wastewater (1)/data.csv",
+      "sha256": "98e92f9a90204b1d06955797ea94021be7973e4d8a297bba483731f865051f04"
+    }
+  ],
+  "raw_files_skipped_as_duplicates": 17,
+  "quality_checks": {
+    "PASS": 347,
+    "SKIP": 21,
+    "WARN": 2
+  },
+  "code": {
+    "researcher.qmd": "835b46f77054ba84e67b4033cf4f8b685ceb9439bb7d54e7067f50d2a8643592",
+    "helpers.py": "56bfaac7af3ea4889f818069307381c4e8919df3227e0775929bdbcf9a99c17e",
+    "provenance.py": "0b730e169408ec835f32f0c3813506568ce6d5c460cb2c846864a2754cb6dcc5"
+  },
+  "git": {
+    "commit": "7b392da0f06650db8190cd409cf681a1388a3b9d",
+    "uncommitted_changes": true
+  },
+  "environment": {
+    "python": "3.12.7",
+    "pandas": "2.2.3",
+    "plotly": "5.24.1",
+    "quarto": "1.10.18",
+    "platform": "Windows-11-10.0.26200-SP0"
+  }
+}
