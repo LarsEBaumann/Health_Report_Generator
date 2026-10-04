@@ -1,0 +1,31 @@
+{
+  "dataset_id": "TBE_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TBE_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TBE_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:32:41.989623+00:00",
+  "csv_sha256": "6a1a47583802eb11814cacefe52e67298697bb5ec003b19acb77a4e23077e22b",
+  "metadata_sha256": "8f1f4d0d40119b84f8cf70d737401fb0980dd59917dbb619229f1b4673594999",
+  "row_count": 745,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ]
+}

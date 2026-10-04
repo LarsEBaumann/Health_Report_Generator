@@ -1,0 +1,26 @@
+{
+  "dataset_id": "ZIKA_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ZIKA_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ZIKA_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:32:44.605812+00:00",
+  "csv_sha256": "c1dadfca9585d781bf76514960d65b968b80c41f0d085f03d6396348e6536817",
+  "metadata_sha256": "c571de6a01427fc6d4c992957cd1dbc9b93c6b9389312fccb847ba0ffdd814a5",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

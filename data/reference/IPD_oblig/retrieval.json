@@ -1,0 +1,26 @@
+{
+  "dataset_id": "IPD_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/IPD_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/IPD_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:52.318563+00:00",
+  "csv_sha256": "51dbe99a902e126a97d398dfcdfd8a1a5633d14d677c99c1a8c8c62f5d6e9f24",
+  "metadata_sha256": "aa2403a5978802d5c9d7faa9a8df8806a64c907ee881f07ba523ce48f1246b61",
+  "row_count": 189,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

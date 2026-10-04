@@ -1,0 +1,26 @@
+{
+  "dataset_id": "HANTA_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HANTA_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HANTA_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:34.140479+00:00",
+  "csv_sha256": "07fd543f65e038edeb4184beab6fb84b0ba59705c83667cb3e24ebd63ff78999",
+  "metadata_sha256": "565f05599086f3e4b3b65c3e8a27e668cbbfdbeafe4ab6affd8876e872f5a7b6",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

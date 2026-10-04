@@ -1,0 +1,26 @@
+{
+  "dataset_id": "DENGUEFEVER_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/DENGUEFEVER_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/DENGUEFEVER_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:32.017429+00:00",
+  "csv_sha256": "2565483b7a74f6051daafe2b77c2a254443b02b1ce85bc0c4bb6fbe0d8c85afa",
+  "metadata_sha256": "3efa42acddc3daa36d46bf2828629064ea29546770d62398dfae046f83fe9476",
+  "row_count": 188,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

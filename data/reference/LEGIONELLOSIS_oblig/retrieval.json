@@ -1,0 +1,26 @@
+{
+  "dataset_id": "LEGIONELLOSIS_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/LEGIONELLOSIS_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/LEGIONELLOSIS_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:52.704897+00:00",
+  "csv_sha256": "9ddb09556e2679a0f1f563f2b46b789cf2105aa680fa7cb433212e57c553e5d3",
+  "metadata_sha256": "f02e09e5c889ba16b9f4a049927dfd97063eceace5434f34827f362bbcf4f877",
+  "row_count": 188,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

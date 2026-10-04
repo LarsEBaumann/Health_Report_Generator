@@ -1,23 +1,123 @@
 {
-  "dataset_id": "COVID19_genomic_surveillance",
-  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_genomic_surveillance/csv",
-  "retrieved_at_utc": "2026-10-03T16:01:31.684346+00:00",
-  "sha256": "8440ae29f194fdd5cdd7adcdcd922aa76ffcad1e299d3a12424034da4aa3fb86",
-  "row_count": 198,
-  "columns": [
-    "valueCategory",
-    "temporal",
-    "temporal_type",
-    "georegion",
-    "georegion_type",
-    "subtype",
-    "testResult",
-    "testResult_type",
-    "value",
-    "prct",
-    "lowerCi",
-    "upperCi",
-    "dataComplete"
-  ],
-  "snapshot_file": "data.csv"
+  "metaVariables": {
+    "topic": "covid19",
+    "source": "swiss_pathogen_surveillance_platform",
+    "publishingDate": "2026-09-30",
+    "sourceDate": "2026-09-29",
+    "publicationFrequency": {
+      "frequency": "quarterly",
+      "frequencyDescription": null
+    },
+    "expectedPublicationDelay": {
+      "delay": 1,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 1 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": [
+        "detections_sentinella",
+        "samples_sentinella"
+      ]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": [
+      "month"
+    ]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "CHFL": {
+          "valueSet": "CHFL",
+          "allValue": "all"
+        }
+      }
+    },
+    "subtype": {
+      "column": "subtype",
+      "columnDescription": "Subtype specification used for grouping within the property 'type'.",
+      "valueSet": [
+        "BA.2.86",
+        "BA.3.2",
+        "JN.1",
+        "KP.2",
+        "KP.3",
+        "LP.8",
+        "NB.1.8.1",
+        "XEC",
+        "XFG",
+        "other"
+      ],
+      "allValue": "all"
+    },
+    "testResult": {
+      "column": "testResult",
+      "columnDescription": "Test result used for grouping.",
+      "typeColumn": "testResult_type",
+      "typeColumnDescription": "Specifies from which type of test the property 'testResult' was derived.",
+      "typeValues": {
+        "sequencing": {
+          "valueSet": "positive",
+          "allValue": "all"
+        }
+      }
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        48
+      ],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "prct": {
+      "description": "Proportion of the entry in the property 'value' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "lowerCi": {
+      "description": "Lower bound of the 95% confidence interval of the property 'prct'. The confidence intervals for SARS-CoV-2 variants in the genomic surveillance are estimated using the two-sided Goodman method for multinomial confidence intervals.",
+      "valueSetOrRange": [
+        0,
+        65.3
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "upperCi": {
+      "description": "Upper bound of the 95% confidence interval of the property 'prct'. The confidence intervals for SARS-CoV-2 variants in the genomic surveillance are estimated using the two-sided Goodman method for multinomial confidence intervals.",
+      "valueSetOrRange": [
+        14.1,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {
+    "dataComplete": {
+      "description": "Can data be assumed to be complete (few late reportings to be expected)?",
+      "valueSetOrRange": true,
+      "nullValue": "NA",
+      "type": "logical"
+    }
+  }
 }

@@ -1,0 +1,31 @@
+{
+  "dataset_id": "HEPATITIS_E_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HEPATITIS_E_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HEPATITIS_E_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:31:36.442078+00:00",
+  "csv_sha256": "9f9612b834280eab711a73c2a38dae0affb51d0c33847f7a9a978608fa4331bd",
+  "metadata_sha256": "285703080ca6bfdad29858b72a1d71ab80935f00df9d8f7fd131f31221c9d4ae",
+  "row_count": 536,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "valueMean3y",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ]
+}

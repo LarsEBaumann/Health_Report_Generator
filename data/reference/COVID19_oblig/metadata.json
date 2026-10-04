@@ -1,31 +1,230 @@
 {
-  "dataset_id": "COVID19_oblig",
-  "source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_oblig/csv",
-  "retrieved_at_utc": "2026-10-03T16:01:32.097823+00:00",
-  "sha256": "884387436099e6982a6c5da6e0a765666bf62599a9789961acdd4947091de185",
-  "row_count": 13501,
-  "columns": [
-    "valueCategory",
-    "temporal",
-    "temporal_type",
-    "georegion",
-    "georegion_type",
-    "agegroup",
-    "agegroup_type",
-    "sex",
-    "testResult",
-    "testResult_type",
-    "value",
-    "pop",
-    "incValue",
-    "prct",
-    "inc14d",
-    "trend",
-    "deltaValue",
-    "deltaIncValue",
-    "incValuePrctChange",
-    "valueMean5y",
-    "dataComplete"
-  ],
-  "snapshot_file": "data.csv"
+  "metaVariables": {
+    "topic": "covid19",
+    "source": "mandatory_reporting_system",
+    "publishingDate": "2026-09-30",
+    "sourceDate": "2026-09-29",
+    "publicationFrequency": {
+      "frequency": "weekly",
+      "frequencyDescription": "-"
+    },
+    "expectedPublicationDelay": {
+      "delay": 1,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 1 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": [
+        "cases"
+      ]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'. The temporal info of cases is constructed taking the earliest available of: The date of swab, the date of test, and the date the report arrived at the FOPH. In general, the temporal info of cases corresponds to the date the swab was taken.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": [
+      "iso_week",
+      "month",
+      "year"
+    ]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "CHFL": {
+          "valueSet": "CHFL",
+          "allValue": "all"
+        },
+        "canton": {
+          "valueSet": [
+            "AG",
+            "AI",
+            "AR",
+            "BE",
+            "BL",
+            "BS",
+            "FR",
+            "GE",
+            "GL",
+            "GR",
+            "JU",
+            "LU",
+            "NE",
+            "NW",
+            "OW",
+            "SG",
+            "SH",
+            "SO",
+            "SZ",
+            "TG",
+            "TI",
+            "UR",
+            "VD",
+            "VS",
+            "ZG",
+            "ZH",
+            "unknown"
+          ],
+          "allValue": "all"
+        },
+        "country": {
+          "valueSet": [
+            "FL",
+            "CH"
+          ],
+          "allValue": "all"
+        }
+      }
+    },
+    "agegroup": {
+      "column": "agegroup",
+      "columnDescription": "Age range brackets used for grouping.",
+      "typeColumn": "agegroup_type",
+      "typeColumnDescription": "Specifies the type of agegroup in the property 'agegroup'. Abbreviations: ili = influenza-like illness; ari = acute respiratory infection.",
+      "typeValues": {
+        "agegroup_ili_ari": {
+          "valueSet": [
+            "0 - 4",
+            "5 - 14",
+            "15 - 29",
+            "30 - 64",
+            "65+",
+            "unknown"
+          ],
+          "allValue": "all"
+        }
+      }
+    },
+    "sex": {
+      "column": "sex",
+      "columnDescription": "Sex specification used for grouping.",
+      "valueSet": [
+        "male",
+        "unknown",
+        "female"
+      ],
+      "allValue": "all"
+    },
+    "testResult": {
+      "column": "testResult",
+      "columnDescription": "Test result used for grouping.",
+      "typeColumn": "testResult_type",
+      "typeColumnDescription": "Specifies from which type of test the property 'testResult' was derived. Abbreviation: pcr = polymerase chain reaction test.",
+      "typeValues": {
+        "all": {
+          "valueSet": "positive",
+          "allValue": "all"
+        }
+      }
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        3045024
+      ],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        16293,
+        9091915
+      ],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "prct": {
+      "description": "Proportion of the entry in the property 'value' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValue": {
+      "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
+      "valueSetOrRange": [
+        0,
+        34387.38
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "inc14d": {
+      "description": "Rolling 14-day incidence calculated by summing up the last 2 weeks of the property 'value' and dividing by the mean population over the last 2 weeks. This metric is right-aligned.",
+      "valueSetOrRange": [
+        0,
+        10983.78
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaValue": {
+      "description": "Absolute difference in the metric 'value' comparing the current year to the last one.",
+      "valueSetOrRange": [
+        -2977073,
+        2144185
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "deltaIncValue": {
+      "description": "Absolute difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [
+        -33632.56,
+        24125.03
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValuePrctChange": {
+      "description": "Percentage difference in the metric 'incValue' comparing the current year to the last one.",
+      "valueSetOrRange": [
+        -97.8,
+        235.1
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueMean5y": {
+      "description": "Right-aligned, rolling 5-year average of the property 'value'.",
+      "valueSetOrRange": [
+        811188.6,
+        899729.2
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {
+    "dataComplete": {
+      "description": "Can data be assumed to be complete (few late reportings to be expected)?",
+      "valueSetOrRange": true,
+      "nullValue": "NA",
+      "type": "logical"
+    },
+    "trend": {
+      "description": "Indicates a trend of an entry with respect to previous entries. The trend is calculated using a poisson, negative binomial and poisson glm with a log-link with a right-aligned window of size 3, 4 and 5 for the temporal_type year, month and week, respectively. For data by year the trend is adjusted by population size. For data by month and week the trend is not adjusted by population size.",
+      "valueSetOrRange": [
+        "rising",
+        "falling",
+        "stagnant"
+      ],
+      "nullValue": "NA",
+      "type": "character"
+    }
+  }
 }

@@ -1,0 +1,26 @@
+{
+  "dataset_id": "TRICHINELLOSIS_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TRICHINELLOSIS_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TRICHINELLOSIS_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:32:42.527274+00:00",
+  "csv_sha256": "e51ecccceba4a57ac3ebb217656884aa679c88e4acfed5e46ad6c9fd72b12c7a",
+  "metadata_sha256": "7837deea813c622027bcdd0bc53da526c5dc5303adc5bf09c77b860643facca5",
+  "row_count": 26,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

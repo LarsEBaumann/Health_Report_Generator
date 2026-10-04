@@ -1,0 +1,26 @@
+{
+  "dataset_id": "CHIKUNGUNYA_oblig",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CHIKUNGUNYA_oblig/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CHIKUNGUNYA_oblig/metadata",
+  "retrieved_at_utc": "2026-10-04T09:30:12.755444+00:00",
+  "csv_sha256": "0dc2fe3abca346ac7238d7fea824e0e1c623b542e1bc43a61551ebf12264eca0",
+  "metadata_sha256": "c4580ae47c05c101d714f050c363ddda159b7d35726f3c949606c5502a4931e8",
+  "row_count": 188,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "type",
+    "value",
+    "pop",
+    "incValue",
+    "valueYearCumSum",
+    "trend",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y"
+  ]
+}

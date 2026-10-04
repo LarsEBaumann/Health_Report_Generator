@@ -1,0 +1,31 @@
+{
+  "dataset_id": "COVID19_sentinella",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_sentinella/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_sentinella/metadata",
+  "retrieved_at_utc": "2026-10-04T09:30:21.655562+00:00",
+  "csv_sha256": "39c3d85333675c70de4820b7046efe72ae7f7f5821ac1205a694bdd9e6bcec04",
+  "metadata_sha256": "db663ed07aab5a2ed92ceb7695586d8ad6307e52ad42c9af4192eee94da80aac",
+  "row_count": 5229,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "value",
+    "popExtrapolation",
+    "totalConsultationsExtrapolation",
+    "incValue",
+    "prctConsultations",
+    "trend",
+    "prct",
+    "deltaValue",
+    "deltaIncValue",
+    "incValuePrctChange",
+    "valueMean5y",
+    "dataComplete"
+  ]
+}
