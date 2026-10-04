@@ -2,10 +2,10 @@
   "dataset_id": "COVID19_wastewater_sequencing",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_wastewater_sequencing/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/COVID19_wastewater_sequencing/metadata",
-  "retrieved_at_utc": "2026-10-04T09:45:27.554279+00:00",
-  "csv_sha256": "e6a330700838a9375feef01155b653ee78ed72e170fcd1256bdfed1f2db9bf63",
+  "retrieved_at_utc": "2026-10-04T11:28:00.949583+00:00",
+  "csv_sha256": "1575cca1fef8dcd499cfd619a1d684434fcd9d4b46c6da19eb81f06591ccfb44",
   "metadata_sha256": "d4e5f24b411a1d2a2c26888246fde718ca587f5724fda490589f4fd60c8062a3",
-  "row_count": 191000,
+  "row_count": 180947,
   "columns": [
     "valueCategory",
     "temporal",
