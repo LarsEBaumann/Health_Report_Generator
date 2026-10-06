@@ -31,6 +31,8 @@ b <- read_bundle(params$data_dir)
 #| results: asis
 if(knitr::is_html_output())cat(methods_html(b,prefix=params$download_prefix))
 if(knitr::is_latex_output()) {
+  p <- presentation_profile(b)
+  cat('Audience: **',p$display_name,'**. Presentation: ',p$layout,'.\n\n',sep='')
   cat('## Where the findings come from\n\n')
   cat('Geography: **',b$cfg$geography,'**. Reporting period: ',paste(b$cfg$years,collapse='–'),'. Reference year: ',b$cfg$reference_year,'.\n\n',sep='')
   cat('Snapshot: `',substr(b$manifest$snapshot_id,1,16),'`. Full fingerprint is available in the companion snapshot manifest.\n\n',sep='')
@@ -40,8 +42,22 @@ if(knitr::is_latex_output()) {
   print(knitr::kable(definitions,row.names=FALSE))
   cat('\nSource: the saved stakeholder policy and metric formulas. Change = (latest count − baseline count) ÷ baseline count × 100. Zero change means unchanged; +100% means twice as many. These are descriptive comparisons, not causal or significance tests.\n\n')
   cat('### Trace a finding\n\n')
-  y<-report_year(b);ref<-b$cfg$reference_year;a<-metric_value(b,paste0('viral:main:',ref,':total'));z<-metric_value(b,paste0('viral:main:',y,':total'))
-  cat('Viral notifications: **',format(z,big.mark=','),'** in ',y,' versus **',format(a,big.mark=','),'** in ',ref,', a change of **',format_pct(metric_value(b,'viral:main:reference_change'),1),'**. Each total links to disease counts and original source records in lineage.csv.\n\n',sep='')
+  y <- report_year(b)
+  ref <- b$cfg$reference_year
+  available <- c('viral:main', 'bacterial:main')
+  available <- available[
+    paste0(available, ':reference_change') %in% b$metrics$metric_id
+  ]
+  if(!length(available)) stop('No main-group metrics available')
+  trace_subject <- available[1]
+  trace_label <- if(trace_subject == 'viral:main') {
+    'Viral notifications'
+  } else {
+    'Bacterial notifications'
+  }
+  a <- metric_value(b, paste0(trace_subject, ':', ref, ':total'))
+  z <- metric_value(b, paste0(trace_subject, ':', y, ':total'))
+  cat(trace_label, ': **',format(z,big.mark=','),'** in ',y,' versus **',format(a,big.mark=','),'** in ',ref,', a change of **',format_pct(metric_value(b,paste0(trace_subject,':reference_change')),1),'**. Each total links to disease counts and original source records in lineage.csv.\n\n',sep='')
   if(show_section(b,'excluded')) {
     cat('## Dataset selection\n\n')
     for(i in seq_len(nrow(b$selection)))cat('- **',label_topic(b,b$selection$topic[i]),'** (',b$selection$status[i],'): ',b$selection$reason[i],'.\n',sep='')

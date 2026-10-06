@@ -199,3 +199,76 @@ def test_requested_single_class_still_requires_eligible_members(project):
 
     with pytest.raises(ValueError, match="No eligible members"):
         run(project)
+
+@pytest.mark.parametrize(
+    "audience,display_name,layout,detail_level",
+    [
+        ("researcher", "Researcher", "technical", "full"),
+        ("policy_maker", "Public health", "dashboard", "monitoring"),
+        ("general_public", "General public", "editorial", "plain_language"),
+    ],
+)
+def test_audience_presentation_config(
+    project, audience, display_name, layout, detail_level
+):
+    path = project[2]
+    cfg = json.loads(path.read_text())
+    cfg["id"] = audience
+    cfg["presentation"] = {
+        "display_name": display_name,
+        "layout": layout,
+        "detail_level": detail_level,
+        "version": "1.0",
+    }
+    path.write_text(json.dumps(cfg))
+
+    loaded = load_config(path)
+    assert loaded["presentation"] == cfg["presentation"]
+
+
+def test_legacy_config_without_presentation(project):
+    path = project[2]
+    cfg = json.loads(path.read_text())
+    cfg.pop("presentation", None)
+    path.write_text(json.dumps(cfg))
+
+    assert "presentation" not in load_config(path)
+
+
+@pytest.mark.parametrize(
+    "presentation",
+    [
+        {
+            "display_name": "Researcher",
+            "layout": "unsupported",
+            "detail_level": "full",
+            "version": "1.0",
+        },
+        {
+            "display_name": "Researcher",
+            "layout": "technical",
+            "detail_level": "full",
+        },
+        {
+            "display_name": "Researcher",
+            "layout": "technical",
+            "detail_level": "unsupported",
+            "version": "1.0",
+        },
+        {
+            "display_name": "Researcher",
+            "layout": "technical",
+            "detail_level": "full",
+            "version": "1.0",
+            "unexpected": True,
+        },
+    ],
+)
+def test_invalid_presentation_config(project, presentation):
+    path = project[2]
+    cfg = json.loads(path.read_text())
+    cfg["presentation"] = presentation
+    path.write_text(json.dumps(cfg))
+
+    with pytest.raises(ValueError, match="Invalid stakeholder setting"):
+        load_config(path)
