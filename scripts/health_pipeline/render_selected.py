@@ -69,9 +69,8 @@ def main():
     if unknown := set(selected_ids) - known:
         raise ValueError(f"Unusable selected datasets: {sorted(unknown)}")
     selected = choices[choices.dataset_id.astype(str).isin(selected_ids)]
-    if not {"viral", "bacterial"}.issubset(set(selected.pathogen_class)):
-        raise ValueError("Select at least one eligible viral and one eligible bacterial dataset")
-
+    if selected.empty:
+        raise ValueError("Select at least one eligible viral or bacterial dataset")
     output = Path(args.output_dir).resolve()
     output.mkdir(parents=True, exist_ok=False)
     labels = dict(zip(selected.dataset_id.astype(str), selected.label.astype(str)))
