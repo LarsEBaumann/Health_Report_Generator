@@ -22,10 +22,13 @@ jobs:
           r-version: '4.3.2'
           use-public-rspm: true
       - run: Rscript workflow/restore_r.R
-      - uses: quarto-dev/quarto-actions/setup@v2
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
         with:
-          version: '1.3.353'
+          version: "1.3.353"
           tinytex: true
+        env:
+          GH_TOKEN: ${{ github.token }}
       - run: pip install -r scripts/health_pipeline/requirements.lock.txt
       - run: python -m pytest -q
       - run: snakemake --config data_root=Data --cores 2
