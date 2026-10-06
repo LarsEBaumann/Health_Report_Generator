@@ -101,7 +101,7 @@ def _(json, mo, os, report_form, requests, source_run, uuid):
             token = os.getenv("GITHUB_TOKEN")
             owner = os.getenv("GITHUB_OWNER", "LarsEBaumann")
             repo = os.getenv("GITHUB_REPO", "Health_Report_Generator")
-            ref = os.getenv("GITHUB_APP_REF", "connector")
+            ref = os.getenv("GITHUB_APP_REF", "main")
             if not token:
                 result = mo.callout(mo.md("Set GITHUB_TOKEN with Actions read/write permission."), kind="warn")
             else:
