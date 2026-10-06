@@ -175,7 +175,8 @@ findings_html <- function(b,navigation=TRUE) {
   } else {
     'How have the selected disease groups changed?'
   }
-  parts<-c('<div class="dashboard">',if(navigation)report_navigation(b),paste0('<div class="eyebrow">Annual disease briefing · ',paste(b$cfg$years,collapse='–'),' · comparison with ',ref,'</div><h1>',title,'</h1>'),report_metadata(b))
+  parts<-c(presentation_open(b),if(navigation)report_navigation(b),paste0('<div class="eyebrow">Annual disease briefing · ',paste(b$cfg$years,collapse='–'),' · comparison with ',ref,'</div><h1>',title,'</h1>'),report_metadata(b))
+  parts <- c(parts, selection_intro(b))
   if(show_section(b,'headline'))parts<-c(parts,summary_cards(b))
   parts<-c(parts,'<div class="chart-grid">')
   if(show_section(b,'group_totals'))parts<-c(parts,panel('How many cases were reported?','Annual totals for the selected diseases',plot_group_totals(b),paste0('Source: FOPH dashboard exports · sum of selected national case notifications. ',esc(excluded),' excluded. Only the reference and configured reporting years are shown. <a href="methods.html#selection">How calculated</a>')))
@@ -184,6 +185,7 @@ findings_html <- function(b,navigation=TRUE) {
   if(show_section(b,'small_multiples'))parts<-c(parts,paste0('<section class="chart-panel full"><h2>Which diseases changed most?</h2><p class="caption">Reported cases in ',year,' compared with ',ref,'</p>',chart_image(plot_changes(b),'Disease-specific changes in reported cases',9,4.7),'<div class="chart-note">Source: selected national FOPH case series. Right of zero = more notifications; left = fewer. Percentage changes do not measure disease severity or statistical significance.</div>'))
   if(show_section(b,'change_table'))parts<-c(parts,paste0('<details><summary>View the figures behind the comparison</summary>',html_table(friendly_table(b)),'<div class="table-note">Source: selected FOPH annual national case counts. Change = (latest count − baseline count) ÷ baseline count × 100. Values are rounded for display. <a href="methods.html#calculations">View calculation details</a></div></details>'))
   if(show_section(b,'small_multiples'))parts<-c(parts,'</section>')
+  parts <- c(parts, technical_findings(b))
   parts<-c(parts,'<footer class="dash-footer"><span>Notifications reflect surveillance and testing as well as disease occurrence.</span><a href="methods.html">Read the methods &amp; source report →</a></footer></div>')
   paste(parts,collapse='\n')
 }
@@ -208,7 +210,7 @@ methods_html <- function(b,navigation=TRUE,prefix='data/') {
   selected<-b$selection[,c('topic','status','reason','group_eligible')];selected$topic<-label_topic(b,selected$topic);selected$group_eligible<-ifelse(tolower(as.character(selected$group_eligible))=='true','Yes','No');names(selected)<-c('Disease or signal','Selection','Reason','In main group')
   sources<-b$sources[b$sources$status=='ok',c('topic','publishing_date','used')];sources$topic<-label_topic(b,sources$topic);sources$used<-ifelse(tolower(as.character(sources$used))=='true','Yes','No');names(sources)<-c('Disease or signal','Published','Used in analysis')
   quality<-as.data.frame(table(b$checks$status));names(quality)<-c('Check result','Number of checks')
-  parts<-c('<div class="dashboard">',if(navigation)report_navigation(b,TRUE),'<div class="eyebrow">Companion report / Methods &amp; sources</div><h1>Where the findings come from.</h1>',report_metadata(b),'<div class="audit-grid"><section class="audit-panel" id="selection"><h2>What is included?</h2>',row('Geography',if(b$cfg$geography=='CHFL')'Switzerland + Liechtenstein' else 'Switzerland'),row('Reporting years',paste(b$cfg$years,collapse='–')),row('Reference year',ref))
+  parts<-c(presentation_open(b),if(navigation)report_navigation(b,TRUE),'<div class="eyebrow">Companion report / Methods &amp; sources</div><h1>Where the findings come from.</h1>',report_metadata(b),'<div class="audit-grid"><section class="audit-panel" id="selection"><h2>What is included?</h2>',row('Geography',if(b$cfg$geography=='CHFL')'Switzerland + Liechtenstein' else 'Switzerland'),row('Reporting years',paste(b$cfg$years,collapse='–')),row('Reference year',ref))
   for(cls in c('viral', 'bacterial')) {
     topics <- unique(b$series$topic[
       b$series$pathogen_class == cls &
@@ -242,3 +244,52 @@ methods_html <- function(b,navigation=TRUE,prefix='data/') {
   if(show_section(b,'sources'))parts<-c(parts,paste0('<section class="audit-panel full"><h2>Sources and audit files</h2>',html_table(sources),'<div class="table-note">Source: the dataset registry and original export descriptions. Dates are publisher release dates. Full paths, data and metadata fingerprints are retained in the downloadable source registry.</div><div class="download-links">',paste(vapply(c('sources.csv','selection.csv','lineage.csv','metrics.csv','checks.csv','snapshot.json'),function(n)paste0('<a download href="',prefix,n,'">',esc(n),'</a>'),character(1)),collapse=''),'</div><details><summary>Technical identifiers and exact snapshot</summary><p class="snapshot">',esc(b$manifest$snapshot_id),'</p><p>Full metric identifiers are in metrics.csv. The findings report uses human-readable names instead of printed M-codes. CSV record numbers count the header as record 1; multiline CSV fields may span several text lines.</p></details></section>'))
   parts<-c(parts,'<footer class="dash-footer"><span>Descriptive comparisons do not establish causes, severity or statistical significance.</span><a href="report.html">← Back to findings</a></footer></div>');paste(parts,collapse='\n')
 }
+
+presentation_profile <- function(b) {
+  p <- b$cfg$presentation
+  if(is.null(p)) {
+    return(list(
+      display_name='Public health', layout='dashboard',
+      detail_level='monitoring', version='legacy'
+    ))
+  }
+  if(!p$layout %in% c('dashboard', 'editorial', 'technical')) {
+    stop('Unsupported presentation layout')
+  }
+  p
+}
+presentation_open <- function(b) {
+  p <- presentation_profile(b)
+  paste0('<div class="dashboard audience-', esc(p$layout), '">')
+}
+selection_intro <- function(b) {
+  p <- presentation_profile(b)
+  topics <- group_topics(b)
+  paste0(
+    '<section class="selection-intro"><p class="audience-label">',
+    esc(p$display_name), ' · ', esc(p$layout), ' presentation</p>',
+    '<p><strong>Selected diseases:</strong> ',
+    esc(paste(label_topic(b, topics), collapse=', ')), '.</p>',
+    '<p>These are recorded notifications, not all infections. ',
+    'Changes may reflect surveillance and testing as well as disease occurrence. ',
+    'The figures are descriptive; they do not establish causes or statistical significance.</p>',
+    '</section>'
+  )
+}
+technical_findings <- function(b) {
+  if(presentation_profile(b)$layout != 'technical') return('')
+  totals <- b$metrics[
+    b$metrics$metric_type == 'group_total',
+    c('metric_id', 'subject', 'year', 'value', 'unit')
+  ]
+  paste0(
+    '<section class="audit-panel full"><h2>Technical group totals</h2>',
+    html_table(totals),
+    '<p class="table-note">Source: metrics.csv in the verified analysis bundle. ',
+    'Identifiers support lookup in lineage.csv; no statistics are recalculated here.</p>',
+    '<h2>Disease-level comparison</h2>', html_table(friendly_table(b)),
+    '</section>'
+  )
+}
+
+source('audience_reports.R')

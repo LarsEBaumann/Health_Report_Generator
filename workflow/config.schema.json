@@ -2,33 +2,211 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Stakeholder report settings",
   "type": "object",
-  "required": ["id", "title", "question", "needs_roles", "period_type", "years", "reference_year", "geography", "measures_preferred", "compare_by", "classes_in_main_comparison", "exclude_from_group_totals", "outputs", "index_base_year", "sensitivity_exclude", "source_priority", "group_source_systems"],
+  "required": [
+    "id",
+    "title",
+    "question",
+    "needs_roles",
+    "period_type",
+    "years",
+    "reference_year",
+    "geography",
+    "measures_preferred",
+    "compare_by",
+    "classes_in_main_comparison",
+    "exclude_from_group_totals",
+    "outputs",
+    "index_base_year",
+    "sensitivity_exclude",
+    "source_priority",
+    "group_source_systems"
+  ],
   "properties": {
-    "id": {"type":"string", "pattern":"^[a-zA-Z0-9_-]+$"},
-    "title": {"type":"string", "minLength":1},
-    "question": {"type":"string", "minLength":1},
-    "needs_roles": {"type":"array", "items":{"enum":["time","measure","place"]}, "uniqueItems":true},
-    "period_type": {"const":"year"},
-    "years": {"type":"array", "items":{"type":"integer", "minimum":1900, "maximum":2200}, "minItems":2, "maxItems":2},
-    "reference_year": {"type":"integer"},
-    "index_base_year": {"type":"integer"},
-    "geography": {"enum":["CH","CHFL"]},
-    "measures_preferred": {"type":"array", "minItems":1, "uniqueItems":true, "items":{"enum":["cases","consultations"]}},
-    "compare_by": {"const":"pathogen_class"},
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "needs_roles": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "time",
+          "measure",
+          "place"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "period_type": {
+      "const": "year"
+    },
+    "years": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1900,
+        "maximum": 2200
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "reference_year": {
+      "type": "integer"
+    },
+    "index_base_year": {
+      "type": "integer"
+    },
+    "geography": {
+      "enum": [
+        "CH",
+        "CHFL"
+      ]
+    },
+    "measures_preferred": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "cases",
+          "consultations"
+        ]
+      }
+    },
+    "compare_by": {
+      "const": "pathogen_class"
+    },
     "classes_in_main_comparison": {
       "type": "array",
       "minItems": 1,
       "maxItems": 2,
       "uniqueItems": true,
-      "items": {"enum": ["viral", "bacterial"]}
+      "items": {
+        "enum": [
+          "viral",
+          "bacterial"
+        ]
+      }
     },
-    "exclude_from_group_totals": {"type":"array", "items":{"type":"string"}, "uniqueItems":true},
-    "sensitivity_exclude": {"type":"array", "items":{"type":"string"}, "uniqueItems":true},
-    "source_priority": {"type":"array", "minItems":1, "items":{"type":"string"}, "uniqueItems":true},
-    "group_source_systems": {"type":"array", "minItems":1, "items":{"type":"string"}, "uniqueItems":true},
-    "outputs": {"type":"array", "minItems":1, "items":{"enum":["headline","group_index","group_totals","small_multiples","change_table","excluded","quality","sources"]}, "uniqueItems":true},
-    "dimension_filters": {"type":"object", "additionalProperties":{"type":"object", "required":["values","reason"], "properties":{"values":{"type":"object", "minProperties":1, "additionalProperties":{"type":"string"}},"reason":{"type":"string", "minLength":1}}, "additionalProperties":false}},
-    "exclusion_notes": {"type":"object", "additionalProperties":{"type":"string"}}
+    "exclude_from_group_totals": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "sensitivity_exclude": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "source_priority": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "group_source_systems": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "enum": [
+          "headline",
+          "group_index",
+          "group_totals",
+          "small_multiples",
+          "change_table",
+          "excluded",
+          "quality",
+          "sources"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "dimension_filters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "values",
+          "reason"
+        ],
+        "properties": {
+          "values": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "exclusion_notes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "required": [
+        "display_name",
+        "layout",
+        "detail_level",
+        "version"
+      ],
+      "properties": {
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layout": {
+          "enum": [
+            "dashboard",
+            "editorial",
+            "technical"
+          ]
+        },
+        "detail_level": {
+          "enum": [
+            "monitoring",
+            "plain_language",
+            "full"
+          ]
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
   },
-  "additionalProperties":false
+  "additionalProperties": false
 }

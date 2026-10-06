@@ -10,7 +10,7 @@ SECTIONS = ['headline','group_index','group_totals','small_multiples','change_ta
 FIELDS = {'id','title','question','needs_roles','period_type','years','reference_year','geography',
           'measures_preferred','compare_by','classes_in_main_comparison','exclude_from_group_totals',
           'outputs','index_base_year','sensitivity_exclude','source_priority','group_source_systems',
-          'dimension_filters','exclusion_notes'}
+          'dimension_filters','exclusion_notes','presentation'}
 LINEAGE_COLUMNS = ['metric_id','input_kind','input_id','source_file','source_row','source_column','sha256','metadata_sha256']
 
 

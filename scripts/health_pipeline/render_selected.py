@@ -50,7 +50,7 @@ def catalogue(root):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--lineage-root", required=True)
-    p.add_argument("--audience", choices=AUDIENCES)
+    p.add_argument("--audience", choices=AUDIENCES, required=True)
     p.add_argument("--selected-ids-json", required=True)
     p.add_argument("--source-run-id", required=True)
     p.add_argument("--request-id", required=True)
@@ -85,6 +85,14 @@ def main():
         config = load_config(PROFILE)
         title, question = AUDIENCES[args.audience]
         config.update(id=args.audience, title=title, question=question)
+        presentations = json.loads(
+            (HERE / "config/audience_presentations.json").read_text()
+        )
+        presentation = {
+            **presentations["profiles"][args.audience],
+            "version": presentations["schema_version"],
+        }
+        config["presentation"] = presentation
         selected_classes = set(selected.pathogen_class.astype(str))
         config["classes_in_main_comparison"] = [
             cls for cls in ("viral", "bacterial")
@@ -103,6 +111,9 @@ def main():
         "schema_version": "1.0",
         "request_id": args.request_id,
         "audience": args.audience,
+        "presentation": presentation,
+        "selected_pathogen_classes": config["classes_in_main_comparison"],
+        "output_formats": ["html", "pdf"],
         "selected_dataset_ids": selected_ids,
         "selected_labels": [labels[x] for x in selected_ids],
         "lineage_artifact_run_id": str(args.source_run_id),

@@ -54,22 +54,39 @@ def _(download_latest_report, pd):
 @app.cell
 def _(datasets, message, mo, ready, source_artifact, source_run):
     audience_widget = mo.ui.dropdown(
-        options={"Researcher": "researcher", "Policy maker": "policy_maker", "General public": "general_public"},
+        options={"Researcher": "researcher", "Public health": "policy_maker", "General public": "general_public"},
         value="Researcher",
         label="Who is this report for?",
         full_width=True,
     )
-    disease_options = (
-        {f"{row.label} ({row.pathogen_class})": row.dataset_id
-         for row in datasets.itertuples(index=False)}
-        if ready else {}
+    def disease_options(pathogen_class):
+        return {
+            f"{row.label} [{row.dataset_id}]": str(row.dataset_id)
+            for row in datasets[
+                datasets["pathogen_class"].eq(pathogen_class)
+            ].itertuples(index=False)
+        } if ready else {}
+
+    bacterial_widget = mo.ui.multiselect(
+        options=disease_options("bacterial"),
+        label="Bacterial diseases",
+        full_width=True,
     )
-    disease_widget = mo.ui.multiselect(
-        options=disease_options, label="Diseases to include", full_width=True
+    viral_widget = mo.ui.multiselect(
+        options=disease_options("viral"),
+        label="Viral diseases",
+        full_width=True,
     )
     report_form = mo.ui.form(
-        mo.md("## Create a report\n\n{audience}\n\n{diseases}").batch(
-            audience=audience_widget, diseases=disease_widget
+        mo.md(
+            "## Create a report\n\n{audience}\n\n"
+            "Select bacterial diseases, viral diseases, or both. "
+            "The report uses only your selected datasets.\n\n"
+            "{bacterial}\n\n{viral}"
+        ).batch(
+            audience=audience_widget,
+            bacterial=bacterial_widget,
+            viral=viral_widget,
         ),
         submit_button_label="Generate report",
         submit_button_disabled=not ready or source_run is None,
@@ -84,7 +101,7 @@ def _(datasets, message, mo, ready, source_artifact, source_run):
             mo.md(f"Could not load report data: `{message}`"), kind="warn"
         )
     mo.vstack([status, report_form])
-    return audience_widget, disease_widget, report_form
+    return audience_widget, bacterial_widget, viral_widget, report_form
 
 
 @app.cell
@@ -94,7 +111,9 @@ def _(json, mo, os, report_form, requests, source_run, uuid):
     else:
         values = report_form.value
         audience = values["audience"]
-        dataset_ids = values["diseases"]
+        dataset_ids = sorted(set(
+            values["bacterial"] + values["viral"]
+        ))
         if not dataset_ids:
             result = mo.callout(mo.md("Select at least one disease."), kind="warn")
         else:

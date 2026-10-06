@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "profiles": {
+    "researcher": {
+      "display_name": "Researcher",
+      "layout": "technical",
+      "detail_level": "full"
+    },
+    "policy_maker": {
+      "display_name": "Public health",
+      "layout": "dashboard",
+      "detail_level": "monitoring"
+    },
+    "general_public": {
+      "display_name": "General public",
+      "layout": "editorial",
+      "detail_level": "plain_language"
+    }
+  }
+}
