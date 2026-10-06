@@ -47,22 +47,69 @@ plot_group_totals <- function(b) {
     ggplot2::scale_y_continuous(labels=function(x)paste0(x/1000,'k'),expand=ggplot2::expansion(mult=c(0,.08)))+
     ggplot2::labs(x=NULL,y='Reported cases')+report_theme()
 }
+
 plot_groups <- function(b) {
-  subjects<-c('viral:main','bacterial:main');labels<-c('Viral','Bacterial')
-  if(length(b$cfg$sensitivity_exclude)){subjects<-c(subjects,'viral:sensitivity');labels<-c(labels,paste('Viral without',sensitivity_label(b)))}
-  d<-b$metrics[b$metrics$metric_type=='group_index' & b$metrics$subject %in% subjects,]
-  d$group<-factor(d$subject,levels=subjects,labels=labels)
-  # Display the existing index in percentage-change units; no series is reselected.
-  d$change<-d$value-100
-  ggplot2::ggplot(d,ggplot2::aes(year,change,colour=group,linetype=group))+
-    ggplot2::geom_hline(yintercept=0,colour='#9fb0b2',linewidth=.4)+ggplot2::geom_line(linewidth=1)+ggplot2::geom_point(size=2)+
-    ggplot2::scale_colour_manual(values=setNames(c('#b95d35','#247c85','#7e728e')[seq_along(subjects)],labels))+
-    ggplot2::scale_linetype_manual(values=setNames(c('solid','solid','dashed')[seq_along(subjects)],labels))+
-    ggplot2::scale_x_continuous(breaks=sort(unique(c(b$cfg$index_base_year,b$cfg$years[1],b$cfg$years[2]-2,b$cfg$years[2]))))+
-    ggplot2::scale_y_continuous(labels=function(x)paste0(ifelse(x>0,'+',''),x,'%'))+
-    ggplot2::labs(x=NULL,y=paste('Change from',b$cfg$index_base_year))+report_theme()+
-    ggplot2::guides(colour=ggplot2::guide_legend(nrow=2),linetype=ggplot2::guide_legend(nrow=2))
+  subjects <- c('viral:main', 'bacterial:main')
+  labels <- c('Viral', 'Bacterial')
+
+  if(length(b$cfg$sensitivity_exclude)) {
+    subjects <- c(subjects, 'viral:sensitivity')
+    labels <- c(labels, paste('Viral without', sensitivity_label(b)))
+  }
+
+  colours <- c('#b95d35', '#247c85', '#7e728e')[seq_along(subjects)]
+  linetypes <- c('solid', 'solid', 'dashed')[seq_along(subjects)]
+
+  available <- subjects %in% b$metrics$subject[
+    b$metrics$metric_type == 'group_index'
+  ]
+  subjects <- subjects[available]
+  labels <- labels[available]
+  colours <- colours[available]
+  linetypes <- linetypes[available]
+
+  d <- b$metrics[
+    b$metrics$metric_type == 'group_index' &
+      b$metrics$subject %in% subjects,
+  ]
+  d$group <- factor(d$subject, levels=subjects, labels=labels)
+
+  # Display existing indices as percentage changes.
+  d$change <- d$value - 100
+
+  ggplot2::ggplot(
+    d,
+    ggplot2::aes(year, change, colour=group, linetype=group)
+  ) +
+    ggplot2::geom_hline(
+      yintercept=0, colour='#9fb0b2', linewidth=.4
+    ) +
+    ggplot2::geom_line(linewidth=1) +
+    ggplot2::geom_point(size=2) +
+    ggplot2::scale_colour_manual(values=setNames(colours, labels)) +
+    ggplot2::scale_linetype_manual(values=setNames(linetypes, labels)) +
+    ggplot2::scale_x_continuous(
+      breaks=sort(unique(c(
+        b$cfg$index_base_year,
+        b$cfg$years[1],
+        b$cfg$years[2] - 2,
+        b$cfg$years[2]
+      )))
+    ) +
+    ggplot2::scale_y_continuous(
+      labels=function(x) paste0(ifelse(x > 0, '+', ''), x, '%')
+    ) +
+    ggplot2::labs(
+      x=NULL,
+      y=paste('Change from', b$cfg$index_base_year)
+    ) +
+    report_theme() +
+    ggplot2::guides(
+      colour=ggplot2::guide_legend(nrow=2),
+      linetype=ggplot2::guide_legend(nrow=2)
+    )
 }
+
 friendly_changes <- function(b) {
   d<-b$metrics[b$metrics$metric_type=='reference_change' & b$metrics$subject %in% group_topics(b),]
   d<-d[order(d$value,decreasing=TRUE),];topics<-d$subject

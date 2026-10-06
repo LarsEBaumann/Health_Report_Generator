@@ -78,12 +78,18 @@ def main():
         work = Path(tmp)
         for name in ["datasets.csv", "harmonised_snapshot.json"]:
             shutil.copy2(root / name, work / name)
+        shutil.copytree(root / "snapshots", work / "snapshots")
         data = pd.read_parquet(root / "harmonised.parquet")
         data[data.dataset_id.astype(str).isin(selected_ids)].to_parquet(work / "harmonised.parquet", index=False)
         validate(work)
         config = load_config(PROFILE)
         title, question = AUDIENCES[args.audience]
         config.update(id=args.audience, title=title, question=question)
+        selected_classes = set(selected.pathogen_class.astype(str))
+        config["classes_in_main_comparison"] = [
+            cls for cls in ("viral", "bacterial")
+            if cls in selected_classes
+        ]
         notes = dict(config.get("exclusion_notes", {}))
         notes["UI-selected datasets"] = ", ".join(f"{labels[x]} [{x}]" for x in selected_ids)
         notes["Lineage artifact run"] = str(args.source_run_id)

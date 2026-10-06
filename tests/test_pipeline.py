@@ -87,6 +87,23 @@ def test_monthly_completeness(project,complete):
         bundle=run(project);m=pd.read_csv(bundle/'metrics.csv').set_index('metric_id');assert m.loc['virus:2025:count','value']==78
         l=pd.read_csv(bundle/'lineage.csv');assert len(l[l.metric_id=='virus:2025:count'])==12
 
+@pytest.mark.parametrize("requested", [["viral"], ["bacterial"]])
+def test_explicit_single_class_comparison(project, requested):
+    cfg_path = project[2]
+    cfg = json.loads(cfg_path.read_text())
+    cfg["classes_in_main_comparison"] = requested
+    cfg_path.write_text(json.dumps(cfg))
+
+    bundle = run(project)
+    metrics = pd.read_csv(bundle / "metrics.csv")
+    subjects = set(
+        metrics.loc[metrics.metric_type == "group_total", "subject"]
+    )
+    assert subjects == {
+        f"{requested[0]}:main",
+        f"{requested[0]}:sensitivity",
+    }
+
 @pytest.mark.parametrize('damage',['negative','duplicate','invalid_date','invalid_value','missing_metadata','truncated_metadata','dropped_sex'])
 def test_bad_input_blocks_gate(project,damage):
     raw,out,*_=project
@@ -162,3 +179,23 @@ def test_checks_cli_exit_code(project):
     run(project);d=pd.read_parquet(project[1]/'harmonised.parquet');d.loc[0,'value']=-1;d.to_parquet(project[1]/'harmonised.parquet')
     p=subprocess.run([sys.executable,str(Path(__file__).resolve().parents[1]/'scripts/health_pipeline/checks.py'),'--out',str(project[1])],capture_output=True)
     assert p.returncode!=0
+@pytest.mark.parametrize("requested", [[], ["viral", "viral"], ["syndromic"]])
+def test_invalid_comparison_classes(project, requested):
+    cfg_path = project[2]
+    cfg = json.loads(cfg_path.read_text())
+    cfg["classes_in_main_comparison"] = requested
+    cfg_path.write_text(json.dumps(cfg))
+
+    with pytest.raises(ValueError):
+        load_config(cfg_path)
+
+
+def test_requested_single_class_still_requires_eligible_members(project):
+    cfg_path = project[2]
+    cfg = json.loads(cfg_path.read_text())
+    cfg["classes_in_main_comparison"] = ["viral"]
+    cfg_path.write_text(json.dumps(cfg))
+    edit_csv(project, lambda d: d.assign(sex="female"))
+
+    with pytest.raises(ValueError, match="No eligible members"):
+        run(project)

@@ -31,7 +31,13 @@ def load_config(path):
     if c['geography'] not in ['CH','CHFL']: raise ValueError('Choose explicit geography CH or CHFL')
     if set(c.get('needs_roles', [])) - {'time','measure','place'}: raise ValueError('Unsupported required roles')
     if not c.get('outputs') or set(c['outputs']) - set(SECTIONS): raise ValueError('Unsupported or empty report sections')
-    if c['classes_in_main_comparison'] != ['viral','bacterial']: raise ValueError('This comparison supports viral and bacterial classes')
+    requested_classes = c['classes_in_main_comparison']
+    if (
+        not requested_classes
+        or len(requested_classes) != len(set(requested_classes))
+        or not set(requested_classes) <= {'viral', 'bacterial'}
+    ):
+        raise ValueError('Choose viral, bacterial, or both without duplicates')
     y0,y1=c['years']
     if any(type(y) is not int for y in [y0,y1,c['reference_year'],c['index_base_year']]) or y0 > y1:
         raise ValueError('Years must be ordered integers')
