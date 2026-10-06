@@ -102,6 +102,9 @@ report_metadata <- function(b) paste0('<div class="report-meta"><span>',length(g
 summary_cards <- function(b) {
   ids<-c('viral:main:reference_change','bacterial:main:reference_change');labels<-c('Viral notifications','Bacterial notifications')
   if(length(b$cfg$sensitivity_exclude)){ids<-c(ids,'viral:sensitivity:reference_change');labels<-c(labels,paste('Viral, without',sensitivity_label(b)))}
+  available <- ids %in% b$metrics$metric_id
+  ids <- ids[available]
+  labels <- labels[available]
   paste0('<div class="metric-grid">',paste(vapply(seq_along(ids),function(i)paste0('<article class="metric-card"><div class="metric-label">',esc(labels[i]),'</div><div class="metric-value">',format_pct(metric_value(b,ids[i])),'</div><p>',report_year(b),' compared with ',b$cfg$reference_year,'</p></article>'),character(1)),collapse=''),'</div>')
 }
 friendly_table <- function(b) {
@@ -117,7 +120,14 @@ findings_html <- function(b,navigation=TRUE) {
   rising <- all(c(metric_value(b,'viral:main:reference_change'),metric_value(b,'bacterial:main:reference_change'))>0,na.rm=FALSE)
   title <- if(isTRUE(rising)) paste0('More notifications in ',year,'.<br>Different patterns behind the rise.') else paste0('Disease notifications:<br>the ',year,' picture.')
   concentrated <- length(b$cfg$sensitivity_exclude)>0 && isTRUE(metric_value(b,'viral:main:reference_change')>0 && metric_value(b,'viral:sensitivity:reference_change')<=0)
-  change_title <- if(concentrated) paste('The viral rise is concentrated in',sensitivity_label(b)) else if(length(b$cfg$sensitivity_exclude)) paste('How does excluding',sensitivity_label(b),'change the picture?') else 'How have the groups changed?'
+  has_sensitivity <- 'viral:sensitivity:reference_change' %in% b$metrics$metric_id
+  change_title <- if(concentrated) {
+    paste('The viral rise is concentrated in', sensitivity_label(b))
+  } else if(has_sensitivity && length(b$cfg$sensitivity_exclude)) {
+    paste('How does excluding', sensitivity_label(b), 'change the picture?')
+  } else {
+    'How have the selected disease groups changed?'
+  }
   parts<-c('<div class="dashboard">',if(navigation)report_navigation(b),paste0('<div class="eyebrow">Annual disease briefing · ',paste(b$cfg$years,collapse='–'),' · comparison with ',ref,'</div><h1>',title,'</h1>'),report_metadata(b))
   if(show_section(b,'headline'))parts<-c(parts,summary_cards(b))
   parts<-c(parts,'<div class="chart-grid">')
@@ -131,15 +141,55 @@ findings_html <- function(b,navigation=TRUE) {
   paste(parts,collapse='\n')
 }
 methods_html <- function(b,navigation=TRUE,prefix='data/') {
-  y<-report_year(b);ref<-b$cfg$reference_year;a<-metric_value(b,paste0('viral:main:',ref,':total'));z<-metric_value(b,paste0('viral:main:',y,':total'))
+    y <- report_year(b)
+  ref <- b$cfg$reference_year
+  available <- c('viral:main', 'bacterial:main')
+  available <- available[
+    paste0(available, ':reference_change') %in% b$metrics$metric_id
+  ]
+  if(!length(available)) stop('No main-group metrics available')
+  trace_subject <- available[1]
+  trace_label <- if(trace_subject == 'viral:main') {
+    'Viral notifications'
+  } else {
+    'Bacterial notifications'
+  }
+  a <- metric_value(b, paste0(trace_subject, ':', ref, ':total'))
+  z <- metric_value(b, paste0(trace_subject, ':', y, ':total'))
   fmt<-function(x)format(x,big.mark=',',scientific=FALSE,trim=TRUE)
   row<-function(k,v)paste0('<div class="audit-row"><span>',esc(k),'</span><strong>',esc(v),'</strong></div>')
   selected<-b$selection[,c('topic','status','reason','group_eligible')];selected$topic<-label_topic(b,selected$topic);selected$group_eligible<-ifelse(tolower(as.character(selected$group_eligible))=='true','Yes','No');names(selected)<-c('Disease or signal','Selection','Reason','In main group')
   sources<-b$sources[b$sources$status=='ok',c('topic','publishing_date','used')];sources$topic<-label_topic(b,sources$topic);sources$used<-ifelse(tolower(as.character(sources$used))=='true','Yes','No');names(sources)<-c('Disease or signal','Published','Used in analysis')
   quality<-as.data.frame(table(b$checks$status));names(quality)<-c('Check result','Number of checks')
   parts<-c('<div class="dashboard">',if(navigation)report_navigation(b,TRUE),'<div class="eyebrow">Companion report / Methods &amp; sources</div><h1>Where the findings come from.</h1>',report_metadata(b),'<div class="audit-grid"><section class="audit-panel" id="selection"><h2>What is included?</h2>',row('Geography',if(b$cfg$geography=='CHFL')'Switzerland + Liechtenstein' else 'Switzerland'),row('Reporting years',paste(b$cfg$years,collapse='–')),row('Reference year',ref))
-  for(cls in c('viral','bacterial')) { topics<-unique(b$series$topic[b$series$pathogen_class==cls & b$series$topic %in% group_topics(b)]);parts<-c(parts,row(paste(tools::toTitleCase(cls),'group'),paste(length(topics),'diseases')),paste0('<p class="caption">',esc(paste(label_topic(b,topics),collapse=', ')),'.</p>')) }
-  parts<-c(parts,paste0('<div class="chart-note">Excluded from group sums: ',esc(paste(label_topic(b,b$cfg$exclude_from_group_totals),collapse=', ')),'. Sentinel estimates are not pooled with mandatory case notifications.</div></section><section class="audit-panel" id="calculations"><h2>Trace a finding, not a code</h2><h3>Viral notifications: ',format_pct(metric_value(b,'viral:main:reference_change'),1),' versus ',ref,'</h3>'),row(paste('Selected cases in',y),fmt(z)),row(paste('Selected cases in',ref),fmt(a)),row('Calculation',paste0('(',fmt(z),' − ',fmt(a),') ÷ ',fmt(a),' × 100')),'<p class="caption">The lineage export links these totals to each disease, then to its original source records. It includes the population denominator for calculated rates.</p></section></div>')
+  for(cls in c('viral', 'bacterial')) {
+    topics <- unique(b$series$topic[
+      b$series$pathogen_class == cls &
+      b$series$topic %in% group_topics(b)
+    ])
+
+    if(!length(topics)) {
+      parts <- c(parts, row(
+        paste(tools::toTitleCase(cls), 'group'),
+        'Not selected for group analysis'
+      ))
+      next
+    }
+
+    parts <- c(
+      parts,
+      row(
+        paste(tools::toTitleCase(cls), 'group'),
+        paste(length(topics), 'diseases')
+      ),
+      paste0(
+        '<p class="caption">',
+        esc(paste(label_topic(b, topics), collapse=', ')),
+        '.</p>'
+      )
+    )
+  }
+  parts<-c(parts,paste0('<div class="chart-note">Excluded from group sums: ',esc(paste(label_topic(b,b$cfg$exclude_from_group_totals),collapse=', ')),'. Sentinel estimates are not pooled with mandatory case notifications.</div></section><section class="audit-panel" id="calculations"><h2>Trace a finding, not a code</h2><h3>',esc(trace_label),': ',format_pct(metric_value(b,paste0(trace_subject,':reference_change')),1),' versus ',ref,'</h3>'),row(paste('Selected cases in',y),fmt(z)),row(paste('Selected cases in',ref),fmt(a)),row('Calculation',paste0('(',fmt(z),' − ',fmt(a),') ÷ ',fmt(a),' × 100')),'<p class="caption">The lineage export links these totals to each disease, then to its original source records. It includes the population denominator for calculated rates.</p></section></div>')
   if(show_section(b,'excluded'))parts<-c(parts,paste0('<section class="audit-panel full"><h2>Dataset selection</h2>',html_table(selected),'<div class="table-note">Source: the saved selection table. “Included” means eligible for disease-level analysis; “In main group” additionally applies the configured source and disease exclusions.</div></section>'))
   if(show_section(b,'quality'))parts<-c(parts,paste0('<section class="audit-panel full"><h2>Data quality</h2>',html_table(quality),'<div class="table-note">Source: automated checks on the full harmonised snapshot. PASS meets the rule; WARN needs interpretation; SKIP means no compatible data for that check. A critical FAIL blocks publication.</div></section>'))
   if(show_section(b,'sources'))parts<-c(parts,paste0('<section class="audit-panel full"><h2>Sources and audit files</h2>',html_table(sources),'<div class="table-note">Source: the dataset registry and original export descriptions. Dates are publisher release dates. Full paths, data and metadata fingerprints are retained in the downloadable source registry.</div><div class="download-links">',paste(vapply(c('sources.csv','selection.csv','lineage.csv','metrics.csv','checks.csv','snapshot.json'),function(n)paste0('<a download href="',prefix,n,'">',esc(n),'</a>'),character(1)),collapse=''),'</div><details><summary>Technical identifiers and exact snapshot</summary><p class="snapshot">',esc(b$manifest$snapshot_id),'</p><p>Full metric identifiers are in metrics.csv. The findings report uses human-readable names instead of printed M-codes. CSV record numbers count the header as record 1; multiline CSV fields may span several text lines.</p></details></section>'))
