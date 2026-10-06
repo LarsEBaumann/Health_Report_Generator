@@ -75,14 +75,18 @@ def download_latest_report():
             shutil.copytree(dest, extracted)
             marker.write_text("ok", encoding="utf-8")
 
-    bundles = [p.parent for p in extracted.rglob("series.csv")
-               if (p.parent / "selection.csv").is_file()]
-    preferred = [p for p in bundles if stakeholder in p.parts]
-    if preferred:
-        bundles = preferred
-    if len(bundles) != 1:
+    bundles = [
+        p.parent
+        for p in extracted.rglob("series.csv")
+        if (p.parent / "selection.csv").is_file()
+    ]
+    preferred = [
+        p for p in bundles
+        if stakeholder in p.parts and p.name == "data"
+    ]
+    if len(preferred) != 1:
         raise RuntimeError(
-            "Expected one series.csv/selection.csv bundle; check artifact layout "
-            "and REPORT_DATA_STAKEHOLDER."
+            f"Expected one data bundle for stakeholder {stakeholder!r}; "
+            f"found: {[str(p) for p in preferred]}"
         )
-    return bundles[0], run, artifact
+    return preferred[0], run, artifact

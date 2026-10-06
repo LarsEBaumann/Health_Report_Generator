@@ -154,7 +154,8 @@ def analyse(out, stakeholder, classes_file, dest):
     for cls in cfg['classes_in_main_comparison']:
         for variant,drop in [('main',set(cfg['exclude_from_group_totals'])),('sensitivity',set(cfg['exclude_from_group_totals'])|set(cfg['sensitivity_exclude']))]:
             members=[u['topic'] for u in used if u['cls']==cls and u['topic'] not in drop and u['source_system'] in cfg['group_source_systems'] and u['measure']=='cases']
-            if not members: raise ValueError(f'No eligible members for {cls}/{variant}')
+            if not members:
+                continue
             subject=f'{cls}:{variant}'
             for year in years:
                 ids=[f'{t}:{year}:count' for t in members]
