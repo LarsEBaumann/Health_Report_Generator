@@ -30,13 +30,27 @@ def atomic_write(path: Path, content: bytes) -> None:
         temp_path = Path(tmp.name)
     os.replace(temp_path, path)
 
-
 def csv_info(content: bytes) -> tuple[list[str], int]:
     text = content.decode("utf-8-sig")
     reader = csv.reader(io.StringIO(text), strict=True)
     columns = next(reader, None)
     if not columns or any(not name.strip() for name in columns):
         raise ValueError("CSV has a missing or invalid header")
+
+    row_count = 0
+    for row_number, row in enumerate(reader, start=2):
+        if not row:
+            continue
+        if len(row) != len(columns):
+            raise ValueError(
+                f"CSV row {row_number} has {len(row)} fields; "
+                f"expected {len(columns)}"
+            )
+        row_count += 1
+
+    if row_count == 0:
+        raise ValueError("CSV contains no data rows")
+    return columns, row_count
 
     row_count = 0
     for row_number, row in enumerate(reader, start=2):
