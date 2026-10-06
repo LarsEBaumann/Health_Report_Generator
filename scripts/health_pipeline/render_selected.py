@@ -111,6 +111,7 @@ def main():
     }
     write_json(output / "provenance.json", provenance)
     render(bundle, output / "report.html", "html", args.quarto)
+    render(bundle, output / "report.pdf", "pdf", args.quarto)
 
 if __name__ == "__main__":
     main()
