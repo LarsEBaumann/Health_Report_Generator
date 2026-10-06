@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Health Report Generator</title>
+<style>
+  :root {
+    --page: #fbfcfe; --card: #ffffff; --ink: #263238; --soft: #55636c; --heading: #173f63;
+    --border: #dde3ea; --public: #2a6b58; --public-dark: #1f5244; --research: #245b8a; --research-dark: #1b4569;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+         font: 17px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 56px 20px 72px; }
+  .eyebrow { margin: 0; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+  h1 { margin: 6px 0 10px; font-size: clamp(30px, 5vw, 44px); line-height: 1.15; color: var(--heading); text-wrap: balance; }
+  .lede { margin: 0 0 36px; max-width: 62ch; font-size: 19px; color: var(--soft); }
+  .question { margin: 0 0 14px; font-size: 22px; font-weight: 650; color: var(--heading); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+  .card { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--border);
+          border-radius: 14px; padding: 26px; box-shadow: 0 3px 10px rgba(30, 55, 80, .07); }
+  .card h2 { margin: 0 0 4px; font-size: 24px; color: var(--heading); }
+  .card .ask { margin: 0 0 14px; color: var(--soft); font-style: italic; }
+  .card ul { margin: 0 0 22px; padding-left: 20px; flex: 1; }
+  .card li { margin: 5px 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .button { display: inline-block; padding: 14px 26px; border-radius: 10px; color: #fff; font-size: 18px;
+            font-weight: 650; text-decoration: none; transition: background .15s ease, transform .15s ease; }
+  .button:hover { transform: translateY(-1px); }
+  .button:focus-visible, .secondary:focus-visible { outline: 3px solid #f2b600; outline-offset: 2px; }
+  .public .button { background: var(--public); }      .public .button:hover { background: var(--public-dark); }
+  .research .button { background: var(--research); }  .research .button:hover { background: var(--research-dark); }
+  .secondary { padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; color: var(--heading);
+               text-decoration: none; font-weight: 600; }
+  .secondary:hover { background: #eef5fb; }
+  .how { margin-top: 44px; padding-top: 26px; border-top: 1px solid var(--border); }
+  .how h2 { margin: 0 0 12px; font-size: 20px; color: var(--heading); }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;
+           margin: 0; padding: 0; list-style: none; counter-reset: step; }
+  .steps li { counter-increment: step; background: var(--card); border: 1px solid var(--border);
+              border-radius: 10px; padding: 14px 16px; font-size: 15px; color: var(--soft); }
+  .steps li b { display: block; color: var(--ink); font-size: 16px; }
+  .steps li::before { content: "0" counter(step); display: block; font: 600 13px ui-monospace, Consolas, monospace;
+                      color: var(--research); margin-bottom: 4px; }
+  footer { margin-top: 40px; font-size: 14px; color: var(--soft); max-width: 75ch; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Infectious disease surveillance · Switzerland and Liechtenstein</p>
+  <h1>Health Report Generator</h1>
+  <p class="lede">One cleaned dataset from the Federal Office of Public Health (FOPH), shaped into a report for each audience. Both reports are built from the same table, so their numbers agree.</p>
+
+  <p class="question">Who are you?</p>
+  <div class="grid">
+    <section class="card public">
+      <h2>Public health officials</h2>
+      <p class="ask">What needs attention now, and where?</p>
+      <ul>
+        <li>Situation at a glance: how many indicators are above their usual level</li>
+        <li>A trend chart for each indicator above its usual level</li>
+        <li>Cantons with the highest incidence</li>
+        <li>Burden this calendar year compared with last year</li>
+        <li>Respiratory season watch</li>
+      </ul>
+      <div class="actions">
+        <a class="button" href="public_health.html">Open the report</a>
+        <a class="secondary" href="Public_health.pdf">PDF</a>
+      </div>
+    </section>
+
+    <section class="card research">
+      <h2>Researchers</h2>
+      <p class="ask">How was it measured, and can I reproduce it?</p>
+      <ul>
+        <li>Data coverage and quality checks for every dataset</li>
+        <li>Methods: comparison window, level rules, definitions</li>
+        <li>Full status table, long-term trends and seasonality</li>
+        <li>Age-group and canton breakdowns</li>
+        <li>The code behind every table and chart</li>
+      </ul>
+      <div class="actions">
+        <a class="button" href="researcher.html">Open the report</a>
+        <a class="secondary" href="Researchers.pdf">PDF</a>
+      </div>
+    </section>
+  </div>
+
+  <section class="how">
+    <h2>How the reports are made</h2>
+    <ol class="steps">
+      <li><b>Fetch</b>FOPH surveillance exports</li>
+      <li><b>Snapshot</b>Raw files archived with checksums</li>
+      <li><b>Harmonise</b>All datasets into one table</li>
+      <li><b>Quality gate</b>Blocking checks before analysis</li>
+      <li><b>Report</b>One Quarto report per audience</li>
+    </ol>
+  </section>
+
+  <footer>
+    <p>Every report ends with a Provenance section recording the source data, checksums, code version, tools and report parameters.</p>
+    <p>Source: FOPH open surveillance data. This is a hackathon prototype, not an official FOPH publication. Reported cases depend on testing and reporting and are not a count of all infections.</p>
+  </footer>
+</main>
+</body>
+</html>

@@ -12,8 +12,8 @@ from pathlib import Path
 import requests
 
 SOURCE_URL = "https://www.idd.bag.admin.ch/api/v1/export/latest/LYME_sentinella/csv"
-DATA_FILE = Path("data/reference/lyme_sentinella/data.csv")
-METADATA_FILE = Path("data/reference/lyme_sentinella/metadata.json")
+DATA_FILE = Path("data/reference/LYME_sentinella/data.csv")
+METADATA_FILE = Path("data/reference/LYME_sentinella/metadata.json")
 REQUIRED_COLUMNS = {
     "valueCategory",
     "temporal",
