@@ -22,6 +22,14 @@ Canonicalization was a source-release change, not a byte-preserving rename. The 
 
 The removal is reversible through Git history, but restoration is not part of the supported production workflow. Any proposed restoration must explain why the older source release is scientifically required and must use a distinct archival path rather than reintroducing an ambiguous active root.
 
-## Licensing
+## Source, terms and acquisition
 
-The repository does not currently state a project-wide license. Source datasets may have their own terms. Preserve publisher metadata and verify applicable source and project licensing before redistribution or release.
+- **Publisher:** Federal Office of Public Health (FOPH/BAG), Infectious Diseases Dashboard (IDD), <https://www.idd.bag.admin.ch/>.
+- **Terms:** the FOPH states the data are publicly accessible and may be used with proper source attribution ([IDD data page](https://www.idd.bag.admin.ch/en/portal-data)). Attribute the FOPH when redistributing reports or data. No separate licence text is given on that page.
+- **Acquisition:** `src/sync_idd_exports.py` downloads `https://api.idd.bag.admin.ch/api/v1/export/latest/<DATASET>/csv` and `/metadata`, and writes `retrieval.json` (source URLs, retrieval time, hashes, row count) beside each export. The publisher updates weekly on Wednesdays; the scheduled workflow commits changes to `data/reference/`.
+- **Layout:** `data/reference/<DATASET>/{data.csv, metadata.json, retrieval.json}`; committed to Git.
+- **Version in a report:** each report's `provenance.json` lists snapshot id, publisher release dates and retrieval dates.
+
+## Project licence
+
+The repository does not yet state a project-wide licence; choosing one is a decision for the repository owner (see `docs/release-checklist.md`). Until then, no reuse rights are granted for the project code. The data terms above are independent of that choice.
