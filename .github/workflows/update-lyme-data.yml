@@ -45,7 +45,7 @@ jobs:
       - name: Test workflow code
         run: python -m pytest -q
       - name: Pull the latest IDD CSV and metadata exports
-        run: python src/sync_idd_exports.py
+        run: python -u src/sync_idd_exports.py
       - name: Commit changed source snapshots
         shell: bash
         run: |
