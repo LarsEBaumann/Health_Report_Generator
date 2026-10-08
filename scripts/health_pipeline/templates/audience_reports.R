@@ -53,7 +53,10 @@ document_limits <- function(b) paste0(
   '<p>Reference year: ', esc(b$cfg$reference_year),
   '. Reporting window: ', esc(paste(b$cfg$years, collapse='–')),
   '. This report does not calculate weekly alert levels, seasonal comparison ',
-  'windows, age distributions or canton maps.</p>'
+  'windows, age distributions or canton maps.</p>',
+  '<p>Recent years can still be revised by the publisher as late notifications arrive; ',
+  'the snapshot identifier below pins exactly which release was used.</p>',
+  '<p>', esc(quality_sentence(b)), '</p>'
 )
 
 document_provenance <- function(b) {
@@ -116,7 +119,11 @@ audience_document_html <- function(b, navigation=TRUE) {
       paste0(selection_intro(b),
              if(show_section(b, 'headline')) summary_cards(b) else ''))
 
+  if(p$layout == 'dashboard')
+    add('monitoring', 'Monitoring summary', monitoring_summary(b))
+
   if(technical) {
+    add('parameters', 'Effective parameters and filters', effective_parameters_table(b))
     add('coverage', 'Selected data coverage', html_table(selected_coverage(b)))
     if(show_section(b, 'quality'))
       add('quality', 'Quality checks', quality_document(b))
@@ -320,3 +327,173 @@ audience_document_pdf <- function(b) {
       'Source definitions and record-level traceability are in the companion ',
       '[Methods and sources report](methods.pdf).\n\n', sep='')
 }
+
+# ---------------------------------------------------------------------------
+# Phase 5: parameter-driven audience content and embedded provenance.
+# Everything below reads saved bundle tables or the provenance record written by
+# publish.py; nothing recalculates statistics.
+# ---------------------------------------------------------------------------
+read_provenance <- function(path='provenance.json') {
+  if(!file.exists(path)) return(NULL)
+  jsonlite::fromJSON(path, simplifyVector=FALSE)
+}
+
+# Machine-readable provenance inside every HTML output. "</" is escaped so the
+# JSON cannot terminate the script element.
+provenance_script <- function(path='provenance.json') {
+  if(!file.exists(path)) return('')
+  json <- paste(readLines(path, warn=FALSE, encoding='UTF-8'), collapse='\n')
+  json <- gsub('</', '<\\/', json, fixed=TRUE)
+  paste0('<script type="application/json" id="report-provenance">', json, '</script>')
+}
+
+detail_level <- function(b) presentation_profile(b)$detail_level
+
+check_counts <- function(b) {
+  s <- toupper(as.character(b$checks$status))
+  list(pass=sum(s=='PASS'), warn=sum(s=='WARN'), skip=sum(s=='SKIP'), fail=sum(s=='FAIL'), total=length(s))
+}
+
+# Plain-language and operational translations of the same quality results.
+quality_sentence <- function(b) {
+  q <- check_counts(b)
+  if(detail_level(b) == 'plain_language') {
+    paste0('Before this summary was made, the data went through ', q$total,
+           ' automatic checks. ', q$pass, ' passed. ', q$warn,
+           ' raised a warning that a person needs to interpret, and ', q$skip,
+           ' could not be applied to this kind of data. Any serious failure would have stopped the report from being published.')
+  } else {
+    paste0(q$total, ' automated checks on this data release: ', q$pass, ' PASS, ', q$warn,
+           ' WARN (needs interpretation), ', q$skip, ' SKIP (not applicable; not a pass), ',
+           q$fail, ' FAIL. Blocking failures prevent publication.')
+  }
+}
+
+provenance_summary <- function(b) {
+  pr <- read_provenance()
+  row <- function(k, v) paste0('<dt>', esc(k), '</dt><dd>', v, '</dd>')
+  p <- presentation_profile(b)
+  items <- c(row('Audience profile', esc(paste0(b$cfg$id, ' (', p$display_name, ', ', p$layout, ', ', p$detail_level, ')'))),
+             row('Data snapshot', paste0('<code>', esc(b$manifest$snapshot_id), '</code>')))
+  if(!is.null(pr)) {
+    rng <- function(x) if(is.null(x)) 'not recorded' else esc(paste(unique(substr(unlist(x), 1, 10)), collapse=' to '))
+    items <- c(items,
+      row('Source', esc(pr$data$publisher)),
+      row('Publisher release dates', rng(pr$data$publishing_date_range)),
+      row('Downloaded from the API', rng(pr$data$retrieved_at_utc_range)),
+      row('Input root', paste0('<code>', esc(if(is.null(pr$data$canonical_root)) pr$data$snapshot_manifest else pr$data$canonical_root), '</code>')),
+      row('Filters', esc(paste0(pr$filters$geography, ' · ', paste(unlist(pr$filters$years), collapse='–'),
+                                ' vs ', pr$filters$reference_year, ' · measure: ', paste(unlist(pr$filters$measures_preferred), collapse=', '),
+                                ' · excluded from group sums: ', paste(label_topic(b, unlist(pr$filters$exclude_from_group_totals)), collapse=', '),
+                                ' · sensitivity comparison without: ', paste(label_topic(b, unlist(pr$filters$sensitivity_exclude)), collapse=', ')))),
+      row('Code version', paste0('<code>', esc(if(is.null(pr$code$git_commit)) 'not recorded' else pr$code$git_commit), '</code>',
+                                 if(isFALSE(pr$code$git_worktree_clean)) ' (uncommitted changes present)' else '')),
+      row('Rendered', esc(pr$rendered_at_utc)))
+  }
+  paste0('<dl class="provenance-list">', paste(items, collapse=''), '</dl>',
+         '<p><a href="provenance.json" download>Download provenance (JSON)</a> · ',
+         '<a href="data/stakeholder.json" download>Audience parameters</a> · ',
+         '<a href="data/bundle.json" download>Bundle manifest</a> · ',
+         '<a href="methods.html">Methods and source traceability</a></p>',
+         '<p class="table-note">The same record is embedded in this page as ',
+         '<code>&lt;script type="application/json" id="report-provenance"&gt;</code>.</p>')
+}
+document_provenance <- function(b) provenance_summary(b)
+
+# Operational monitoring: largest absolute and relative changes with counts, and
+# a small-number caution. The threshold is a display rule, not a statistical test.
+SMALL_COUNT <- 20
+monitoring_table <- function(b) {
+  d <- friendly_changes(b)
+  d$Difference <- d$Latest - d$Baseline
+  d <- d[order(abs(d$Difference), decreasing=TRUE), ]
+  caution <- ifelse(pmin(d$Baseline, d$Latest) < SMALL_COUNT, 'Small numbers: interpret with caution', '')
+  fmt <- function(x) format(x, big.mark=',', scientific=FALSE, trim=TRUE)
+  out <- data.frame(Disease=d$Disease, Reference=fmt(d$Baseline), Latest=fmt(d$Latest),
+                    Difference=ifelse(d$Difference > 0, paste0('+', fmt(d$Difference)), fmt(d$Difference)),
+                    Change=format_pct(d$Change, 1), Note=caution, check.names=FALSE)
+  names(out)[2:3] <- c(paste('Cases', b$cfg$reference_year), paste('Cases', report_year(b)))
+  if(all(out$Note == '')) out$Note <- NULL
+  out
+}
+monitoring_summary <- function(b) {
+  d <- friendly_changes(b); d$Difference <- d$Latest - d$Baseline
+  up <- d[d$Difference > 0, ]; up <- up[order(up$Difference, decreasing=TRUE), ]
+  down <- d[d$Difference < 0, ]; down <- down[order(down$Difference), ]
+  li <- function(x) if(!nrow(x)) '<li>None</li>' else paste0('<li><strong>', esc(x$Disease), '</strong>: ',
+        format(x$Baseline, big.mark=','), ' → ', format(x$Latest, big.mark=','), ' cases (', format_pct(x$Change), ')</li>', collapse='')
+  paste0('<div class="monitoring-grid"><div><h3>Largest increases in reported cases</h3><ul>', li(head(up, 3)),
+         '</ul></div><div><h3>Largest decreases</h3><ul>', li(head(down, 3)), '</ul></div></div>',
+         '<p class="table-note">Ranked by absolute difference in notified cases, ', report_year(b), ' versus ', b$cfg$reference_year,
+         '. Scope: ', if(b$cfg$geography=='CHFL') 'Switzerland and Liechtenstein combined' else 'Switzerland',
+         ' national totals. Canton-level breakdowns are not part of this release because they are not available for every selected disease. ',
+         'A change versus the reference year is not an outbreak signal or seasonal threshold.</p>',
+         html_table(monitoring_table(b)),
+         '<p class="table-note">Diseases with fewer than ', SMALL_COUNT, ' cases in either year are flagged as small numbers',
+         if(all(pmin(d$Baseline, d$Latest) >= SMALL_COUNT)) '; none of the selected diseases is below that level in this release.' else '.', '</p>',
+         '<p class="table-note">', esc(quality_sentence(b)), ' <a href="methods.html#selection">Selection decisions</a></p>')
+}
+
+effective_parameters_table <- function(b) {
+  c <- b$cfg
+  v <- function(x) paste(unlist(x), collapse=', ')
+  d <- data.frame(Parameter=c('Stakeholder id','Geography','Reporting years','Reference year','Index base year',
+                              'Preferred measures','Classes compared','Excluded from group sums','Sensitivity exclusion',
+                              'Source priority','Sources summed in groups','Dimension filters','Sections shown','Presentation'),
+                  Value=c(c$id, c$geography, v(c$years), c$reference_year, c$index_base_year, v(c$measures_preferred),
+                          v(c$classes_in_main_comparison), v(c$exclude_from_group_totals), v(c$sensitivity_exclude),
+                          v(c$source_priority), v(c$group_source_systems),
+                          if(length(c$dimension_filters)) paste(vapply(names(c$dimension_filters), function(k)
+                            paste0(k, ': ', paste(names(c$dimension_filters[[k]]$values), unlist(c$dimension_filters[[k]]$values), sep='=', collapse=';')),
+                            character(1)), collapse=' | ') else 'none',
+                          v(c$outputs), paste(presentation_profile(b)$layout, presentation_profile(b)$detail_level, sep=' / ')),
+                  check.names=FALSE)
+  paste0(html_table(d), '<p class="table-note">Source: <a href="data/stakeholder.json" download>stakeholder.json</a>, ',
+         'validated against workflow/config.schema.json. Audiences differ only in these parameters.</p>')
+}
+
+# Public (editorial) additions: translate uncertainty instead of hiding it.
+public_explainer <- function(b) {
+  excluded <- paste(label_topic(b, b$cfg$exclude_from_group_totals), collapse=' and ')
+  sens <- metric_value(b, 'viral:sensitivity:reference_change')
+  sens_text <- if(length(b$cfg$sensitivity_exclude) && !is.na(sens)) paste0(
+    '<li><strong>One disease can dominate a group.</strong> Without ', esc(sensitivity_label(b)),
+    ', the change for viral diseases is ', format_pct(sens), ' instead of ',
+    format_pct(metric_value(b, 'viral:main:reference_change')), '. These data show where the change is, not why it happened.</li>') else ''
+  paste0(
+    '<section class="chart-panel full plain-language" id="how-sure"><h2>How sure can we be?</h2><ul>',
+    '<li><strong>These are reported cases, not all infections.</strong> Many people with mild illness never see a doctor or get tested, so the real number of infections is higher.</li>',
+    '<li><strong>More testing finds more cases.</strong> A rise can mean the disease spread more, that more people were tested, or both. These numbers alone cannot tell which.</li>',
+    sens_text,
+    '<li><strong>Small numbers jump around.</strong> When a disease has only a few cases, a small change can look like a big percentage.</li>',
+    '<li><strong>Recent numbers can still change.</strong> The Federal Office of Public Health may update counts for recent years as late reports arrive.</li>',
+    '<li><strong>What is left out.</strong> ', esc(excluded), ' are not added to the group totals, and estimates from the doctors’ sample network (Sentinella) are not mixed with confirmed reports.</li>',
+    '</ul><p>', esc(quality_sentence(b)), '</p>',
+    '<p>This summary describes what was reported. It does not say whether a change is due to chance, and it does not explain causes. ',
+    'If you are worried about an illness, talk to a doctor.</p></section>',
+    '<section class="chart-panel full" id="provenance"><h2>Where this comes from</h2>', provenance_summary(b), '</section>')
+}
+audience_extras <- function(b) if(presentation_profile(b)$layout == 'editorial') public_explainer(b) else ''
+
+# Lightweight, dependency-free interactivity for every HTML audience:
+# filter any report table and sort by clicking a column heading.
+interactive_tables_script <- function() paste0('<script>', "
+(function(){
+  function num(t){var x=t.replace(/[,%+\\s]/g,'').replace('\\u2212','-');return x!==''&&!isNaN(x)?parseFloat(x):null;}
+  document.querySelectorAll('table.report-table').forEach(function(tbl,ti){
+    var wrap=tbl.parentNode, body=tbl.tBodies[0]; if(!body) return;
+    var input=document.createElement('input'); input.type='search'; input.className='table-filter';
+    input.placeholder='Filter rows'; input.setAttribute('aria-label','Filter table rows');
+    wrap.parentNode.insertBefore(input,wrap);
+    input.addEventListener('input',function(){var q=input.value.toLowerCase();
+      Array.prototype.forEach.call(body.rows,function(r){r.style.display=r.textContent.toLowerCase().indexOf(q)>-1?'':'none';});});
+    Array.prototype.forEach.call(tbl.tHead?tbl.tHead.rows[0].cells:[],function(th,ci){
+      th.tabIndex=0; th.className+=' sortable'; th.title='Sort by this column'; var asc=true;
+      function sort(){var rows=Array.prototype.slice.call(body.rows);
+        rows.sort(function(a,b){var x=a.cells[ci].textContent.trim(),y=b.cells[ci].textContent.trim(),nx=num(x),ny=num(y);
+          var c=(nx!==null&&ny!==null)?nx-ny:x.localeCompare(y);return asc?c:-c;});
+        rows.forEach(function(r){body.appendChild(r);}); th.setAttribute('aria-sort',asc?'ascending':'descending'); asc=!asc;}
+      th.addEventListener('click',sort); th.addEventListener('keydown',function(e){if(e.key==='Enter')sort();});
+    });
+  });
+})();", '</script>')

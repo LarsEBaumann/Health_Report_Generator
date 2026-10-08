@@ -54,3 +54,13 @@ body {background:var(--paper);color:var(--ink);font-family:Arial,sans-serif;font
   .document-toc nav{position:static}
   .document-toc{border-bottom:1px solid var(--rule);padding:18px 0}
 }
+
+/* Phase 5: audience-specific blocks and table interactivity. */
+.table-filter{margin:14px 0 0;padding:7px 10px;border:1px solid var(--rule);border-radius:6px;font-size:13px;min-width:220px}
+.dashboard th.sortable{cursor:pointer;user-select:none}
+.dashboard th.sortable:after{content:' \2195';color:var(--rule)}
+.monitoring-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.monitoring-grid ul{padding-left:18px;margin:6px 0}
+.plain-language ul{padding-left:20px}
+.plain-language li{margin:8px 0;color:var(--subtle)}
+@media(max-width:700px){.monitoring-grid{grid-template-columns:1fr}}

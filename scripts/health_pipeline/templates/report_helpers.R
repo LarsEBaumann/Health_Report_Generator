@@ -186,6 +186,7 @@ findings_html <- function(b,navigation=TRUE) {
   if(show_section(b,'change_table'))parts<-c(parts,paste0('<details><summary>View the figures behind the comparison</summary>',html_table(friendly_table(b)),'<div class="table-note">Source: selected FOPH annual national case counts. Change = (latest count − baseline count) ÷ baseline count × 100. Values are rounded for display. <a href="methods.html#calculations">View calculation details</a></div></details>'))
   if(show_section(b,'small_multiples'))parts<-c(parts,'</section>')
   parts <- c(parts, technical_findings(b))
+  parts <- c(parts, audience_extras(b))
   parts<-c(parts,'<footer class="dash-footer"><span>Notifications reflect surveillance and testing as well as disease occurrence.</span><a href="methods.html">Read the methods &amp; source report →</a></footer></div>')
   paste(parts,collapse='\n')
 }
