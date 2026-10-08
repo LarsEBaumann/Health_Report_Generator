@@ -12,9 +12,13 @@
   },
   "tinytex": {
     "validated": "2026.10",
-    "asset": "TinyTeX-1-linux-x86_64-v2026.10.tar.xz",
-    "sha256": "4d519d6236ee6798e3ec0d8e2093d1fda01aeb267aa22c2a5586d76bcfce6566",
-    "reproducibility_note": "CI downloads the immutable release asset by versioned URL and verifies its SHA-256 digest before installation."
+    "bundle": "TinyTeX",
+    "asset": "TinyTeX-linux-x86_64-v2026.10.tar.xz",
+    "sha256": "54fec1c79ab437d2d52e2f918bdb738c85779d654a93e62cc44f022e227692b5",
+    "required_latex_files": [
+      "scrartcl.cls"
+    ],
+    "reproducibility_note": "CI downloads the immutable, versioned TinyTeX bundle, verifies its SHA-256 digest, and checks that the KOMA-Script class required by PDF reports is present before the build."
   },
   "uv": {
     "validated": "0.8.14"

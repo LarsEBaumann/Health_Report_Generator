@@ -2,8 +2,8 @@
 set -euo pipefail
 
 version="2026.10"
-asset="TinyTeX-1-linux-x86_64-v2026.10.tar.xz"
-expected_sha256="4d519d6236ee6798e3ec0d8e2093d1fda01aeb267aa22c2a5586d76bcfce6566"
+asset="TinyTeX-linux-x86_64-v2026.10.tar.xz"
+expected_sha256="54fec1c79ab437d2d52e2f918bdb738c85779d654a93e62cc44f022e227692b5"
 requested_version="${1:-$version}"
 
 if [[ "$requested_version" != "$version" ]]; then
@@ -20,5 +20,10 @@ echo "${expected_sha256}  ${archive}" | sha256sum --check --status
 rm -rf "$HOME/.TinyTeX"
 tar -xJf "$archive" -C "$HOME"
 
-echo "$HOME/.TinyTeX/bin/x86_64-linux" >> "$GITHUB_PATH"
-"$HOME/.TinyTeX/bin/x86_64-linux/tlmgr" --version
+tinytex_bin="$HOME/.TinyTeX/bin/x86_64-linux"
+echo "$tinytex_bin" >> "$GITHUB_PATH"
+"$tinytex_bin/tlmgr" --version
+"$tinytex_bin/kpsewhich" scrartcl.cls >/dev/null || {
+  echo "Pinned TinyTeX bundle does not contain required class scrartcl.cls" >&2
+  exit 3
+}

@@ -45,10 +45,19 @@ def test_tinytex_contract_is_aligned():
     assert f'asset="{tinytex["asset"]}"' in installer
     assert f'expected_sha256="{tinytex["sha256"]}"' in installer
     assert 'requested_version="${1:-$version}"' in installer
+    assert tinytex["bundle"] == "TinyTeX"
+    for required_file in tinytex["required_latex_files"]:
+        assert f'kpsewhich" {required_file}' in installer
     for workflow in WORKFLOWS:
         content = text(workflow)
         assert "tinytex: true" not in content
         assert f'install_tinytex.sh {tinytex["validated"]}' in content
+
+
+def test_validation_runs_for_push_and_pull_requests():
+    workflow = text(".github/workflows/validate.yml")
+    assert "  push:" in workflow
+    assert "  pull_request:" in workflow
 
 
 def test_workflow_branch_refs_are_main():
