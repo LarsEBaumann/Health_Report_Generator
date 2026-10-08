@@ -4,7 +4,7 @@ The connector app reads a **versioned lineage artifact**. It does not read `data
 
 ## 1. Get a lineage artifact
 
-Run the update workflow on the `connector` branch in GitHub Actions. When it succeeds, note its numeric run ID. Then download the artifact locally with GitHub CLI:
+Run the update workflow on the `main` branch in GitHub Actions. When it succeeds, note its numeric run ID. Then download the artifact locally with GitHub CLI:
 
 ```bash
 gh auth login
@@ -32,8 +32,8 @@ export GITHUB_REPOSITORY=LarsEBaumann/Health_Report_Generator
 
 ```bash
 cd ~/projects/Health_Report_Generator
-git switch connector
-git pull --ff-only origin connector
+git switch main
+git pull --ff-only origin main
 
 LOCAL_UID="$(id -u)" LOCAL_GID="$(id -g)" \
 LINEAGE_RUN_ID="$LINEAGE_RUN_ID" \
