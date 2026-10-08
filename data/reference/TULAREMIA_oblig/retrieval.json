@@ -2,9 +2,9 @@
   "dataset_id": "TULAREMIA_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TULAREMIA_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TULAREMIA_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:32:43.421886+00:00",
-  "csv_sha256": "8e2a4f79e50d510b75ff5a169b02374c642e6bd78ae3140c6af67fb0e15d8bc8",
-  "metadata_sha256": "7dafff6095fe5564eb21eb4fe5b29811909db78898d60362c9ba905e40835362",
+  "retrieved_at_utc": "2026-10-08T09:03:40.077076+00:00",
+  "csv_sha256": "e100227405ff183d7d27af12551192a4702de6cd3daa41a0041fb647f21c9af9",
+  "metadata_sha256": "7be8487113f3024e2e5ff9055729780e82070fa2a872a6ef7a50e7e24398e093",
   "row_count": 741,
   "columns": [
     "valueCategory",

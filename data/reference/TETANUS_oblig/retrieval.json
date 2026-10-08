@@ -2,9 +2,9 @@
   "dataset_id": "TETANUS_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TETANUS_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TETANUS_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:32:42.262635+00:00",
-  "csv_sha256": "70d42a4ff71557c11a493302e6f1babee56e1d3a3ff9c0776eeba0538e60abc0",
-  "metadata_sha256": "2c7061aa7bd57a916137a29c6a2089e9b1bbcd1d4c36e52423b80088bb607fa9",
+  "retrieved_at_utc": "2026-10-08T09:03:38.932543+00:00",
+  "csv_sha256": "0187a5ddb5781197b16ca311908cb0075153803295dc969021d0a8d4d5291ff1",
+  "metadata_sha256": "9d7bb56feb058e1b1ca4edf7d9078a9860282f295dd7874d7febc9dfc6f22b25",
   "row_count": 26,
   "columns": [
     "valueCategory",

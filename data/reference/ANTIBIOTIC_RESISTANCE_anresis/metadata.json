@@ -1,0 +1,153 @@
+{
+  "metaVariables": {
+    "topic": "antibiotic_resistance",
+    "source": "swiss_center_for_antibiotic_resistance",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
+    "publicationFrequency": {
+      "frequency": "monthly",
+      "frequencyDescription": "First Wednesday after day 1 of every month. The exact weekday can vary due to public holidays. Because of reporting delays, there is a gap of 3 months between the publication date and published data."
+    },
+    "expectedPublicationDelay": {
+      "delay": 90,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 90 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": [
+        "drug_resistant_pathogen"
+      ]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": [
+      "year"
+    ]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "country": {
+          "valueSet": "CH",
+          "allValue": "all"
+        },
+        "linguistic_region": {
+          "valueSet": [
+            "D-CH",
+            "F-CH",
+            "I-CH",
+            "unknown"
+          ],
+          "allValue": "all"
+        }
+      }
+    },
+    "agegroup": {
+      "column": "agegroup",
+      "columnDescription": "Age range brackets used for grouping.",
+      "typeColumn": "agegroup_type",
+      "typeColumnDescription": "Specifies the type of agegroup in the property 'agegroup'.",
+      "typeValues": {
+        "agegroup_anresis": {
+          "valueSet": [],
+          "allValue": "all"
+        }
+      }
+    },
+    "sex": {
+      "column": "sex",
+      "columnDescription": "Sex specification used for grouping.",
+      "valueSet": [],
+      "allValue": "all"
+    },
+    "pathogen": {
+      "column": "pathogen",
+      "columnDescription": "Pathogen specification used for grouping.",
+      "valueSet": [
+        "CRE",
+        "ESCR-E.coli",
+        "ESCR-K.pneumoniae",
+        "FQR-E.coli",
+        "MRSA",
+        "VRE"
+      ],
+      "allValue": "all"
+    },
+    "testResult": {
+      "column": "testResult",
+      "columnDescription": "Test result used for grouping. In the context of ANRESIS data, 'testResult' positive means the tested organism is resistant, while negative means it is susceptible at the standard antibiotic dose or susceptible at an increased dose",
+      "valueSet": [
+        "negative",
+        "positive"
+      ],
+      "allValue": "all"
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        10267.3
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valueRaw": {
+      "description": "The property 'valueRaw' represents the value defined by the property 'valueCategory' within the given temporal unit and grouping reported by the subset of participating individuals and/or institutions.",
+      "valueSetOrRange": [
+        0,
+        10249
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        7415102,
+        9127125
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "prct": {
+      "description": "Proportion of the entry in the property 'value' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValue": {
+      "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
+      "valueSetOrRange": [
+        0,
+        119.3
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "prctRaw": {
+      "description": "Proportion of the entry in the property 'valueRaw' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {}
+}

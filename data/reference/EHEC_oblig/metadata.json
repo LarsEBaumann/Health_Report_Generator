@@ -158,7 +158,7 @@
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
         15778,
-        9091915
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"

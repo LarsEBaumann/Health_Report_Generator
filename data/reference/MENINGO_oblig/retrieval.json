@@ -2,9 +2,9 @@
   "dataset_id": "MENINGO_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/MENINGO_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/MENINGO_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:31:54.774188+00:00",
-  "csv_sha256": "1e155d30edc098657d9054cd3c642b02dbdbdb3120a2df350e3539f17a712b9f",
-  "metadata_sha256": "91b165f9bed5e79e9ad43797c3745bb68628f20c27d123852efab187f59b0792",
+  "retrieved_at_utc": "2026-10-08T09:02:52.462137+00:00",
+  "csv_sha256": "73c8ddf1d392b48ae7ed33378f2bc117c37808083cfe7b43553637f3bdcfe4be",
+  "metadata_sha256": "fcee9ff1d1322812f78c7a6f3a07e1fee8d7ab02956c882a598bf734d1d12e80",
   "row_count": 26,
   "columns": [
     "valueCategory",

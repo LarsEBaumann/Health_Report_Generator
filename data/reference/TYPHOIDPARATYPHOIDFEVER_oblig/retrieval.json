@@ -2,9 +2,9 @@
   "dataset_id": "TYPHOIDPARATYPHOIDFEVER_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TYPHOIDPARATYPHOIDFEVER_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/TYPHOIDPARATYPHOIDFEVER_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:32:43.807071+00:00",
-  "csv_sha256": "d4dfb160b111321ebc11a215494a3b932522efe61fb8528f2d805eae5f66a8a2",
-  "metadata_sha256": "ab140b7f03c0e9d64d920ad25f612781fff5b26ec8a32e13362a1fcb15d8fad8",
+  "retrieved_at_utc": "2026-10-08T09:03:40.453419+00:00",
+  "csv_sha256": "4c44f43f89b0fa895f77401569ff785067c580fc762dfee64bec41e04cfe3b65",
+  "metadata_sha256": "0df7aae95aebef6d285f0053ad1680d96fff1479d03400c78c065670582fda11",
   "row_count": 26,
   "columns": [
     "valueCategory",

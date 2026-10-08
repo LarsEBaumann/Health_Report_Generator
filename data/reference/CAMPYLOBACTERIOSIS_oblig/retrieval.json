@@ -2,9 +2,9 @@
   "dataset_id": "CAMPYLOBACTERIOSIS_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CAMPYLOBACTERIOSIS_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CAMPYLOBACTERIOSIS_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:30:12.367259+00:00",
-  "csv_sha256": "19b915920c0f6ffc6fa456300ab5138b98b180d38ce5a29bc959ece7d414503b",
-  "metadata_sha256": "025b5f11cbf0c6b486aa16115966d54d44bea2a8d80653c0ea14ce86ef90ee19",
+  "retrieved_at_utc": "2026-10-08T09:01:02.350552+00:00",
+  "csv_sha256": "d3acf4a9f9cc32bcb942683d75ec3105bd11986ca77581930340c7976d778101",
+  "metadata_sha256": "4a7a0e08a1134dad5baacb10e055921e0b44e20fef6534987696f75c593bd511",
   "row_count": 755,
   "columns": [
     "valueCategory",

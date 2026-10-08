@@ -2,8 +2,8 @@
   "metaVariables": {
     "topic": "gonorrhea",
     "source": "mandatory_reporting_system",
-    "publishingDate": "2026-09-02",
-    "sourceDate": "2026-09-01",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
     "publicationFrequency": {
       "frequency": "monthly",
       "frequencyDescription": "First Wednesday after day 1 of every month. The exact weekday can vary due to public holidays. Because of reporting delays, there is a gap of 3 months between the publication date and published data."
@@ -130,8 +130,8 @@
     "pop": {
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
-        36942,
-        9091915
+        37129,
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"
@@ -149,7 +149,7 @@
       "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
       "valueSetOrRange": [
         0.08,
-        201.49
+        202.42
       ],
       "nullValue": "NA",
       "type": "double"
@@ -158,7 +158,7 @@
       "description": "Right-aligned, rolling 3-month mean of the property 'incValue' within the grouping described in the property name.",
       "valueSetOrRange": [
         1.47,
-        7.14
+        7.13
       ],
       "nullValue": "NA",
       "type": "double"

@@ -2,9 +2,9 @@
   "dataset_id": "HANTA_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HANTA_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HANTA_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:31:34.140479+00:00",
-  "csv_sha256": "07fd543f65e038edeb4184beab6fb84b0ba59705c83667cb3e24ebd63ff78999",
-  "metadata_sha256": "565f05599086f3e4b3b65c3e8a27e668cbbfdbeafe4ab6affd8876e872f5a7b6",
+  "retrieved_at_utc": "2026-10-08T09:02:32.006991+00:00",
+  "csv_sha256": "28959dfa55baf15f8e8bd5f328a74bc1a09c3e6c890f9636b56f0e5531f963c1",
+  "metadata_sha256": "32764a89ba707151b53a4d17d71e488b4df65b588372faa46cdf6b2179c38fca",
   "row_count": 26,
   "columns": [
     "valueCategory",

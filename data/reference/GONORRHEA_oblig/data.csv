@@ -1,40 +1,40 @@
 valueCategory,temporal,temporal_type,georegion,georegion_type,agegroup,agegroup_type,sex,value,pop,incValue,valueYearCumSum,incValueMean3m,valueMean3y,trend,prct,deltaValue,deltaIncValue,incValuePrctChange,valueMean5y,dataComplete
-cases,2013-M01,month,CHFL,CHFL,all,agegroup_sti,all,171,8176573,2.09,171,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M02,month,CHFL,CHFL,all,agegroup_sti,all,109,8176573,1.33,280,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M03,month,CHFL,CHFL,all,agegroup_sti,all,145,8176573,1.77,425,1.73,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M04,month,CHFL,CHFL,all,agegroup_sti,all,159,8176573,1.94,584,1.68,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M05,month,CHFL,CHFL,all,agegroup_sti,all,147,8176573,1.8,731,1.84,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M06,month,CHFL,CHFL,all,agegroup_sti,all,123,8176573,1.5,854,1.75,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M07,month,CHFL,CHFL,all,agegroup_sti,all,161,8176573,1.97,1015,1.76,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M08,month,CHFL,CHFL,all,agegroup_sti,all,134,8176573,1.64,1149,1.7,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M09,month,CHFL,CHFL,all,agegroup_sti,all,138,8176573,1.69,1287,1.77,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M10,month,CHFL,CHFL,all,agegroup_sti,all,130,8176573,1.59,1417,1.64,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M11,month,CHFL,CHFL,all,agegroup_sti,all,137,8176573,1.68,1554,1.65,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013-M12,month,CHFL,CHFL,all,agegroup_sti,all,107,8176573,1.31,1661,1.53,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M01,month,CHFL,CHFL,all,agegroup_sti,all,164,8274608,1.98,164,1.66,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M02,month,CHFL,CHFL,all,agegroup_sti,all,114,8274608,1.38,278,1.56,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M03,month,CHFL,CHFL,all,agegroup_sti,all,126,8274608,1.52,404,1.63,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M04,month,CHFL,CHFL,all,agegroup_sti,all,133,8274608,1.61,537,1.5,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M05,month,CHFL,CHFL,all,agegroup_sti,all,162,8274608,1.96,699,1.7,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M06,month,CHFL,CHFL,all,agegroup_sti,all,119,8274608,1.44,818,1.67,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M07,month,CHFL,CHFL,all,agegroup_sti,all,133,8274608,1.61,951,1.67,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M08,month,CHFL,CHFL,all,agegroup_sti,all,161,8274608,1.95,1112,1.67,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M09,month,CHFL,CHFL,all,agegroup_sti,all,102,8274608,1.23,1214,1.6,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M10,month,CHFL,CHFL,all,agegroup_sti,all,137,8274608,1.66,1351,1.61,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M11,month,CHFL,CHFL,all,agegroup_sti,all,127,8274608,1.53,1478,1.47,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014-M12,month,CHFL,CHFL,all,agegroup_sti,all,114,8274608,1.38,1592,1.52,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M01,month,CHFL,CHFL,all,agegroup_sti,all,187,8362816,2.24,187,1.72,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M02,month,CHFL,CHFL,all,agegroup_sti,all,155,8362816,1.85,342,1.82,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M03,month,CHFL,CHFL,all,agegroup_sti,all,172,8362816,2.06,514,2.05,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M04,month,CHFL,CHFL,all,agegroup_sti,all,144,8362816,1.72,658,1.88,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M05,month,CHFL,CHFL,all,agegroup_sti,all,160,8362816,1.91,818,1.9,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M06,month,CHFL,CHFL,all,agegroup_sti,all,141,8362816,1.69,959,1.77,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M07,month,CHFL,CHFL,all,agegroup_sti,all,170,8362816,2.03,1129,1.88,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M08,month,CHFL,CHFL,all,agegroup_sti,all,188,8362816,2.25,1317,1.99,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M09,month,CHFL,CHFL,all,agegroup_sti,all,180,8362816,2.15,1497,2.14,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M10,month,CHFL,CHFL,all,agegroup_sti,all,172,8362816,2.06,1669,2.15,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M11,month,CHFL,CHFL,all,agegroup_sti,all,195,8362816,2.33,1864,2.18,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015-M12,month,CHFL,CHFL,all,agegroup_sti,all,163,8362816,1.95,2027,2.11,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M01,month,CHFL,CHFL,all,agegroup_sti,all,171,8176760,2.09,171,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M02,month,CHFL,CHFL,all,agegroup_sti,all,109,8176760,1.33,280,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M03,month,CHFL,CHFL,all,agegroup_sti,all,145,8176760,1.77,425,1.73,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M04,month,CHFL,CHFL,all,agegroup_sti,all,159,8176760,1.94,584,1.68,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M05,month,CHFL,CHFL,all,agegroup_sti,all,147,8176760,1.8,731,1.84,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M06,month,CHFL,CHFL,all,agegroup_sti,all,123,8176760,1.5,854,1.75,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M07,month,CHFL,CHFL,all,agegroup_sti,all,161,8176760,1.97,1015,1.76,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M08,month,CHFL,CHFL,all,agegroup_sti,all,134,8176760,1.64,1149,1.7,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M09,month,CHFL,CHFL,all,agegroup_sti,all,138,8176760,1.69,1287,1.77,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M10,month,CHFL,CHFL,all,agegroup_sti,all,130,8176760,1.59,1417,1.64,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M11,month,CHFL,CHFL,all,agegroup_sti,all,137,8176760,1.68,1554,1.65,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013-M12,month,CHFL,CHFL,all,agegroup_sti,all,107,8176760,1.31,1661,1.53,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M01,month,CHFL,CHFL,all,agegroup_sti,all,164,8275032,1.98,164,1.66,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M02,month,CHFL,CHFL,all,agegroup_sti,all,114,8275032,1.38,278,1.56,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M03,month,CHFL,CHFL,all,agegroup_sti,all,126,8275032,1.52,404,1.63,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M04,month,CHFL,CHFL,all,agegroup_sti,all,133,8275032,1.61,537,1.5,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M05,month,CHFL,CHFL,all,agegroup_sti,all,162,8275032,1.96,699,1.7,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M06,month,CHFL,CHFL,all,agegroup_sti,all,119,8275032,1.44,818,1.67,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M07,month,CHFL,CHFL,all,agegroup_sti,all,133,8275032,1.61,951,1.67,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M08,month,CHFL,CHFL,all,agegroup_sti,all,161,8275032,1.95,1112,1.67,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M09,month,CHFL,CHFL,all,agegroup_sti,all,102,8275032,1.23,1214,1.6,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M10,month,CHFL,CHFL,all,agegroup_sti,all,137,8275032,1.66,1351,1.61,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M11,month,CHFL,CHFL,all,agegroup_sti,all,127,8275032,1.53,1478,1.47,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014-M12,month,CHFL,CHFL,all,agegroup_sti,all,114,8275032,1.38,1592,1.52,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M01,month,CHFL,CHFL,all,agegroup_sti,all,187,8364748,2.24,187,1.72,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M02,month,CHFL,CHFL,all,agegroup_sti,all,155,8364748,1.85,342,1.82,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M03,month,CHFL,CHFL,all,agegroup_sti,all,172,8364748,2.06,514,2.05,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M04,month,CHFL,CHFL,all,agegroup_sti,all,144,8364748,1.72,658,1.88,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M05,month,CHFL,CHFL,all,agegroup_sti,all,160,8364748,1.91,818,1.9,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M06,month,CHFL,CHFL,all,agegroup_sti,all,141,8364748,1.69,959,1.77,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M07,month,CHFL,CHFL,all,agegroup_sti,all,170,8364748,2.03,1129,1.88,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M08,month,CHFL,CHFL,all,agegroup_sti,all,188,8364748,2.25,1317,1.99,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M09,month,CHFL,CHFL,all,agegroup_sti,all,180,8364748,2.15,1497,2.14,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M10,month,CHFL,CHFL,all,agegroup_sti,all,172,8364748,2.06,1669,2.15,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M11,month,CHFL,CHFL,all,agegroup_sti,all,195,8364748,2.33,1864,2.18,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015-M12,month,CHFL,CHFL,all,agegroup_sti,all,163,8364748,1.95,2027,2.11,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2016-M01,month,CHFL,CHFL,all,agegroup_sti,all,225,8457360,2.66,225,2.31,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2016-M02,month,CHFL,CHFL,all,agegroup_sti,all,205,8457360,2.42,430,2.34,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2016-M03,month,CHFL,CHFL,all,agegroup_sti,all,192,8457360,2.27,622,2.45,NA,NA,NA,NA,NA,NA,NA,TRUE
@@ -143,23 +143,24 @@ cases,2024-M09,month,CHFL,CHFL,all,agegroup_sti,all,608,9091915,6.69,4996,6.52,N
 cases,2024-M10,month,CHFL,CHFL,all,agegroup_sti,all,635,9091915,6.98,5631,6.72,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2024-M11,month,CHFL,CHFL,all,agegroup_sti,all,703,9091915,7.73,6334,7.13,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2024-M12,month,CHFL,CHFL,all,agegroup_sti,all,534,9091915,5.87,6868,6.86,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M01,month,CHFL,CHFL,all,agegroup_sti,all,585,9091915,6.43,585,6.68,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M02,month,CHFL,CHFL,all,agegroup_sti,all,487,9091915,5.36,1072,5.89,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M03,month,CHFL,CHFL,all,agegroup_sti,all,482,9091915,5.3,1554,5.7,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M04,month,CHFL,CHFL,all,agegroup_sti,all,516,9091915,5.68,2070,5.45,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M05,month,CHFL,CHFL,all,agegroup_sti,all,620,9091915,6.82,2690,5.93,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M06,month,CHFL,CHFL,all,agegroup_sti,all,515,9091915,5.66,3205,6.05,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M07,month,CHFL,CHFL,all,agegroup_sti,all,650,9091915,7.15,3855,6.54,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M08,month,CHFL,CHFL,all,agegroup_sti,all,645,9091915,7.09,4500,6.63,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M09,month,CHFL,CHFL,all,agegroup_sti,all,653,9091915,7.18,5153,7.14,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M10,month,CHFL,CHFL,all,agegroup_sti,all,591,9091915,6.5,5744,6.92,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M11,month,CHFL,CHFL,all,agegroup_sti,all,562,9091915,6.18,6306,6.62,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025-M12,month,CHFL,CHFL,all,agegroup_sti,all,588,9091915,6.47,6894,6.38,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2026-M01,month,CHFL,CHFL,all,agegroup_sti,all,655,9091674,7.2,655,6.62,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2026-M02,month,CHFL,CHFL,all,agegroup_sti,all,518,9091674,5.7,1173,6.46,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2026-M03,month,CHFL,CHFL,all,agegroup_sti,all,543,9091674,5.97,1716,6.29,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2026-M04,month,CHFL,CHFL,all,agegroup_sti,all,512,9091674,5.63,2228,5.77,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2026-M05,month,CHFL,CHFL,all,agegroup_sti,all,504,9091674,5.54,2732,5.71,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M01,month,CHFL,CHFL,all,agegroup_sti,all,585,9127125,6.41,585,6.67,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M02,month,CHFL,CHFL,all,agegroup_sti,all,487,9127125,5.34,1072,5.87,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M03,month,CHFL,CHFL,all,agegroup_sti,all,482,9127125,5.28,1554,5.68,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M04,month,CHFL,CHFL,all,agegroup_sti,all,516,9127125,5.65,2070,5.42,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M05,month,CHFL,CHFL,all,agegroup_sti,all,620,9127125,6.79,2690,5.91,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M06,month,CHFL,CHFL,all,agegroup_sti,all,515,9127125,5.64,3205,6.03,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M07,month,CHFL,CHFL,all,agegroup_sti,all,650,9127125,7.12,3855,6.52,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M08,month,CHFL,CHFL,all,agegroup_sti,all,644,9127125,7.06,4499,6.61,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M09,month,CHFL,CHFL,all,agegroup_sti,all,654,9127125,7.17,5153,7.12,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M10,month,CHFL,CHFL,all,agegroup_sti,all,591,9127125,6.48,5744,6.9,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M11,month,CHFL,CHFL,all,agegroup_sti,all,562,9127125,6.16,6306,6.6,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025-M12,month,CHFL,CHFL,all,agegroup_sti,all,588,9127125,6.44,6894,6.36,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2026-M01,month,CHFL,CHFL,all,agegroup_sti,all,653,9127125,7.15,653,6.58,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2026-M02,month,CHFL,CHFL,all,agegroup_sti,all,517,9127125,5.66,1170,6.42,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2026-M03,month,CHFL,CHFL,all,agegroup_sti,all,544,9127125,5.96,1714,6.26,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2026-M04,month,CHFL,CHFL,all,agegroup_sti,all,511,9127125,5.6,2225,5.74,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2026-M05,month,CHFL,CHFL,all,agegroup_sti,all,503,9127125,5.51,2728,5.69,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2026-M06,month,CHFL,CHFL,all,agegroup_sti,all,555,9127125,6.08,3283,5.73,NA,NA,NA,NA,NA,NA,NA,TRUE
 min_value_5y,2017-M01,month,CHFL,CHFL,all,agegroup_sti,all,164,NA,1.98,164,1.66,NA,NA,NA,NA,NA,NA,NA,TRUE
 min_value_5y,2017-M02,month,CHFL,CHFL,all,agegroup_sti,all,109,NA,1.33,278,1.56,NA,NA,NA,NA,NA,NA,NA,TRUE
 min_value_5y,2017-M03,month,CHFL,CHFL,all,agegroup_sti,all,126,NA,1.52,404,1.63,NA,NA,NA,NA,NA,NA,NA,TRUE
@@ -273,6 +274,7 @@ min_value_5y,2026-M02,month,CHFL,CHFL,all,agegroup_sti,all,415,NA,4.69,777,4.37,
 min_value_5y,2026-M03,month,CHFL,CHFL,all,agegroup_sti,all,422,NA,4.69,1231,4.64,NA,NA,NA,NA,NA,NA,NA,TRUE
 min_value_5y,2026-M04,month,CHFL,CHFL,all,agegroup_sti,all,368,NA,4.09,1621,4.71,NA,NA,NA,NA,NA,NA,NA,TRUE
 min_value_5y,2026-M05,month,CHFL,CHFL,all,agegroup_sti,all,484,NA,5.43,2105,4.74,NA,NA,NA,NA,NA,NA,NA,TRUE
+min_value_5y,2026-M06,month,CHFL,CHFL,all,agegroup_sti,all,474,NA,5.35,2579,5.07,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2017-M01,month,CHFL,CHFL,all,agegroup_sti,all,187,NA,2.24,187,2.02,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2017-M02,month,CHFL,CHFL,all,agegroup_sti,all,155,NA,1.85,342,2.08,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2017-M03,month,CHFL,CHFL,all,agegroup_sti,all,172,NA,2.06,514,2.05,NA,NA,NA,NA,NA,NA,NA,TRUE
@@ -374,18 +376,19 @@ median_value_5y,2025-M02,month,CHFL,CHFL,all,agegroup_sti,all,481,NA,5.34,929,4.
 median_value_5y,2025-M03,month,CHFL,CHFL,all,agegroup_sti,all,454,NA,5.13,1351,5,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2025-M04,month,CHFL,CHFL,all,agegroup_sti,all,390,NA,4.4,1719,4.74,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2025-M05,month,CHFL,CHFL,all,agegroup_sti,all,489,NA,5.47,2208,5,NA,NA,NA,NA,NA,NA,NA,TRUE
-median_value_5y,2025-M06,month,CHFL,CHFL,all,agegroup_sti,all,515,NA,5.66,2776,5.28,NA,NA,NA,NA,NA,NA,NA,TRUE
+median_value_5y,2025-M06,month,CHFL,CHFL,all,agegroup_sti,all,515,NA,5.64,2776,5.28,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2025-M07,month,CHFL,CHFL,all,agegroup_sti,all,555,NA,6.17,3331,5.97,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2025-M08,month,CHFL,CHFL,all,agegroup_sti,all,591,NA,6.5,3943,6.23,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2025-M09,month,CHFL,CHFL,all,agegroup_sti,all,500,NA,5.55,4443,6.17,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2025-M10,month,CHFL,CHFL,all,agegroup_sti,all,549,NA,6.1,4992,6.15,NA,NA,NA,NA,NA,NA,NA,TRUE
-median_value_5y,2025-M11,month,CHFL,CHFL,all,agegroup_sti,all,562,NA,6.18,5593,6.11,NA,NA,NA,NA,NA,NA,NA,TRUE
+median_value_5y,2025-M11,month,CHFL,CHFL,all,agegroup_sti,all,562,NA,6.16,5593,6.11,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2025-M12,month,CHFL,CHFL,all,agegroup_sti,all,498,NA,5.53,6091,6.1,NA,NA,NA,NA,NA,NA,NA,TRUE
 median_value_5y,2026-M01,month,CHFL,CHFL,all,agegroup_sti,all,572,NA,6.29,572,6.17,NA,NA,NA,NA,NA,NA,NA,TRUE
-median_value_5y,2026-M02,month,CHFL,CHFL,all,agegroup_sti,all,487,NA,5.36,1072,5.89,NA,NA,NA,NA,NA,NA,NA,TRUE
-median_value_5y,2026-M03,month,CHFL,CHFL,all,agegroup_sti,all,482,NA,5.3,1554,5.7,NA,NA,NA,NA,NA,NA,NA,TRUE
-median_value_5y,2026-M04,month,CHFL,CHFL,all,agegroup_sti,all,505,NA,5.55,2070,5.45,NA,NA,NA,NA,NA,NA,NA,TRUE
-median_value_5y,2026-M05,month,CHFL,CHFL,all,agegroup_sti,all,504,NA,5.54,2688,5.71,NA,NA,NA,NA,NA,NA,NA,TRUE
+median_value_5y,2026-M02,month,CHFL,CHFL,all,agegroup_sti,all,487,NA,5.34,1072,5.87,NA,NA,NA,NA,NA,NA,NA,TRUE
+median_value_5y,2026-M03,month,CHFL,CHFL,all,agegroup_sti,all,482,NA,5.28,1554,5.68,NA,NA,NA,NA,NA,NA,NA,TRUE
+median_value_5y,2026-M04,month,CHFL,CHFL,all,agegroup_sti,all,505,NA,5.55,2070,5.42,NA,NA,NA,NA,NA,NA,NA,TRUE
+median_value_5y,2026-M05,month,CHFL,CHFL,all,agegroup_sti,all,503,NA,5.51,2688,5.69,NA,NA,NA,NA,NA,NA,NA,TRUE
+median_value_5y,2026-M06,month,CHFL,CHFL,all,agegroup_sti,all,529,NA,5.82,3205,5.73,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2017-M01,month,CHFL,CHFL,all,agegroup_sti,all,238,NA,2.79,238,2.49,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2017-M02,month,CHFL,CHFL,all,agegroup_sti,all,205,NA,2.42,432,2.49,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2017-M03,month,CHFL,CHFL,all,agegroup_sti,all,233,NA,2.73,665,2.6,NA,NA,NA,NA,NA,NA,NA,TRUE
@@ -482,26 +485,27 @@ max_value_5y,2024-M09,month,CHFL,CHFL,all,agegroup_sti,all,608,NA,6.69,4996,6.52
 max_value_5y,2024-M10,month,CHFL,CHFL,all,agegroup_sti,all,635,NA,6.98,5631,6.72,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2024-M11,month,CHFL,CHFL,all,agegroup_sti,all,703,NA,7.73,6334,7.13,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2024-M12,month,CHFL,CHFL,all,agegroup_sti,all,534,NA,5.87,6868,6.86,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M01,month,CHFL,CHFL,all,agegroup_sti,all,585,NA,6.43,585,6.68,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M01,month,CHFL,CHFL,all,agegroup_sti,all,585,NA,6.41,585,6.67,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2025-M02,month,CHFL,CHFL,all,agegroup_sti,all,559,NA,6.15,1131,5.99,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2025-M03,month,CHFL,CHFL,all,agegroup_sti,all,486,NA,5.35,1617,5.93,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M04,month,CHFL,CHFL,all,agegroup_sti,all,516,NA,5.68,2122,5.68,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M05,month,CHFL,CHFL,all,agegroup_sti,all,620,NA,6.82,2690,5.93,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M06,month,CHFL,CHFL,all,agegroup_sti,all,568,NA,6.31,3217,6.05,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M07,month,CHFL,CHFL,all,agegroup_sti,all,650,NA,7.15,3855,6.54,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M08,month,CHFL,CHFL,all,agegroup_sti,all,645,NA,7.09,4500,6.63,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M09,month,CHFL,CHFL,all,agegroup_sti,all,653,NA,7.18,5153,7.14,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M10,month,CHFL,CHFL,all,agegroup_sti,all,635,NA,6.98,5744,6.92,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M04,month,CHFL,CHFL,all,agegroup_sti,all,516,NA,5.65,2122,5.68,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M05,month,CHFL,CHFL,all,agegroup_sti,all,620,NA,6.79,2690,5.91,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M06,month,CHFL,CHFL,all,agegroup_sti,all,568,NA,6.31,3217,6.03,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M07,month,CHFL,CHFL,all,agegroup_sti,all,650,NA,7.12,3855,6.52,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M08,month,CHFL,CHFL,all,agegroup_sti,all,644,NA,7.06,4499,6.61,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M09,month,CHFL,CHFL,all,agegroup_sti,all,654,NA,7.17,5153,7.12,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M10,month,CHFL,CHFL,all,agegroup_sti,all,635,NA,6.98,5744,6.9,NA,NA,NA,NA,NA,NA,NA,TRUE
 max_value_5y,2025-M11,month,CHFL,CHFL,all,agegroup_sti,all,703,NA,7.73,6334,7.13,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2025-M12,month,CHFL,CHFL,all,agegroup_sti,all,588,NA,6.47,6894,6.86,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2026-M01,month,CHFL,CHFL,all,agegroup_sti,all,655,NA,7.2,655,6.68,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2026-M02,month,CHFL,CHFL,all,agegroup_sti,all,559,NA,6.15,1173,6.46,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2026-M03,month,CHFL,CHFL,all,agegroup_sti,all,543,NA,5.97,1716,6.29,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2026-M04,month,CHFL,CHFL,all,agegroup_sti,all,516,NA,5.68,2228,5.77,NA,NA,NA,NA,NA,NA,NA,TRUE
-max_value_5y,2026-M05,month,CHFL,CHFL,all,agegroup_sti,all,620,NA,6.82,2732,5.93,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2025-M12,month,CHFL,CHFL,all,agegroup_sti,all,588,NA,6.44,6894,6.86,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2026-M01,month,CHFL,CHFL,all,agegroup_sti,all,653,NA,7.15,653,6.67,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2026-M02,month,CHFL,CHFL,all,agegroup_sti,all,559,NA,6.15,1170,6.42,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2026-M03,month,CHFL,CHFL,all,agegroup_sti,all,544,NA,5.96,1714,6.26,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2026-M04,month,CHFL,CHFL,all,agegroup_sti,all,516,NA,5.65,2225,5.74,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2026-M05,month,CHFL,CHFL,all,agegroup_sti,all,620,NA,6.79,2728,5.91,NA,NA,NA,NA,NA,NA,NA,TRUE
+max_value_5y,2026-M06,month,CHFL,CHFL,all,agegroup_sti,all,568,NA,6.31,3283,6.03,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2013,year,CH,country,all,agegroup_sti,all,1660,8139631,20.39,NA,NA,NA,NA,99.9,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,all,agegroup_sti,all,1661,8176573,20.31,NA,NA,NA,NA,100,NA,NA,NA,NA,TRUE
-cases,2013,year,FL,country,all,agegroup_sti,all,1,36942,2.71,NA,NA,NA,NA,0.1,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,all,agegroup_sti,all,1661,8176760,20.31,NA,NA,NA,NA,100,NA,NA,NA,NA,TRUE
+cases,2013,year,FL,country,all,agegroup_sti,all,1,37129,2.69,NA,NA,NA,NA,0.1,NA,NA,NA,NA,TRUE
 cases,2013,year,espace_mittelland,grossregion,all,agegroup_sti,all,203,1808480,11.22,NA,NA,NA,NA,12.2,NA,NA,NA,NA,TRUE
 cases,2013,year,nordwestschweiz,grossregion,all,agegroup_sti,all,181,1104353,16.39,NA,NA,NA,NA,10.9,NA,NA,NA,NA,TRUE
 cases,2013,year,ostschweiz,grossregion,all,agegroup_sti,all,128,1134781,11.28,NA,NA,NA,NA,7.7,NA,NA,NA,NA,TRUE
@@ -510,8 +514,8 @@ cases,2013,year,ticino,grossregion,all,agegroup_sti,all,40,346539,11.54,NA,NA,NA
 cases,2013,year,zentralschweiz,grossregion,all,agegroup_sti,all,157,774123,20.28,NA,NA,NA,NA,9.5,NA,NA,NA,NA,TRUE
 cases,2013,year,zürich,grossregion,all,agegroup_sti,all,489,1425538,34.3,NA,NA,NA,NA,29.5,NA,NA,NA,NA,TRUE
 cases,2014,year,CH,country,all,agegroup_sti,all,1589,8237666,19.29,NA,NA,NA,NA,99.8,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,all,agegroup_sti,all,1592,8274608,19.24,NA,NA,NA,NA,100,-69,-1.07,-5.3,NA,TRUE
-cases,2014,year,FL,country,all,agegroup_sti,all,3,36942,8.12,NA,NA,NA,NA,0.2,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,all,agegroup_sti,all,1592,8275032,19.24,NA,NA,NA,NA,100,-69,-1.07,-5.3,NA,TRUE
+cases,2014,year,FL,country,all,agegroup_sti,all,3,37366,8.03,NA,NA,NA,NA,0.2,NA,NA,NA,NA,TRUE
 cases,2014,year,espace_mittelland,grossregion,all,agegroup_sti,all,223,1826251,12.21,NA,NA,NA,NA,14,NA,NA,NA,NA,TRUE
 cases,2014,year,nordwestschweiz,grossregion,all,agegroup_sti,all,217,1117158,19.42,NA,NA,NA,NA,13.7,NA,NA,NA,NA,TRUE
 cases,2014,year,ostschweiz,grossregion,all,agegroup_sti,all,128,1144572,11.18,NA,NA,NA,NA,8.1,NA,NA,NA,NA,TRUE
@@ -519,18 +523,18 @@ cases,2014,year,région_lémanique,grossregion,all,agegroup_sti,all,355,1570594,
 cases,2014,year,ticino,grossregion,all,agegroup_sti,all,61,350363,17.41,NA,NA,NA,NA,3.8,NA,NA,NA,NA,TRUE
 cases,2014,year,zentralschweiz,grossregion,all,agegroup_sti,all,161,782374,20.58,NA,NA,NA,NA,10.1,NA,NA,NA,NA,TRUE
 cases,2014,year,zürich,grossregion,all,agegroup_sti,all,444,1446354,30.7,NA,NA,NA,NA,27.9,NA,NA,NA,NA,TRUE
-cases,2015,year,CH,country,all,agegroup_sti,all,2025,8325194,24.32,NA,NA,1758,NA,99.9,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,all,agegroup_sti,all,2027,8362816,24.24,NA,NA,1760,NA,100,435,5,26,NA,TRUE
+cases,2015,year,CH,country,all,agegroup_sti,all,2025,8327126,24.32,NA,NA,1758,NA,99.9,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,all,agegroup_sti,all,2027,8364748,24.23,NA,NA,1760,NA,100,435,4.99,25.9,NA,TRUE
 cases,2015,year,FL,country,all,agegroup_sti,all,2,37622,5.32,NA,NA,2,NA,0.1,NA,NA,NA,NA,TRUE
-cases,2015,year,espace_mittelland,grossregion,all,agegroup_sti,all,230,1841805,12.49,NA,NA,218.7,NA,11.4,NA,NA,NA,NA,TRUE
-cases,2015,year,nordwestschweiz,grossregion,all,agegroup_sti,all,346,1128455,30.66,NA,NA,248,NA,17.1,NA,NA,NA,NA,TRUE
-cases,2015,year,ostschweiz,grossregion,all,agegroup_sti,all,160,1153315,13.87,NA,NA,138.7,NA,7.9,NA,NA,NA,NA,TRUE
-cases,2015,year,région_lémanique,grossregion,all,agegroup_sti,all,438,1593306,27.49,NA,NA,418.3,NA,21.6,NA,NA,NA,NA,TRUE
-cases,2015,year,ticino,grossregion,all,agegroup_sti,all,35,351894,9.95,NA,NA,45.3,NA,1.7,NA,NA,NA,NA,TRUE
-cases,2015,year,zentralschweiz,grossregion,all,agegroup_sti,all,159,790343,20.12,NA,NA,159,NA,7.9,NA,NA,NA,NA,TRUE
-cases,2015,year,zürich,grossregion,all,agegroup_sti,all,657,1466076,44.81,NA,NA,530,NA,32.4,NA,NA,NA,NA,TRUE
+cases,2015,year,espace_mittelland,grossregion,all,agegroup_sti,all,230,1842251,12.48,NA,NA,218.7,NA,11.4,NA,NA,NA,NA,TRUE
+cases,2015,year,nordwestschweiz,grossregion,all,agegroup_sti,all,346,1128723,30.65,NA,NA,248,NA,17.1,NA,NA,NA,NA,TRUE
+cases,2015,year,ostschweiz,grossregion,all,agegroup_sti,all,160,1153485,13.87,NA,NA,138.7,NA,7.9,NA,NA,NA,NA,TRUE
+cases,2015,year,région_lémanique,grossregion,all,agegroup_sti,all,438,1593839,27.48,NA,NA,418.3,NA,21.6,NA,NA,NA,NA,TRUE
+cases,2015,year,ticino,grossregion,all,agegroup_sti,all,35,351946,9.94,NA,NA,45.3,NA,1.7,NA,NA,NA,NA,TRUE
+cases,2015,year,zentralschweiz,grossregion,all,agegroup_sti,all,159,790458,20.11,NA,NA,159,NA,7.9,NA,NA,NA,NA,TRUE
+cases,2015,year,zürich,grossregion,all,agegroup_sti,all,657,1466424,44.8,NA,NA,530,NA,32.4,NA,NA,NA,NA,TRUE
 cases,2016,year,CH,country,all,agegroup_sti,all,2478,8419550,29.43,NA,NA,2030.7,NA,99.7,NA,NA,NA,NA,TRUE
-cases,2016,year,CHFL,CHFL,all,agegroup_sti,all,2485,8457360,29.38,NA,NA,2034.7,rising,100,458,5.14,21.2,NA,TRUE
+cases,2016,year,CHFL,CHFL,all,agegroup_sti,all,2485,8457360,29.38,NA,NA,2034.7,rising,100,458,5.15,21.3,NA,TRUE
 cases,2016,year,FL,country,all,agegroup_sti,all,7,37810,18.51,NA,NA,4,NA,0.3,NA,NA,NA,NA,TRUE
 cases,2016,year,espace_mittelland,grossregion,all,agegroup_sti,all,354,1859557,19.04,NA,NA,269,NA,14.3,NA,NA,NA,NA,TRUE
 cases,2016,year,nordwestschweiz,grossregion,all,agegroup_sti,all,340,1142156,29.77,NA,NA,301,NA,13.7,NA,NA,NA,NA,TRUE
@@ -623,39 +627,39 @@ cases,2024,year,région_lémanique,grossregion,all,agegroup_sti,all,1694,1757496
 cases,2024,year,ticino,grossregion,all,agegroup_sti,all,181,358903,50.43,NA,NA,153.7,NA,2.6,NA,NA,NA,NA,TRUE
 cases,2024,year,zentralschweiz,grossregion,all,agegroup_sti,all,384,863896,44.45,NA,NA,355.3,NA,5.6,NA,NA,NA,NA,TRUE
 cases,2024,year,zürich,grossregion,all,agegroup_sti,all,2281,1620020,140.8,NA,NA,1969.7,NA,33.2,NA,NA,NA,NA,TRUE
-cases,2025,year,CH,country,all,agegroup_sti,all,6886,9051029,76.08,NA,NA,6609.7,NA,99.9,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,all,agegroup_sti,all,6894,9091915,75.83,NA,NA,6617.7,rising,100,26,0.29,0.4,5813.6,TRUE
-cases,2025,year,FL,country,all,agegroup_sti,all,8,40886,19.57,NA,NA,8,NA,0.1,NA,NA,NA,NA,TRUE
-cases,2025,year,espace_mittelland,grossregion,all,agegroup_sti,all,1004,1962040,51.17,NA,NA,957.7,NA,14.6,NA,NA,NA,NA,TRUE
-cases,2025,year,nordwestschweiz,grossregion,all,agegroup_sti,all,792,1238515,63.95,NA,NA,737.7,NA,11.5,NA,NA,NA,NA,TRUE
-cases,2025,year,ostschweiz,grossregion,all,agegroup_sti,all,508,1250159,40.63,NA,NA,492.7,NA,7.4,NA,NA,NA,NA,TRUE
-cases,2025,year,région_lémanique,grossregion,all,agegroup_sti,all,1723,1757496,98.04,NA,NA,1690,NA,25,NA,NA,NA,NA,TRUE
-cases,2025,year,ticino,grossregion,all,agegroup_sti,all,194,358903,54.05,NA,NA,175.7,NA,2.8,NA,NA,NA,NA,TRUE
-cases,2025,year,zentralschweiz,grossregion,all,agegroup_sti,all,380,863896,43.99,NA,NA,381.3,NA,5.5,NA,NA,NA,NA,TRUE
-cases,2025,year,zürich,grossregion,all,agegroup_sti,all,2285,1620020,141.05,NA,NA,2174.7,NA,33.2,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,0 - 14,agegroup_sti,all,1,1217937,0.08,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,15 - 24,agegroup_sti,all,408,944634,43.19,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,25 - 34,agegroup_sti,all,578,1118518,51.68,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,35 - 44,agegroup_sti,all,331,1170364,28.28,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,45 - 54,agegroup_sti,all,229,1295942,17.67,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,55 - 64,agegroup_sti,all,97,990820,9.79,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,65+,agegroup_sti,all,17,1438358,1.18,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CH,country,all,agegroup_sti,all,6886,9127125,75.45,NA,NA,6609.7,NA,99.9,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,all,agegroup_sti,all,6894,9127125,75.53,NA,NA,6617.7,rising,100,26,-0.01,0,5813.6,TRUE
+cases,2025,year,FL,country,all,agegroup_sti,all,8,NA,NA,NA,NA,8,NA,0.1,NA,NA,NA,NA,TRUE
+cases,2025,year,espace_mittelland,grossregion,all,agegroup_sti,all,1004,1974171,50.86,NA,NA,957.7,NA,14.6,NA,NA,NA,NA,TRUE
+cases,2025,year,nordwestschweiz,grossregion,all,agegroup_sti,all,792,1251797,63.27,NA,NA,737.7,NA,11.5,NA,NA,NA,NA,TRUE
+cases,2025,year,ostschweiz,grossregion,all,agegroup_sti,all,508,1260895,40.29,NA,NA,492.7,NA,7.4,NA,NA,NA,NA,TRUE
+cases,2025,year,région_lémanique,grossregion,all,agegroup_sti,all,1723,1776847,96.97,NA,NA,1690,NA,25,NA,NA,NA,NA,TRUE
+cases,2025,year,ticino,grossregion,all,agegroup_sti,all,194,359783,53.92,NA,NA,175.7,NA,2.8,NA,NA,NA,NA,TRUE
+cases,2025,year,zentralschweiz,grossregion,all,agegroup_sti,all,380,870714,43.64,NA,NA,381.3,NA,5.5,NA,NA,NA,NA,TRUE
+cases,2025,year,zürich,grossregion,all,agegroup_sti,all,2285,1632918,139.93,NA,NA,2174.7,NA,33.2,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,0 - 14,agegroup_sti,all,1,1217925,0.08,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,15 - 24,agegroup_sti,all,408,944607,43.19,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,25 - 34,agegroup_sti,all,578,1118572,51.67,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,35 - 44,agegroup_sti,all,331,1170297,28.28,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,45 - 54,agegroup_sti,all,229,1296008,17.67,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,55 - 64,agegroup_sti,all,97,990833,9.79,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,65+,agegroup_sti,all,17,1438518,1.18,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2013,year,CHFL,CHFL,unknown,agegroup_sti,all,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,0 - 14,agegroup_sti,all,4,1230641,0.33,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,15 - 24,agegroup_sti,all,406,941523,43.12,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,25 - 34,agegroup_sti,all,536,1138469,47.08,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,35 - 44,agegroup_sti,all,330,1169962,28.21,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,45 - 54,agegroup_sti,all,223,1310930,17.01,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,55 - 64,agegroup_sti,all,69,1011907,6.82,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,65+,agegroup_sti,all,24,1471176,1.63,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,0 - 14,agegroup_sti,all,4,1230630,0.33,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,15 - 24,agegroup_sti,all,406,941471,43.12,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,25 - 34,agegroup_sti,all,536,1138513,47.08,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,35 - 44,agegroup_sti,all,330,1169792,28.21,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,45 - 54,agegroup_sti,all,223,1311079,17.01,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,55 - 64,agegroup_sti,all,69,1012008,6.82,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,65+,agegroup_sti,all,24,1471539,1.63,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2014,year,CHFL,CHFL,unknown,agegroup_sti,all,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,0 - 14,agegroup_sti,all,9,1240708,0.73,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,15 - 24,agegroup_sti,all,437,939001,46.54,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,25 - 34,agegroup_sti,all,681,1154249,59,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,35 - 44,agegroup_sti,all,483,1174542,41.12,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,45 - 54,agegroup_sti,all,284,1318385,21.54,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,55 - 64,agegroup_sti,all,101,1034453,9.76,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,65+,agegroup_sti,all,32,1501478,2.13,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,0 - 14,agegroup_sti,all,9,1242402,0.72,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,15 - 24,agegroup_sti,all,437,939125,46.53,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,25 - 34,agegroup_sti,all,681,1154455,58.99,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,35 - 44,agegroup_sti,all,483,1174621,41.12,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,45 - 54,agegroup_sti,all,284,1318429,21.54,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,55 - 64,agegroup_sti,all,101,1034465,9.76,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,65+,agegroup_sti,all,32,1501251,2.13,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2015,year,CHFL,CHFL,unknown,agegroup_sti,all,0,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2016,year,CHFL,CHFL,0 - 14,agegroup_sti,all,3,1260615,0.24,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2016,year,CHFL,CHFL,15 - 24,agegroup_sti,all,547,936312,58.42,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
@@ -729,25 +733,25 @@ cases,2024,year,CHFL,CHFL,45 - 54,agegroup_sti,all,860,1235592,69.6,NA,NA,NA,NA,
 cases,2024,year,CHFL,CHFL,55 - 64,agegroup_sti,all,461,1264238,36.46,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2024,year,CHFL,CHFL,65+,agegroup_sti,all,142,1777708,7.99,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2024,year,CHFL,CHFL,unknown,agegroup_sti,all,25,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,0 - 14,agegroup_sti,all,9,1348976,0.67,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,15 - 24,agegroup_sti,all,1238,932570,132.75,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,25 - 34,agegroup_sti,all,2442,1211964,201.49,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,35 - 44,agegroup_sti,all,1790,1320867,135.52,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,45 - 54,agegroup_sti,all,810,1235592,65.56,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,55 - 64,agegroup_sti,all,485,1264238,38.36,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,65+,agegroup_sti,all,113,1777708,6.36,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,0 - 14,agegroup_sti,all,9,1340058,0.67,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,15 - 24,agegroup_sti,all,1238,937001,132.12,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,25 - 34,agegroup_sti,all,2442,1206400,202.42,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,35 - 44,agegroup_sti,all,1790,1332463,134.34,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,45 - 54,agegroup_sti,all,810,1235719,65.55,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,55 - 64,agegroup_sti,all,485,1264836,38.34,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,65+,agegroup_sti,all,113,1810648,6.24,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
 cases,2025,year,CHFL,CHFL,unknown,agegroup_sti,all,7,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,all,agegroup_sti,female,397,4136168,9.6,NA,NA,NA,NA,23.9,NA,NA,NA,NA,TRUE
-cases,2013,year,CHFL,CHFL,all,agegroup_sti,male,1260,4040405,31.18,NA,NA,NA,NA,75.9,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,all,agegroup_sti,female,397,4136269,9.6,NA,NA,NA,NA,23.9,NA,NA,NA,NA,TRUE
+cases,2013,year,CHFL,CHFL,all,agegroup_sti,male,1260,4040491,31.18,NA,NA,NA,NA,75.9,NA,NA,NA,NA,TRUE
 cases,2013,year,CHFL,CHFL,all,agegroup_sti,unknown,4,NA,NA,NA,NA,NA,NA,0.2,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,all,agegroup_sti,female,297,4182414,7.1,NA,NA,NA,NA,18.7,NA,NA,NA,NA,TRUE
-cases,2014,year,CHFL,CHFL,all,agegroup_sti,male,1291,4092194,31.55,NA,NA,NA,NA,81.1,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,all,agegroup_sti,female,297,4182599,7.1,NA,NA,NA,NA,18.7,NA,NA,NA,NA,TRUE
+cases,2014,year,CHFL,CHFL,all,agegroup_sti,male,1291,4092433,31.55,NA,NA,NA,NA,81.1,NA,NA,NA,NA,TRUE
 cases,2014,year,CHFL,CHFL,all,agegroup_sti,unknown,4,NA,NA,NA,NA,NA,NA,0.3,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,all,agegroup_sti,female,386,4223661,9.14,NA,NA,NA,NA,19,NA,NA,NA,NA,TRUE
-cases,2015,year,CHFL,CHFL,all,agegroup_sti,male,1635,4139155,39.5,NA,NA,NA,NA,80.7,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,all,agegroup_sti,female,386,4224617,9.14,NA,NA,NA,NA,19,NA,NA,NA,NA,TRUE
+cases,2015,year,CHFL,CHFL,all,agegroup_sti,male,1635,4140131,39.49,NA,NA,NA,NA,80.7,NA,NA,NA,NA,TRUE
 cases,2015,year,CHFL,CHFL,all,agegroup_sti,unknown,6,NA,NA,NA,NA,NA,NA,0.3,NA,NA,NA,NA,TRUE
-cases,2016,year,CHFL,CHFL,all,agegroup_sti,female,486,4265179,11.39,NA,NA,NA,NA,19.6,NA,NA,NA,NA,TRUE
-cases,2016,year,CHFL,CHFL,all,agegroup_sti,male,1990,4192181,47.47,NA,NA,NA,NA,80.1,NA,NA,NA,NA,TRUE
+cases,2016,year,CHFL,CHFL,all,agegroup_sti,female,486,4265177,11.39,NA,NA,NA,NA,19.6,NA,NA,NA,NA,TRUE
+cases,2016,year,CHFL,CHFL,all,agegroup_sti,male,1990,4192183,47.47,NA,NA,NA,NA,80.1,NA,NA,NA,NA,TRUE
 cases,2016,year,CHFL,CHFL,all,agegroup_sti,unknown,9,NA,NA,NA,NA,NA,NA,0.4,NA,NA,NA,NA,TRUE
 cases,2017,year,CHFL,CHFL,all,agegroup_sti,female,462,4296920,10.75,NA,NA,NA,NA,18.1,NA,NA,NA,NA,TRUE
 cases,2017,year,CHFL,CHFL,all,agegroup_sti,male,2083,4225324,49.3,NA,NA,NA,NA,81.4,NA,NA,NA,NA,TRUE
@@ -773,6 +777,6 @@ cases,2023,year,CHFL,CHFL,all,agegroup_sti,unknown,35,NA,NA,NA,NA,NA,NA,0.6,NA,N
 cases,2024,year,CHFL,CHFL,all,agegroup_sti,female,1113,4571296,24.35,NA,NA,NA,NA,16.2,NA,NA,NA,NA,TRUE
 cases,2024,year,CHFL,CHFL,all,agegroup_sti,male,5707,4520619,126.24,NA,NA,NA,NA,83.1,NA,NA,NA,NA,TRUE
 cases,2024,year,CHFL,CHFL,all,agegroup_sti,unknown,48,NA,NA,NA,NA,NA,NA,0.7,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,all,agegroup_sti,female,1112,4571296,24.33,NA,NA,NA,NA,16.1,NA,NA,NA,NA,TRUE
-cases,2025,year,CHFL,CHFL,all,agegroup_sti,male,5707,4520619,126.24,NA,NA,NA,NA,82.8,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,all,agegroup_sti,female,1112,4586802,24.24,NA,NA,NA,NA,16.1,NA,NA,NA,NA,TRUE
+cases,2025,year,CHFL,CHFL,all,agegroup_sti,male,5707,4540323,125.7,NA,NA,NA,NA,82.8,NA,NA,NA,NA,TRUE
 cases,2025,year,CHFL,CHFL,all,agegroup_sti,unknown,75,NA,NA,NA,NA,NA,NA,1.1,NA,NA,NA,NA,TRUE

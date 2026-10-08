@@ -2,9 +2,9 @@
   "dataset_id": "RUBELLA_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/RUBELLA_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/RUBELLA_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:32:39.954108+00:00",
-  "csv_sha256": "21f3a8bfbe066aa35dbf3b56d677404e8d6953e90f045de167c705f640dfb03f",
-  "metadata_sha256": "5b035d323055fa8f65f3fc001fc6270c0bcc70ad31d92917dfdef0f0d09f9328",
+  "retrieved_at_utc": "2026-10-08T09:03:36.626781+00:00",
+  "csv_sha256": "a38fa442115ef460b98ae2aa9d5dd1aae98e115469f507d5216b6bba5d2d8719",
+  "metadata_sha256": "f81e0e38ffa75e6f2f549c2c7e2c951315e0e5ebae15317573e2f80fe1846a5d",
   "row_count": 26,
   "columns": [
     "valueCategory",

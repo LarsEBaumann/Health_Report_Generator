@@ -148,7 +148,7 @@
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
         15778,
-        9091915
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"
@@ -166,7 +166,7 @@
       "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
       "valueSetOrRange": [
         0,
-        12.61
+        12.54
       ],
       "nullValue": "NA",
       "type": "double"

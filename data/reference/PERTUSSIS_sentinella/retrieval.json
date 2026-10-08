@@ -2,9 +2,9 @@
   "dataset_id": "PERTUSSIS_sentinella",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/PERTUSSIS_sentinella/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/PERTUSSIS_sentinella/metadata",
-  "retrieved_at_utc": "2026-10-04T09:31:55.305178+00:00",
-  "csv_sha256": "65ab62a68b2f9501407725eed5e5f81c1e11e9c24bb7aacbe6862bdc7118a3db",
-  "metadata_sha256": "61f6326b67253806bfe6b8da50da03e444c339074ee2e637eef54622ffad7897",
+  "retrieved_at_utc": "2026-10-08T09:02:52.979282+00:00",
+  "csv_sha256": "3c5729fb35387fea06ea6086b473ec5a048b0832a54d670fac57709bce676d19",
+  "metadata_sha256": "340999cec6b6efd5549f3429cd91c2e0245de1353ad26d59cc764d33a70a2a07",
   "row_count": 13,
   "columns": [
     "valueCategory",

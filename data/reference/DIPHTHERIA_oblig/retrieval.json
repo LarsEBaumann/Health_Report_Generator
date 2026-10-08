@@ -2,9 +2,9 @@
   "dataset_id": "DIPHTHERIA_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/DIPHTHERIA_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/DIPHTHERIA_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:31:32.401454+00:00",
-  "csv_sha256": "b7c753c0a7a0d45c58051b1c5dff947b22f17982a3d8430f59954d53c92e5c04",
-  "metadata_sha256": "52abd037f38bc270995f314a3a093c450ea06bc3c6d3bfb10a1393d11ea7edc3",
+  "retrieved_at_utc": "2026-10-08T09:02:30.287348+00:00",
+  "csv_sha256": "96ca9d1dec00f0db5ad8e13a6b82a7802ce1b008379a2aa2173b2cb7de0115f6",
+  "metadata_sha256": "fc97da199712547e2261c45db1d4973ad9b94c7291937b274cbd03958a8d93ab",
   "row_count": 26,
   "columns": [
     "valueCategory",

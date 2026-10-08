@@ -2,9 +2,9 @@
   "dataset_id": "SHIGELLOSIS_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/SHIGELLOSIS_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/SHIGELLOSIS_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:32:41.097709+00:00",
-  "csv_sha256": "f3b6c8f59d399934990b638e6c1194d0d3ca26bde0f9f8ba1fa85b888e74ad1c",
-  "metadata_sha256": "32f1be77d7daf3968713c725bafcfd9d655a51d4e481165c88875e7666cfd6fb",
+  "retrieved_at_utc": "2026-10-08T09:03:37.758858+00:00",
+  "csv_sha256": "c1f78a69f843c938d5836917e86709a9535bc6cf043f84da8b0bfcf4944e2e6e",
+  "metadata_sha256": "3dc31f545c09ea929b753548a96f4f4e904d28fb033d35c4cc620516bb3578e9",
   "row_count": 745,
   "columns": [
     "valueCategory",

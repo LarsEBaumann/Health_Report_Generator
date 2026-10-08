@@ -2,9 +2,9 @@
   "dataset_id": "CJD_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CJD_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/CJD_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:30:13.949882+00:00",
-  "csv_sha256": "d6596a31edc885abacda4b30ec1eb81dd650002b5e5759dd64278031c84adaaa",
-  "metadata_sha256": "bcdd14fb441ba2075e978b9ae1f96a942a65b3e0fd67f16d021bf6a3d8fa4d13",
+  "retrieved_at_utc": "2026-10-08T09:01:03.986386+00:00",
+  "csv_sha256": "2bee5dee2b6bff1cbba55b5976a14ca06f1bd114724c76e3d251927cb1f4dba2",
+  "metadata_sha256": "6bb8036a92441ff65fcb5232362db54927ed59271eada7ee03ab5573ad5c244d",
   "row_count": 26,
   "columns": [
     "valueCategory",

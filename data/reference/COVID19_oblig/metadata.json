@@ -2,8 +2,8 @@
   "metaVariables": {
     "topic": "covid19",
     "source": "mandatory_reporting_system",
-    "publishingDate": "2026-09-30",
-    "sourceDate": "2026-09-29",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
     "publicationFrequency": {
       "frequency": "weekly",
       "frequencyDescription": "-"
@@ -140,7 +140,7 @@
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
         16293,
-        9091915
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"

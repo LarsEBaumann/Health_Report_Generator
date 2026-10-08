@@ -1,0 +1,24 @@
+{
+  "dataset_id": "ANTIBIOTIC_USAGE_anresis",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ANTIBIOTIC_USAGE_anresis/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ANTIBIOTIC_USAGE_anresis/metadata",
+  "retrieved_at_utc": "2026-10-08T09:01:01.314395+00:00",
+  "csv_sha256": "82b63bb663ab01c298843a5a75d4b30f6644af32c6939e00920ba71c76d92061",
+  "metadata_sha256": "b66f0ad3b3f26371e35cd71ca357c836a8795fed6eb7e34d38c9bfde3f653b87",
+  "row_count": 352,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "awareCategory",
+    "setting",
+    "atcClassification",
+    "value",
+    "pop",
+    "temporalLength",
+    "valuePer1000PerDay",
+    "prct"
+  ]
+}

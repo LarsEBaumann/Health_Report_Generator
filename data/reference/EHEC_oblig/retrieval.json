@@ -2,9 +2,9 @@
   "dataset_id": "EHEC_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/EHEC_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/EHEC_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:31:32.947122+00:00",
-  "csv_sha256": "8f9109a49ed04e697191fcc302176c37e5f5a66478749d9bcfef2c21e578c73f",
-  "metadata_sha256": "468d9692d94054be25eaa6ce231cfe0a8c1ee4a6d9168454a8d2dfcfa015d3dd",
+  "retrieved_at_utc": "2026-10-08T09:02:30.787481+00:00",
+  "csv_sha256": "4ea15a752e3a30539b099c25d67c81bac095494414629edc98ca6e903c513b51",
+  "metadata_sha256": "6cefe603f19f566c44f7bfb509db64343bbd353fe690e72a86db86e90db9c717",
   "row_count": 771,
   "columns": [
     "valueCategory",

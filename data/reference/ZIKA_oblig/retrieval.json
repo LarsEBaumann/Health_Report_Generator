@@ -2,9 +2,9 @@
   "dataset_id": "ZIKA_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ZIKA_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ZIKA_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:32:44.605812+00:00",
-  "csv_sha256": "c1dadfca9585d781bf76514960d65b968b80c41f0d085f03d6396348e6536817",
-  "metadata_sha256": "c571de6a01427fc6d4c992957cd1dbc9b93c6b9389312fccb847ba0ffdd814a5",
+  "retrieved_at_utc": "2026-10-08T09:03:41.235561+00:00",
+  "csv_sha256": "ec8b00b74a74c00a862daeddd0c78f24966c5e9b2af3456de14e27d41bbd1b15",
+  "metadata_sha256": "e5e1126a5285d87575da2d9c8b1e434049b18c712805c0f3e2d53dc4ad308221",
   "row_count": 26,
   "columns": [
     "valueCategory",

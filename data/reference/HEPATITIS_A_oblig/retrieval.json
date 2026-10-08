@@ -2,9 +2,9 @@
   "dataset_id": "HEPATITIS_A_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HEPATITIS_A_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/HEPATITIS_A_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:31:34.645298+00:00",
-  "csv_sha256": "af364adc8c31f0256cefc3b275a4fd443f387b4efeac97820f26c081710ff94a",
-  "metadata_sha256": "1f3940cd294a7f78a7533b39df3d34a8126f64176a43cd04a937ea2b48e8684a",
+  "retrieved_at_utc": "2026-10-08T09:02:32.501374+00:00",
+  "csv_sha256": "a9879d84c56dd3e6e2658b6d748897e290bf5ef582d7002c791be08c2de690b9",
+  "metadata_sha256": "1ebd847b5dd49a561404af23325b3778540b5303f1397eb86883f86611be505f",
   "row_count": 745,
   "columns": [
     "valueCategory",

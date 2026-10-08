@@ -89,7 +89,7 @@
     "valueMean3y": {
       "description": "Right-aligned, rolling 3-year average of the property 'value' within the grouping described in the property name.",
       "valueSetOrRange": [
-        7809.7,
+        7810.1,
         13901.6
       ],
       "nullValue": "NA",
@@ -99,7 +99,7 @@
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
         8139631,
-        9051029
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"
@@ -126,7 +126,7 @@
       "description": "Extrapolated population number within the given temporal unit and grouping. For the current year, 'popExtrapolation' is extrapolated to a full year based on the number of days that have passed.",
       "valueSetOrRange": [
         151604.3,
-        208288
+        208429
       ],
       "nullValue": "NA",
       "type": "double"
@@ -170,7 +170,7 @@
     "valueMean5y": {
       "description": "Right-aligned, rolling 5-year average of the property 'value'.",
       "valueSetOrRange": [
-        9152.78,
+        9153.06,
         12229.42
       ],
       "nullValue": "NA",

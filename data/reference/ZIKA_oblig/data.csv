@@ -1,7 +1,7 @@
 valueCategory,temporal,temporal_type,georegion,georegion_type,type,value,pop,incValue,valueYearCumSum,trend,deltaValue,deltaIncValue,incValuePrctChange,valueMean5y
-cases,2013,year,CHFL,CHFL,all,0,8176573,0,NA,NA,NA,NA,NA,NA
-cases,2014,year,CHFL,CHFL,all,0,8274608,0,NA,NA,0,0,NA,NA
-cases,2015,year,CHFL,CHFL,all,0,8362816,0,NA,NA,0,0,NA,NA
+cases,2013,year,CHFL,CHFL,all,0,8176760,0,NA,NA,NA,NA,NA,NA
+cases,2014,year,CHFL,CHFL,all,0,8275032,0,NA,NA,0,0,NA,NA
+cases,2015,year,CHFL,CHFL,all,0,8364748,0,NA,NA,0,0,NA,NA
 cases,2016,year,CHFL,CHFL,all,54,8457360,0.64,NA,NA,54,0.64,NA,NA
 cases,2017,year,CHFL,CHFL,all,16,8522244,0.19,NA,NA,-38,-0.45,-70.3,14
 cases,2018,year,CHFL,CHFL,all,3,8582905,0.03,NA,NA,-13,-0.16,-84.2,14.6
@@ -11,10 +11,10 @@ cases,2021,year,CHFL,CHFL,all,0,8778099,0,NA,NA,0,0,NA,4
 cases,2022,year,CHFL,CHFL,all,0,8855062,0,NA,NA,0,0,NA,0.8
 cases,2023,year,CHFL,CHFL,all,5,9002273,0.06,NA,NA,5,0.06,NA,1.2
 cases,2024,year,CHFL,CHFL,all,9,9091915,0.1,NA,NA,4,0.04,66.7,2.8
-cases,2025,year,CHFL,CHFL,all,2,9091915,0.02,NA,NA,-7,-0.08,-80,3.2
-cases,2013,year,CH,country,all,0,8176573,0,NA,NA,NA,NA,NA,NA
-cases,2014,year,CH,country,all,0,8274608,0,NA,NA,0,0,NA,NA
-cases,2015,year,CH,country,all,0,8362816,0,NA,NA,0,0,NA,NA
+cases,2025,year,CHFL,CHFL,all,2,9127125,0.02,NA,NA,-7,-0.08,-80,3.2
+cases,2013,year,CH,country,all,0,8176760,0,NA,NA,NA,NA,NA,NA
+cases,2014,year,CH,country,all,0,8275032,0,NA,NA,0,0,NA,NA
+cases,2015,year,CH,country,all,0,8364748,0,NA,NA,0,0,NA,NA
 cases,2016,year,CH,country,all,54,8457360,0.64,NA,NA,54,0.64,NA,NA
 cases,2017,year,CH,country,all,16,8522244,0.19,NA,NA,-38,-0.45,-70.3,14
 cases,2018,year,CH,country,all,3,8582905,0.03,NA,NA,-13,-0.16,-84.2,14.6
@@ -24,4 +24,4 @@ cases,2021,year,CH,country,all,0,8778099,0,NA,NA,0,0,NA,4
 cases,2022,year,CH,country,all,0,8855062,0,NA,NA,0,0,NA,0.8
 cases,2023,year,CH,country,all,5,9002273,0.06,NA,NA,5,0.06,NA,1.2
 cases,2024,year,CH,country,all,9,9091915,0.1,NA,NA,4,0.04,66.7,2.8
-cases,2025,year,CH,country,all,2,9091915,0.02,NA,NA,-7,-0.08,-80,3.2
+cases,2025,year,CH,country,all,2,9127125,0.02,NA,NA,-7,-0.08,-80,3.2

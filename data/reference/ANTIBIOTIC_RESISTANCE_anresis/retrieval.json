@@ -1,0 +1,27 @@
+{
+  "dataset_id": "ANTIBIOTIC_RESISTANCE_anresis",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ANTIBIOTIC_RESISTANCE_anresis/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ANTIBIOTIC_RESISTANCE_anresis/metadata",
+  "retrieved_at_utc": "2026-10-08T09:01:00.938000+00:00",
+  "csv_sha256": "f2b227b3f6bcead0099bc72226966f52802aa520ca259d8d8e03177c9fe394b3",
+  "metadata_sha256": "33f191e92c16baed94145331f0d2cbac49790ce345f7516791f46e22ea0e3803",
+  "row_count": 1320,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "pathogen",
+    "testResult",
+    "valueRaw",
+    "value",
+    "pop",
+    "incValue",
+    "prctRaw",
+    "prct"
+  ]
+}

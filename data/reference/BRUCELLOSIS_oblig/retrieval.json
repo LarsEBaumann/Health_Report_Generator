@@ -2,9 +2,9 @@
   "dataset_id": "BRUCELLOSIS_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/BRUCELLOSIS_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/BRUCELLOSIS_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:30:11.744952+00:00",
-  "csv_sha256": "30860b6ef1ed48294c74af93333def7ac21f4209bbada409f546af86e147bae2",
-  "metadata_sha256": "65344eeb8311411bf7231437bc5ff89f6dcd4b90c4e6e4f5bd4e849498e09f2e",
+  "retrieved_at_utc": "2026-10-08T09:01:01.847146+00:00",
+  "csv_sha256": "7acf92059c9e24293dd21a4d3983a8486ea54d0540b9da59e314f0f69024532e",
+  "metadata_sha256": "362c70eb3d487a8a0a90cd0f5909076fd45f2a0f6625eda5fb54faea1766112c",
   "row_count": 26,
   "columns": [
     "valueCategory",

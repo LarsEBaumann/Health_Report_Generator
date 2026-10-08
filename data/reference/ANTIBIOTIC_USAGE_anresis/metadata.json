@@ -1,0 +1,132 @@
+{
+  "metaVariables": {
+    "topic": "antibiotic_usage",
+    "source": "swiss_center_for_antibiotic_resistance",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
+    "publicationFrequency": {
+      "frequency": "monthly",
+      "frequencyDescription": "First Wednesday after day 1 of every month. The exact weekday can vary due to public holidays. Because of reporting delays, there is a gap of 3 months between the publication date and published data."
+    },
+    "expectedPublicationDelay": {
+      "delay": 90,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 90 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": [
+        "defined_daily_doses"
+      ]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": [
+      "year"
+    ]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "CHFL": {
+          "valueSet": "CHFL",
+          "allValue": "all"
+        },
+        "linguistic_region": {
+          "valueSet": [
+            "D-CHFL",
+            "F-CH",
+            "I-CH"
+          ],
+          "allValue": "all"
+        }
+      }
+    },
+    "setting": {
+      "column": "setting",
+      "columnDescription": "Specifies the setting in which the antibiotic agent was used.",
+      "valueSet": [
+        "inpatient",
+        "outpatient"
+      ],
+      "allValue": "all"
+    },
+    "awareCategory": {
+      "column": "awareCategory",
+      "columnDescription": "WHO classification of antibiotics into the categories access, watch, and reserve (AWaRe).",
+      "valueSet": [
+        "access",
+        "reserve",
+        "unclassified",
+        "watch"
+      ],
+      "allValue": "all"
+    },
+    "atcClassification": {
+      "column": "atcClassification",
+      "columnDescription": "Anatomical therapeutic chemical. Categorizes an antibiotic by its primary mechanism of action. This dataset highlights only the ones with a systemic mechanism of action (J01) using ATC level 2.",
+      "valueSet": [
+        "other",
+        "systemic_j01"
+      ],
+      "allValue": "all"
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        38964908.1
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        341616,
+        9127125
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "prct": {
+      "description": "Proportion of the entry in the property 'value' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0.2,
+        100
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "temporalLength": {
+      "description": "Length of the year used for the calculation of 'valuePer1000PerDay'",
+      "valueSetOrRange": [
+        365,
+        366
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "valuePer1000PerDay": {
+      "description": "Represents the value per 1'000 inhabitants per day.",
+      "valueSetOrRange": [
+        0,
+        16.15
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {}
+}

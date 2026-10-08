@@ -2,16 +2,16 @@
   "metaVariables": {
     "topic": "monkeypox",
     "source": "mandatory_reporting_system",
-    "publishingDate": "2026-08-19",
-    "sourceDate": "2026-08-18",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
     "publicationFrequency": {
       "frequency": "yearly",
       "frequencyDescription": null
     },
     "expectedPublicationDelay": {
-      "delay": 90,
+      "delay": 28,
       "unit": "days",
-      "delayDescription": "Because of reporting delays, there is a gap of at least 90 day(s) between the publication date and published data."
+      "delayDescription": "Because of reporting delays, there is a gap of at least 28 day(s) between the publication date and published data."
     },
     "valueCategory": {
       "column": "valueCategory",
@@ -77,7 +77,7 @@
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
         8855062,
-        9091915
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"
@@ -130,7 +130,7 @@
   },
   "entryVariables": {
     "trend": {
-      "description": "Indicates a trend of an entry with respect to previous entries. The trend is calculated using a poisson glm with a log-link with a right-aligned window of size 3 for the temporal_type year. For data by year the trend is adjusted by population size.",
+      "description": "Indicates a trend of an entry with respect to previous entries.",
       "valueSetOrRange": [
         "falling",
         "rising"

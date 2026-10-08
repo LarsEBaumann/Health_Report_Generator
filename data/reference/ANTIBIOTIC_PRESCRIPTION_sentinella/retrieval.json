@@ -1,0 +1,28 @@
+{
+  "dataset_id": "ANTIBIOTIC_PRESCRIPTION_sentinella",
+  "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ANTIBIOTIC_PRESCRIPTION_sentinella/csv",
+  "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/ANTIBIOTIC_PRESCRIPTION_sentinella/metadata",
+  "retrieved_at_utc": "2026-10-08T09:01:00.203567+00:00",
+  "csv_sha256": "4df5f0724dd4995b7969a900eeee9db2eefa4ec1f0ee618ce81da9cd8e4e03c5",
+  "metadata_sha256": "094e23eee5c1e15f68ccd22cac58e4630b22bc922b69b2f6a8b6c9ac12736323",
+  "row_count": 189,
+  "columns": [
+    "valueCategory",
+    "temporal",
+    "temporal_type",
+    "georegion",
+    "georegion_type",
+    "agegroup",
+    "agegroup_type",
+    "sex",
+    "speciality",
+    "indication",
+    "value",
+    "popExtrapolation",
+    "totalConsultationsExtrapolation",
+    "pop",
+    "incValue",
+    "prctConsultations",
+    "prct"
+  ]
+}

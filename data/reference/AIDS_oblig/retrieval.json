@@ -2,9 +2,9 @@
   "dataset_id": "AIDS_oblig",
   "csv_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/AIDS_oblig/csv",
   "metadata_source_url": "https://api.idd.bag.admin.ch/api/v1/export/latest/AIDS_oblig/metadata",
-  "retrieved_at_utc": "2026-10-04T09:30:11.219889+00:00",
-  "csv_sha256": "906ec0d77eba7d1d8b75e3d451e822230fe416c55f0ffbb419e3ab6ee2a3c1fb",
-  "metadata_sha256": "7fbbf36d17fdf016c5a07c2e940b599440eca38a4cb0acd8ed866a819e8c24c5",
+  "retrieved_at_utc": "2026-10-08T09:00:59.707252+00:00",
+  "csv_sha256": "dfdf4b3b05838b62d877b3e7429132d0d4aeddb654b9760e40c488b2f30a4b77",
+  "metadata_sha256": "598cfa7688f5df219fa4f3735f575d6b769b394f0890afbf7860944b8fe6fa63",
   "row_count": 13,
   "columns": [
     "valueCategory",

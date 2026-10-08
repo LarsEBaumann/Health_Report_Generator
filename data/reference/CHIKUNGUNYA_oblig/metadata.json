@@ -2,8 +2,8 @@
   "metaVariables": {
     "topic": "chikungunya",
     "source": "mandatory_reporting_system",
-    "publishingDate": "2026-09-02",
-    "sourceDate": "2026-09-01",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
     "publicationFrequency": {
       "frequency": "yearly",
       "frequencyDescription": null
@@ -77,8 +77,8 @@
     "pop": {
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
-        8176573,
-        9091915
+        8176760,
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"
@@ -87,7 +87,7 @@
       "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
       "valueSetOrRange": [
         0,
-        1.31
+        1.3
       ],
       "nullValue": "NA",
       "type": "double"
@@ -105,7 +105,7 @@
       "description": "Absolute difference in the metric 'incValue' comparing the current year to the last one.",
       "valueSetOrRange": [
         -0.51,
-        1.09
+        1.08
       ],
       "nullValue": "NA",
       "type": "double"

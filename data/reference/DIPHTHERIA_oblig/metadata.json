@@ -2,8 +2,8 @@
   "metaVariables": {
     "topic": "diphtheria",
     "source": "mandatory_reporting_system",
-    "publishingDate": "2026-09-02",
-    "sourceDate": "2026-09-01",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
     "publicationFrequency": {
       "frequency": "yearly",
       "frequencyDescription": null
@@ -76,8 +76,8 @@
     "pop": {
       "description": "Population number within the given temporal unit and grouping.",
       "valueSetOrRange": [
-        8176573,
-        9091915
+        8176760,
+        9127125
       ],
       "nullValue": "NA",
       "type": "integer"

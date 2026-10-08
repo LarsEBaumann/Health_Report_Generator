@@ -1,0 +1,153 @@
+{
+  "metaVariables": {
+    "topic": "antibiotic_prescriptions",
+    "source": "sentinella_reporting_system",
+    "publishingDate": "2026-10-07",
+    "sourceDate": "2026-10-06",
+    "publicationFrequency": {
+      "frequency": "monthly",
+      "frequencyDescription": null
+    },
+    "expectedPublicationDelay": {
+      "delay": 90,
+      "unit": "days",
+      "delayDescription": "Because of reporting delays, there is a gap of at least 90 day(s) between the publication date and published data."
+    },
+    "valueCategory": {
+      "column": "valueCategory",
+      "columnDescription": "Defines what the property 'value' represents.",
+      "valueSet": [
+        "prescriptions"
+      ]
+    }
+  },
+  "temporalVariables": {
+    "column": "temporal",
+    "columnDescription": "Temporal information of the value specified in the property 'valueCategory'.",
+    "typeColumn": "temporal_type",
+    "typeColumnDescription": "Specifies the type of temporal value in the property 'temporal'.",
+    "typeValues": [
+      "year"
+    ]
+  },
+  "groupingVariables": {
+    "georegion": {
+      "column": "georegion",
+      "columnDescription": "Geographical unit of the data record.",
+      "typeColumn": "georegion_type",
+      "typeColumnDescription": "Specifies the type of geographical unit in the property 'georegion'.",
+      "typeValues": {
+        "country": {
+          "valueSet": "CH",
+          "allValue": "all"
+        }
+      }
+    },
+    "agegroup": {
+      "column": "agegroup",
+      "columnDescription": "Age range brackets used for grouping.",
+      "typeColumn": "agegroup_type",
+      "typeColumnDescription": "Specifies the type of agegroup in the property 'agegroup'.",
+      "typeValues": {
+        "agegroup_anresis": {
+          "valueSet": [],
+          "allValue": "all"
+        }
+      }
+    },
+    "sex": {
+      "column": "sex",
+      "columnDescription": "Sex specification used for grouping.",
+      "valueSet": [],
+      "allValue": "all"
+    },
+    "speciality": {
+      "column": "speciality",
+      "columnDescription": "Medical field in which a patient was treated.",
+      "valueSet": [
+        "general_internal_medicine",
+        "pediatrics"
+      ],
+      "allValue": "all"
+    },
+    "indication": {
+      "column": "indication",
+      "columnDescription": "Medical reason for prescribing a treatment. Indications in this dataset are grouped by infection area.",
+      "valueSet": [
+        "lower_respiratory_tract",
+        "other",
+        "skin_soft_tissue",
+        "unknown",
+        "upper_respiratory_tract",
+        "urinary_tract"
+      ],
+      "allValue": "all"
+    }
+  },
+  "valueVariables": {
+    "value": {
+      "description": "Represents the value defined by the property 'valueCategory' within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        979492.5
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "pop": {
+      "description": "Population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        1527781,
+        9127125
+      ],
+      "nullValue": "NA",
+      "type": "integer"
+    },
+    "prct": {
+      "description": "Proportion of the entry in the property 'value' as percent within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        0,
+        82.9
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "incValue": {
+      "description": "Incidence value within the given temporal unit and grouping. Based on non-rounded figures of value and pop.",
+      "valueSetOrRange": [
+        0,
+        13992.99
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "prctConsultations": {
+      "description": "Percentage of doctors' consultations due to either influenza-like illness or acute respiratory infection (defined in the property 'valueCategory'). Based on property 'value'.",
+      "valueSetOrRange": [
+        0,
+        3.9
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "popExtrapolation": {
+      "description": "Extrapolated population number within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        28577.7,
+        195550.4
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    },
+    "totalConsultationsExtrapolation": {
+      "description": "Extrapolated total patient doctor consultations within the given temporal unit and grouping.",
+      "valueSetOrRange": [
+        96493,
+        605347
+      ],
+      "nullValue": "NA",
+      "type": "double"
+    }
+  },
+  "entryVariables": {}
+}
