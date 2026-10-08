@@ -17,6 +17,10 @@ from publish import render
 HERE = Path(__file__).resolve().parent
 PROFILE = HERE / "config/stakeholders/public_health_expert.json"
 CLASSES = HERE / "config/pathogen_class.csv"
+# Lineage bundles produced by the default build. `researcher` shares the analytic
+# parameters of the historical `public_health_expert` profile; older artifacts
+# still contain only `public_health_expert`.
+LINEAGE_STAKEHOLDERS = ("researcher", "public_health_expert")
 AUDIENCES = {
     "researcher": ("Technical disease-surveillance report", "Technical view of the selected disease-surveillance series."),
     "policy_maker": ("Disease-surveillance monitoring brief", "Monitoring summary of the selected disease notifications for decision support."),
@@ -28,13 +32,20 @@ def results_root(path: Path) -> Path:
     if not matches:
         raise FileNotFoundError("No harmonised.parquet in lineage artifact")
     root = matches[0].parent
-    required = [root / "datasets.csv", root / "harmonised_snapshot.json", root / "reports/public_health_expert/data/series.csv"]
-    if not all(p.is_file() for p in required):
+    required = [root / "datasets.csv", root / "harmonised_snapshot.json"]
+    if not all(p.is_file() for p in required) or lineage_bundle(root) is None:
         raise FileNotFoundError("Artifact is not a complete report lineage bundle")
     return root
 
+def lineage_bundle(root):
+    for stakeholder in LINEAGE_STAKEHOLDERS:
+        bundle = root / "reports" / stakeholder / "data"
+        if (bundle / "series.csv").is_file() and (bundle / "selection.csv").is_file():
+            return bundle
+    return None
+
 def catalogue(root):
-    bundle = root / "reports/public_health_expert/data"
+    bundle = lineage_bundle(root)
     series = pd.read_csv(bundle / "series.csv").fillna("")
     selection = pd.read_csv(bundle / "selection.csv").fillna("")
     ok = selection[
@@ -121,7 +132,8 @@ def main():
         "rendered_at_utc": datetime.now(timezone.utc).isoformat(),
     }
     write_json(output / "provenance.json", provenance)
-    render(bundle, output / "report.html", "html", args.quarto)
+    # Embed the request provenance in the HTML as machine-readable JSON as well.
+    render(bundle, output / "report.html", "html", args.quarto, provenance=provenance)
     render(bundle, output / "report.pdf", "pdf", args.quarto)
 
 if __name__ == "__main__":

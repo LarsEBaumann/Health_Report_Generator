@@ -18,7 +18,10 @@ def download_latest_report():
     repo = os.getenv("GITHUB_REPO", "Health_Report_Generator")
     workflow = os.getenv("GITHUB_WORKFLOW", "update-lyme-data.yml")
     branch = os.getenv("GITHUB_BRANCH", "main")
-    stakeholder = os.getenv("REPORT_DATA_STAKEHOLDER", "public_health_expert")
+    # `researcher` is the default lineage bundle since Phase 5; older artifacts
+    # only contain `public_health_expert`. An explicit setting is never overridden.
+    requested = os.getenv("REPORT_DATA_STAKEHOLDER")
+    candidates = [requested] if requested else ["researcher", "public_health_expert"]
     cache = Path(os.getenv("ARTIFACT_CACHE", ".cache/github-artifact"))
     headers = {
         "Accept": "application/vnd.github+json",
@@ -80,13 +83,16 @@ def download_latest_report():
         for p in extracted.rglob("series.csv")
         if (p.parent / "selection.csv").is_file()
     ]
-    preferred = [
-        p for p in bundles
-        if stakeholder in p.parts and p.name == "data"
-    ]
-    if len(preferred) != 1:
-        raise RuntimeError(
-            f"Expected one data bundle for stakeholder {stakeholder!r}; "
-            f"found: {[str(p) for p in preferred]}"
-        )
-    return preferred[0], run, artifact
+    for stakeholder in candidates:
+        preferred = [
+            p for p in bundles
+            if stakeholder in p.parts and p.name == "data"
+        ]
+        if len(preferred) == 1:
+            return preferred[0], run, artifact
+        if len(preferred) > 1:
+            break
+    raise RuntimeError(
+        f"Expected one data bundle for stakeholder(s) {candidates!r}; "
+        f"found: {[str(p) for p in bundles]}"
+    )
