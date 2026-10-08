@@ -6,11 +6,11 @@
 
 Treat each update as a new source release. Do not edit files in place without retaining their source metadata and recording the resulting content-addressed snapshot.
 
-## Legacy source
+## Retired legacy source
 
-`Data/` is a frozen legacy release. It is no longer read by production workflows or CI. Phase 0 identified duplicate-suffixed directories and unexpectedly nested exports in that tree.
+The frozen `Data/` release was removed in Phase 4 after the canonical-root migration passed full push and pull-request CI. It is not an accepted runtime input and must not be recreated.
 
-The machine-readable disposition of every legacy dataset directory is recorded in `docs/phase-3-data-migration.json`. The legacy tree remains temporarily in this branch so the canonical switch can pass full CI before a separately reviewable deletion commit. Git history and the Phase 0 snapshot ID preserve its previous state.
+The machine-readable disposition of every former legacy dataset directory remains recorded in `docs/phase-3-data-migration.json`. `docs/phase-4-legacy-removal.json` records the removal gate and deletion commit. Git history and the Phase 0 snapshot ID preserve the previous state for audit and recovery.
 
 ## Generated data
 
@@ -18,15 +18,9 @@ The pipeline writes generated snapshots, harmonised data, checks, analysis bundl
 
 ## Migration safety
 
-Canonicalization is a source-release change, not a byte-preserving rename. The two roots have different publisher dates and file hashes. Their selected reports have the same row counts and topic set, but some 2022–2025 values and 2025 population denominators differ. Those differences are documented in `docs/phase-3-data-migration.json` and must not be hidden as deduplication.
+Canonicalization was a source-release change, not a byte-preserving rename. The two roots had different publisher dates and file hashes. Their selected reports had the same row counts and topic set, but some 2022–2025 values and 2025 population denominators differed. Those differences remain documented in `docs/phase-3-data-migration.json` and must not be described as simple deduplication.
 
-Before deleting the frozen `Data/` tree:
-
-1. Merge or otherwise preserve the Phase 0 baseline commit and snapshot ID.
-2. Retain the machine-readable path and hash map.
-3. Run full HTML, PDF, and Shiny validation against `data/reference/` with zero failures.
-4. Review the documented scientific differences.
-5. Delete `Data/` in a separate commit so the destructive step is easy to audit and revert.
+The removal is reversible through Git history, but restoration is not part of the supported production workflow. Any proposed restoration must explain why the older source release is scientifically required and must use a distinct archival path rather than reintroducing an ambiguous active root.
 
 ## Licensing
 

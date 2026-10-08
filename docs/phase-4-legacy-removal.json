@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "phase": 4,
+  "action": "remove_frozen_legacy_data_root",
+  "legacy_root": "Data",
+  "canonical_root": "data/reference",
+  "migration_manifest": "docs/phase-3-data-migration.json",
+  "legacy_snapshot_id": "f1484622df74831453d66fb36cfc9fab002bd0695385195143930328d4f74653",
+  "canonical_snapshot_id": "d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee",
+  "legacy_dataset_directories": 37,
+  "legacy_files_removed": 74,
+  "unmapped_legacy_directories": 0,
+  "precondition": "Phase 3 canonical-root builds passed for push and pull_request",
+  "deletion_commit": "d3e25a224c39dfef0e6c9a843e0d2c19ee213b0c",
+  "source_main_commit": "3408ff6bed35038a16adbcd74da5793a0c31ae4a",
+  "recovery": "Restore from Git history only to an explicitly archival path; do not recreate Data as an active input root.",
+  "scientific_note": "The canonical root is a newer source release, not a byte-identical rename. Scientific differences remain documented in the Phase 3 migration manifest."
+}
