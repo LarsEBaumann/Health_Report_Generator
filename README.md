@@ -3,7 +3,7 @@
 This workflow archives a local data release, validates it, calculates stakeholder metrics once, and produces a Quarto HTML report, PDF report, and R Shiny application using the same CSV tables.
 
 ```text
-Data/ -> snapshot + hashes -> harmonised.parquet -> blocking quality checks
+data/reference/ -> snapshot + hashes -> harmonised.parquet -> blocking quality checks
   -> stakeholder analysis -> report CSVs + lineage -> Quarto HTML / PDF + Shiny bundle
 ```
 
@@ -18,7 +18,7 @@ pip install -r scripts/health_pipeline/requirements.lock.txt
 Rscript workflow/restore_r.R
 ```
 
-Install Quarto **1.3.353** and its PDF engine (`quarto install tinytex`; the baseline observed **TinyTeX v2026.10**). TinyTeX is installed by the Quarto setup action rather than locked byte-for-byte, so every release records the actual TeX version; PDF byte identity across installations is not claimed. Place `quarto` on PATH, or supply its path below. These are explicit installation steps; ordinary builds never fetch new data or install packages deliberately. Quarto's automatic TeX package installation is disabled in the template so PDF builds fail clearly if their TeX environment is incomplete.
+Install Quarto **1.3.353**. CI installs the checksum-pinned full **TinyTeX v2026.10** bundle through `scripts/ci/install_tinytex.sh`; local PDF builds require an equivalent TeX installation. The installer verifies the archive digest and the required KOMA-Script class before rendering. Place `quarto` on PATH, or supply its path below. These are explicit installation steps; ordinary builds never fetch new data or install packages deliberately. Quarto's automatic TeX package installation is disabled in the template so PDF builds fail clearly if their TeX environment is incomplete.
 
 ```sh
 snakemake --cores 2
@@ -28,7 +28,7 @@ snakemake --cores 2 --config quarto=/Applications/RStudio.app/Contents/Resources
 
 Optional targets: `snakemake tables --cores 1`, `snakemake html --cores 1`, `snakemake pdf --cores 1`, `snakemake shiny --cores 1`.
 
-`bash scripts/health_pipeline/run_all.sh Data results` is a compatibility wrapper around Snakemake. Set `QUARTO` to override the renderer path. The former Python-generated HTML is replaced by the shared QMD to avoid duplicate statistical logic.
+`bash scripts/health_pipeline/run_all.sh data/reference results` is a compatibility wrapper around Snakemake. Set `QUARTO` to override the renderer path. The former Python-generated HTML is replaced by the shared QMD to avoid duplicate statistical logic.
 
 Outputs for the default stakeholder:
 
@@ -55,9 +55,9 @@ snakemake --cores 2 --config \
   out=reproduced
 ```
 
-This mode verifies and reads only that archived snapshot, without requiring the original `Data/` tree or any API. Retain the snapshot **and** code/config/environment versions with the report. Hashes cannot recover deleted data. Paths inside a snapshot and its lineage are relative, so the archive can move between computers. Original source record numbers count CSV records (header = 1), not physical lines in multiline CSV fields.
+This mode verifies and reads only that archived snapshot, without requiring the live `data/reference/` tree or any API. Retain the snapshot **and** code/config/environment versions with the report. Hashes cannot recover deleted data. Paths inside a snapshot and its lineage are relative, so the archive can move between computers. Original source record numbers count CSV records (header = 1), not physical lines in multiline CSV fields.
 
-For an update, place a new release in `Data/` and run the ordinary workflow. It creates a new content-addressed archive rather than replacing the old snapshot. Remote API acquisition is deliberately separate: no endpoint, authentication, or download specification was supplied. The included weekly CI job rebuilds the committed data; it does **not** claim to fetch newer surveillance data.
+For an update, place a new release in `data/reference/` and run the ordinary workflow. It creates a new content-addressed archive rather than replacing the old snapshot. Remote API acquisition is deliberately separate: no endpoint, authentication, or download specification was supplied. The included weekly CI job rebuilds the committed data; it does **not** claim to fetch newer surveillance data.
 
 ## Scientific and quality policy
 
@@ -93,18 +93,6 @@ Tests cover subgroup safety, incomplete months/years/baselines, denominators, so
 
 CI runs tests, builds all outputs, checks Shiny server outputs, and uploads a release bundle only after success. It does not deploy or overwrite a production site. A failed local build may leave older reports on disk; treat only a successfully completed build and its matching `release.json` as a release. Preserve previously uploaded successful artifacts independently of a new build.
 
-The production Python lock at `scripts/health_pipeline/requirements.lock.txt` pins the Snakemake/report pipeline; `uv.lock` pins the optional Marimo/connector environment from `pyproject.toml`; `renv.lock` records R dependencies. `workflow/toolchain.json` is the machine-readable runtime contract, and `tests/test_environment_contract.py` prevents supported entry points from drifting away from it. The R setup script restores those into `.r-library/`; `.Rprofile` and the renderer use that isolated library. A pre-existing global R installation can also run the workflow, and its actual versions are recorded, but use the restored library for reproduction. `workflow/environment.yml` describes the base Python/R environment, not a platform-specific binary lock. Reproducing identical metric tables is tested; bit-identical PDF bytes across platforms/toolchain versions are not claimed. Quarto and TeX versions are recorded in release metadata. Upgrade locks intentionally and rerun tests; `workflow/write_r_lock.R` records the current R dependency set when explicitly invoked.
+The production Python lock at `scripts/health_pipeline/requirements.lock.txt` pins the Snakemake/report pipeline; `uv.lock` pins the optional Marimo/connector environment from `pyproject.toml`; `renv.lock` records R dependencies. `workflow/toolchain.json` is the machine-readable source of runtime version policy. `workflow/environment.yml` is an alternative convenience environment, not an additional authoritative lock.
 
-Legacy files in `scripts/health_pipeline/example_output/` are historical examples, not results from this workflow. Existing untracked files and raw datasets are not modified by the implementation.
-
-## Demo dashboard and companion report
-
-The findings report now uses the approved visual dashboard with **ggplot2** charts, summary cards, case-count bars, percentage change from the baseline, and a disease comparison plot. Supporting numbers are in an expandable table with descriptive column headings. Every chart and table has a source/method note.
-
-Open `results/reports/public_health_expert/report.html` for the demo. Use **Methods & sources** to open `methods.html`; the navigation also links to their PDF versions (`report.pdf` and `methods.pdf`). Audit files are available from the methods report. Keep the entire stakeholder folder together when sharing it so report and download links work.
-
-Shiny uses the same ggplot2 helpers and keeps Findings, Methods & sources, and Explore a disease on separate tabs. No disease-selection or statistical calculation was moved into the presentation layer. The chart formerly labelled an index now shows percentage change from the baseline (index minus 100); zero is the baseline level.
-
-After pulling these changes, run `Rscript workflow/restore_r.R` to restore the updated lock including ggplot2. Then run Snakemake normally. Rendering each format builds both companion reports, and a rendering error stops the pair from being published by the renderer.
-
-The alternate editorial briefing is preserved in `design/report-mockups.html` for later iteration. The dashboard is the active production design.
+See [GETTING_STARTED.md](GETTING_STARTED.md) for setup and reproduction instructions.

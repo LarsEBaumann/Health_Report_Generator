@@ -1,32 +1,32 @@
 # Data directories
 
-The repository currently contains two source-data roots with different roles and histories. Do not treat them as interchangeable.
+## Canonical live source
 
-## `data/reference/`
+`data/reference/` is the only active source-data root. It is the default in `workflow/config.yaml`, and CI uses that default without an override. The directory contains the broader synchronized IDD reference collection and associated publisher metadata.
 
-This is the default source configured in `workflow/config.yaml`. It contains the broader automatically synchronized IDD reference collection, including retrieval metadata where available.
+Treat each update as a new source release. Do not edit files in place without retaining their source metadata and recording the resulting content-addressed snapshot.
 
-## `Data/`
+## Legacy source
 
-This is the legacy committed source used by the main validation workflow through `--config data_root=Data`. It contains duplicate-suffixed directories and two unexpectedly nested exports. It remains in place until a separately reviewed migration proves that scientific outputs and provenance are preserved.
+`Data/` is a frozen legacy release. It is no longer read by production workflows or CI. Phase 0 identified duplicate-suffixed directories and unexpectedly nested exports in that tree.
+
+The machine-readable disposition of every legacy dataset directory is recorded in `docs/phase-3-data-migration.json`. The legacy tree remains temporarily in this branch so the canonical switch can pass full CI before a separately reviewable deletion commit. Git history and the Phase 0 snapshot ID preserve its previous state.
 
 ## Generated data
 
 The pipeline writes generated snapshots, harmonised data, checks, analysis bundles, and reports under `results/` by default. Generated results are ignored by Git and must not be manually promoted to source data.
 
-## Safety policy
+## Migration safety
 
-Before moving, deleting, or deduplicating source data:
+Canonicalization is a source-release change, not a byte-preserving rename. The two roots have different publisher dates and file hashes. Their selected reports have the same row counts and topic set, but some 2022–2025 values and 2025 population denominators differ. Those differences are documented in `docs/phase-3-data-migration.json` and must not be hidden as deduplication.
 
-1. Record the source commit and snapshot ID.
-2. Hash both `data.csv` and associated metadata/retrieval files.
-3. Produce a machine-readable mapping from every old path to its retained path or documented removal.
-4. Run validation with zero `FAIL` results.
-5. Compare pre/post analysis-table contents and hashes.
-6. Explain every intentional difference.
-7. Retain enough source and provenance information to reproduce the previous release.
+Before deleting the frozen `Data/` tree:
 
-The Phase 0 inventory is recorded in `docs/phase-0-baseline.md`.
+1. Merge or otherwise preserve the Phase 0 baseline commit and snapshot ID.
+2. Retain the machine-readable path and hash map.
+3. Run full HTML, PDF, and Shiny validation against `data/reference/` with zero failures.
+4. Review the documented scientific differences.
+5. Delete `Data/` in a separate commit so the destructive step is easy to audit and revert.
 
 ## Licensing
 
