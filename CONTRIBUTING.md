@@ -26,8 +26,8 @@ For a complete release check, also run:
 
 ```sh
 snakemake --cores 2
-Rscript tests/shiny_smoke.R results/reports/public_health_expert/app
-Rscript tests/dashboard_smoke.R results/reports/public_health_expert/app
+Rscript tests/shiny_smoke.R results/reports/researcher/app
+Rscript tests/dashboard_smoke.R results/reports/researcher/app
 ```
 
 A complete rendering check requires the pinned R, Quarto, and TinyTeX environment described in the root README.

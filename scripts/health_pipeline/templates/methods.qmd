@@ -30,6 +30,7 @@ b <- read_bundle(params$data_dir)
 ```{r}
 #| results: asis
 if(knitr::is_html_output())cat(methods_html(b,prefix=params$download_prefix))
+if(knitr::is_html_output()) cat(provenance_script(), interactive_tables_script())
 if(knitr::is_latex_output()) {
   p <- presentation_profile(b)
   cat('Audience: **',p$display_name,'**. Presentation: ',p$layout,'.\n\n',sep='')

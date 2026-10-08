@@ -2,7 +2,12 @@
 data_root: data/reference
 out: results
 quarto: quarto
+# One shared report source is rendered once per stakeholder parameter file in
+# scripts/health_pipeline/config/stakeholders/<id>.json. Add an audience by
+# adding a parameter file and listing its id here; do not copy the template.
 stakeholders:
-  - public_health_expert
+  - researcher
+  - health_institution
+  - public
 # Set this to an existing snapshots/<id>/manifest.json for offline reproduction.
 snapshot_manifest: null

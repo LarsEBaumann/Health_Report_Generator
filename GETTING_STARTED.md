@@ -71,24 +71,27 @@ Other laptops should use their own installed Quarto; do not copy this Mac-specif
 
 ### Where the outputs are
 
+One build produces three audience reports from the same template; `<id>` is `researcher`, `health_institution` or `public` (see the README).
+
 | Location | What it contains |
 |---|---|
-| `results/reports/public_health_expert/report.html` | Main visual dashboard |
-| `results/reports/public_health_expert/methods.html` | Sources, methods, exclusions, and traceability |
-| `results/reports/public_health_expert/report.pdf` | Findings PDF |
-| `results/reports/public_health_expert/methods.pdf` | Methods PDF |
-| `results/reports/public_health_expert/data/` | Shared analysis tables and supporting records |
-| `results/reports/public_health_expert/app/` | Shiny app, Quarto sources, and their data |
+| `results/reports/<id>/report.html` | Main visual dashboard |
+| `results/reports/<id>/methods.html` | Sources, methods, exclusions, and traceability |
+| `results/reports/<id>/report.pdf` | Findings PDF |
+| `results/reports/<id>/methods.pdf` | Methods PDF |
+| `results/reports/<id>/data/` | Shared analysis tables and supporting records |
+| `results/reports/<id>/app/` | Shiny app, Quarto sources, and their data |
+| `results/reports/<id>/provenance.json` | Machine-readable provenance for the HTML (also embedded in each page); `provenance.pdf.json` for the PDF |
 | `results/snapshots/` | Archived input files |
 | `results/release.json` | Output fingerprints and recorded code/environment information |
 
 Open `report.html` with your browser using Finder or your file manager. On macOS you can also run:
 
 ```bash
-open results/reports/public_health_expert/report.html
+open results/reports/researcher/report.html
 ```
 
-Keep the entire `public_health_expert` output folder together when sharing reports so navigation and download links continue to work.
+Keep the entire stakeholder output folder (`researcher`, `health_institution` or `public`) together when sharing reports so navigation and download links continue to work.
 
 ## 4. Test a fresh installation
 
@@ -96,8 +99,8 @@ Run these after a successful full build:
 
 ```bash
 python -m pytest -q
-Rscript tests/dashboard_smoke.R results/reports/public_health_expert/app
-Rscript tests/shiny_smoke.R results/reports/public_health_expert/app
+Rscript tests/dashboard_smoke.R results/reports/researcher/app
+Rscript tests/shiny_smoke.R results/reports/researcher/app
 snakemake --dry-run --cores 2
 ```
 
@@ -112,7 +115,7 @@ python - <<'PY'
 from pathlib import Path
 import hashlib
 
-folder = Path('results/reports/public_health_expert/data')
+folder = Path('results/reports/researcher/data')
 expected = {
     'metrics.csv': '4b80640609dff31f79fd977774cd91a8c8768d3a7ab551eada0e7f8e8799def2',
     'series.csv': '58ce7f3b40237c7d0f37529430bb228d4f35de6eb731793883a41c738953168f',
@@ -140,7 +143,7 @@ Do this before the presentation, not during it:
 4. Start Shiny from the repository root:
 
 ```bash
-Rscript -e 'shiny::runApp("results/reports/public_health_expert/app", launch.browser=TRUE)'
+Rscript -e 'shiny::runApp("results/reports/researcher/app", launch.browser=TRUE)'
 ```
 
 Keep that terminal running. If a browser does not open, copy the local address printed after `Listening on` into your browser. Press Control+C in the terminal when you want to stop the app.

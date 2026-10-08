@@ -30,6 +30,7 @@ knitr::opts_chunk$set(fig.width=7,fig.height=3.8)
 ```{r}
 #| results: asis
 if(knitr::is_html_output()) cat(findings_html(b))
+if(knitr::is_html_output()) cat(provenance_script(), interactive_tables_script())
 if(knitr::is_latex_output() && presentation_profile(b)$layout == 'editorial') {
   p <- presentation_profile(b)
   cat('Audience: **',p$display_name,'**. Presentation: ',p$layout,'.\n\n',sep='')

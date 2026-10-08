@@ -31,8 +31,9 @@ jobs:
       - run: pip install -r scripts/health_pipeline/requirements.lock.txt
       - run: python -m pytest -q
       - run: snakemake --cores 2
-      - run: Rscript tests/shiny_smoke.R results/reports/public_health_expert/app
-      - run: Rscript tests/dashboard_smoke.R results/reports/public_health_expert/app
+      - run: python scripts/health_pipeline/check_outputs.py
+      - run: Rscript tests/shiny_smoke.R results/reports/researcher/app
+      - run: Rscript tests/dashboard_smoke.R results/reports/researcher/app
       - name: Upload only a successful complete release
         uses: actions/upload-artifact@v4
         with:
