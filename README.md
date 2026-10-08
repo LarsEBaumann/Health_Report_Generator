@@ -109,14 +109,18 @@ See [SCHEMA.md](scripts/health_pipeline/SCHEMA.md) for table keys, types and cal
 ## Tests and release discipline
 
 ```sh
+ruff check .
 python -m pytest -q
-Rscript tests/shiny_smoke.R results/reports/researcher/app
 snakemake --dry-run --cores 1
+# after a full build
+python scripts/health_pipeline/check_outputs.py
+python scripts/health_pipeline/verify_release.py --out results
+Rscript tests/shiny_smoke.R results/reports/researcher/app
 ```
 
 Tests cover subgroup safety, incomplete months/years/baselines, denominators, source completeness, metadata conflicts, overlapping exports, nonzero CLI failures, stale gates, snapshot relocation/tampering, deterministic tables, and independent reconstruction of every fixture metric from raw records and formula inputs. The final dry run should say no work is needed after a successful unchanged build.
 
-CI runs tests, builds all outputs, checks Shiny server outputs, and uploads a release bundle only after success. It does not deploy or overwrite a production site. A failed local build may leave older reports on disk; treat only a successfully completed build and its matching `release.json` as a release. Preserve previously uploaded successful artifacts independently of a new build.
+CI is split into gated jobs (`docs/phase-6-ci-hardening.md`): `fast` (Ruff, tests, dry run), `secrets` (pinned gitleaks history scan), `container` (Docker build and smoke run) and `full` (all three audiences, output and provenance checks, release-hash and rendered-link verification, Shiny checks, no-op rebuild). It uploads a release bundle only after every `full` step succeeds. It does not deploy or overwrite a production site. A failed local build may leave older reports on disk; treat only a successfully completed build and its matching `release.json` as a release. Preserve previously uploaded successful artifacts independently of a new build.
 
 The production Python lock at `scripts/health_pipeline/requirements.lock.txt` pins the Snakemake/report pipeline; `uv.lock` pins the optional Marimo/connector environment from `pyproject.toml`; `renv.lock` records R dependencies. `workflow/toolchain.json` is the machine-readable source of runtime version policy. `workflow/environment.yml` is an alternative convenience environment, not an additional authoritative lock.
 
