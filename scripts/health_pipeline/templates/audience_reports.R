@@ -61,10 +61,17 @@ document_limits <- function(b) paste0(
 
 document_provenance <- function(b) {
   p <- presentation_profile(b)
+
+  commit <- Sys.getenv("GITHUB_SHA", unset = "")
+  if (!nzchar(commit)) {
+    commit <- "not recorded"
+  }
+
   paste0(
     '<dl class="provenance-list"><dt>Audience</dt><dd>', esc(p$display_name),
     '</dd><dt>Presentation version</dt><dd>', esc(p$version),
     '</dd><dt>Snapshot</dt><dd><code>', esc(b$manifest$snapshot_id),
+    '</code></dd><dt>Rendering code version</dt><dd><code>', esc(commit),
     '</code></dd></dl>',
     '<p><a href="provenance.json" download>Download request provenance</a> · ',
     '<a href="data/bundle.json" download>Download bundle manifest</a> · ',

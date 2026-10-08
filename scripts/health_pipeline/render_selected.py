@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Render one selected report from a versioned lineage artifact."""
 import argparse
+import os
 import json
 import re
 import shutil
@@ -120,6 +121,7 @@ def main():
 
     provenance = {
         "schema_version": "1.0",
+	"render_git_commit": os.environ.get("GITHUB_SHA") or None,
         "request_id": args.request_id,
         "audience": args.audience,
         "presentation": presentation,
