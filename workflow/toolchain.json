@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "python": {
+    "supported": ">=3.11.6,<3.12",
+    "validated": "3.11.6"
+  },
+  "r": {
+    "validated": "4.3.2"
+  },
+  "quarto": {
+    "validated": "1.3.353"
+  },
+  "tinytex": {
+    "observed": "2026.10",
+    "reproducibility_note": "CI installs TinyTeX through the Quarto setup action; release metadata records the actual version because the distribution is not locked byte-for-byte."
+  },
+  "uv": {
+    "validated": "0.8.14"
+  }
+}

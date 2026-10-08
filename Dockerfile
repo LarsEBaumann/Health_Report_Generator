@@ -1,9 +1,9 @@
 ARG UV_VERSION=0.8.14
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uvbin
 
-FROM python:3.14-slim
+FROM python:3.11.6-slim
 
-ARG QUARTO_VERSION=1.9.38
+ARG QUARTO_VERSION=1.3.353
 
 ENV UV_PROJECT_ENVIRONMENT=/tmp/health-report-venv \
     UV_LINK_MODE=copy \
