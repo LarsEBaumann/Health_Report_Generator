@@ -80,3 +80,16 @@ def test_documentation_names_authoritative_contract():
 
 def test_uv_version_is_aligned():
     assert f'ARG UV_VERSION={CONTRACT["uv"]["validated"]}' in text("Dockerfile")
+
+
+def test_canonical_data_root_is_used_everywhere_active():
+    config = text("workflow/config.yaml")
+    assert "data_root: data/reference" in config
+    for workflow in WORKFLOWS:
+        content = text(workflow)
+        assert "data_root=Data" not in content
+    migration = json.loads(text("docs/phase-3-data-migration.json"))
+    assert migration["canonical_root"] == "data/reference"
+    assert migration["legacy_root"] == "Data"
+    assert migration["unmapped_legacy_directories"] == 0
+    assert len(migration["entries"]) == migration["legacy_dataset_directories"] == 37
