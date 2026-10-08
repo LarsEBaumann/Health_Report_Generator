@@ -13,7 +13,7 @@ import pandas as pd
 from analyse import analyse, load_config
 from checks import validate
 from common import write_json
-from publish import render
+from publish import build_provenance, render
 
 HERE = Path(__file__).resolve().parent
 PROFILE = HERE / "config/stakeholders/public_health_expert.json"
@@ -119,24 +119,77 @@ def main():
         bundle = output / "data"
         analyse(work, config_path, CLASSES, bundle)
 
-    provenance = {
-        "schema_version": "1.0",
-	"render_git_commit": os.environ.get("GITHUB_SHA") or None,
-        "request_id": args.request_id,
-        "audience": args.audience,
-        "presentation": presentation,
-        "selected_pathogen_classes": config["classes_in_main_comparison"],
-        "output_formats": ["html", "pdf"],
-        "selected_dataset_ids": selected_ids,
-        "selected_labels": [labels[x] for x in selected_ids],
-        "lineage_artifact_run_id": str(args.source_run_id),
-        "snapshot_id": json.loads((bundle / "bundle.json").read_text())["snapshot_id"],
-        "rendered_at_utc": datetime.now(timezone.utc).isoformat(),
-    }
-    write_json(output / "provenance.json", provenance)
-    # Embed the request provenance in the HTML as machine-readable JSON as well.
-    render(bundle, output / "report.html", "html", args.quarto, provenance=provenance)
-    render(bundle, output / "report.pdf", "pdf", args.quarto)
+        request_provenance = {
+            "request_id": args.request_id,
+            "audience": args.audience,
+            "presentation": presentation,
+            "selected_pathogen_classes": config["classes_in_main_comparison"],
+            "output_formats": ["html", "pdf"],
+            "selected_dataset_ids": selected_ids,
+            "selected_labels": [labels[x] for x in selected_ids],
+            "lineage_artifact_run_id": str(args.source_run_id),
+        }
 
+        snapshot = json.loads((bundle / "snapshot.json").read_text())
+        snapshot_path = snapshot.get("snapshot_path")
+        snapshot_root = work / snapshot_path if snapshot_path else None
+
+        data_root = (
+            snapshot_root
+            if snapshot_root is not None and snapshot_root.is_dir()
+            else None
+        )
+
+        workflow_path = Path(
+            ".github/workflows/render-selected-report.yml"
+        )
+        workflow_config = {
+            "path": workflow_path.as_posix(),
+            "sha256": __import__("hashlib").sha256(
+                workflow_path.read_bytes()
+            ).hexdigest(),
+        }
+
+        html_provenance = build_provenance(
+            bundle,
+            "html",
+            args.quarto,
+            data_root=data_root,
+            workflow_config=workflow_config,
+            extra=request_provenance,
+        )
+        pdf_provenance = build_provenance(
+            bundle,
+            "pdf",
+            args.quarto,
+            data_root=data_root,
+            workflow_config=workflow_config,
+            extra=request_provenance,
+        )
+
+        # Record the artifact-relative location, not the disposable temp path.
+        for record in (html_provenance, pdf_provenance):
+            record["data"]["canonical_root"] = None
+            record["data"]["snapshot_manifest"] = (
+                "data/snapshot.json"
+            )
+            record["data"]["lineage_artifact_snapshot_path"] = snapshot_path
+
+    render(
+        bundle,
+        output / "report.html",
+        "html",
+        args.quarto,
+        provenance=html_provenance,
+        provenance_out=output / "provenance.json",
+    )
+    render(
+        bundle,
+        output / "report.pdf",
+        "pdf",
+        args.quarto,
+        provenance=pdf_provenance,
+        provenance_out=output / "provenance-pdf.json",
+    )
 if __name__ == "__main__":
     main()
