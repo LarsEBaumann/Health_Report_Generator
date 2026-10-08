@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and cite the data source (FOPH Infectious Diseases Dashboard)."
+title: "Reproducible infectious-disease reports: one data source, many audiences"
+type: software
+authors:
+  - alias: "LarsEBaumann"
+repository-code: "https://github.com/LarsEBaumann/Health_Report_Generator"
+abstract: >-
+  A reproducible, parameterised reporting workflow that turns FOPH Infectious
+  Diseases Dashboard exports into interactive HTML reports for researchers,
+  health institutions and the public from one shared Quarto template, with
+  machine-readable provenance and explicit uncertainty communication.
+keywords:
+  - reproducibility
+  - epidemiology
+  - public health
+  - Quarto
+  - Snakemake
+  - provenance
+references:
+  - type: dataset
+    title: "Infectious Diseases Dashboard (IDD) data exports"
+    authors:
+      - name: "Federal Office of Public Health (FOPH/BAG)"
+    url: "https://www.idd.bag.admin.ch/en/portal-data"
