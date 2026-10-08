@@ -16,6 +16,10 @@ This map distinguishes the supported production workflow from optional, experime
 | `tests/` | Python pipeline tests and R rendering/application smoke tests. | Active |
 | `.github/workflows/validate.yml` | Full test and report build in CI. | Active |
 | `.github/workflows/update-lyme-data.yml` | Scheduled/manual IDD synchronization and versioned artifact build. | Active |
+| `scripts/health_pipeline/run_all.sh` | One-command wrapper around `snakemake` (defaults from `workflow/config.yaml`). | Active |
+| `docs/architecture.md`, `docs/limitations.md`, `docs/demo.md`, `docs/audiences.md`, `docs/reproduction.md`, `docs/scientific-policy.md` | Final documentation set linked from the README. | Active |
+| `docs/phase-7-release.md` | Scope and decisions of the release-polish phase. | Active |
+| `CITATION.cff`, `RELEASE_NOTES.md`, `docs/release-checklist.md` | Citation metadata and release process. | Active |
 
 ## Optional interfaces
 
