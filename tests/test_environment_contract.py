@@ -93,3 +93,17 @@ def test_canonical_data_root_is_used_everywhere_active():
     assert migration["legacy_root"] == "Data"
     assert migration["unmapped_legacy_directories"] == 0
     assert len(migration["entries"]) == migration["legacy_dataset_directories"] == 37
+
+
+def test_legacy_data_root_remains_removed_and_auditable():
+    assert not (ROOT / "Data").exists()
+    migration = json.loads(text("docs/phase-3-data-migration.json"))
+    removal = json.loads(text("docs/phase-4-legacy-removal.json"))
+    assert removal["action"] == "remove_frozen_legacy_data_root"
+    assert removal["canonical_root"] == migration["canonical_root"] == "data/reference"
+    assert removal["legacy_root"] == migration["legacy_root"] == "Data"
+    assert removal["legacy_snapshot_id"] == migration["legacy_snapshot_id"]
+    assert removal["canonical_snapshot_id"] == migration["canonical_snapshot_id"]
+    assert removal["legacy_dataset_directories"] == migration["legacy_dataset_directories"] == 37
+    assert removal["legacy_files_removed"] == 74
+    assert removal["unmapped_legacy_directories"] == 0
