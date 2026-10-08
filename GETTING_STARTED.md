@@ -23,7 +23,7 @@ The `Data/` folder is included in the repository. Generated outputs in `results/
 
 The commands below are for macOS or Linux. On Windows, use a WSL2/Linux terminal and install the prerequisites inside that environment. Native Windows has not been validated.
 
-Install Python 3.11, R, and Quarto before continuing. The demo was tested with Python 3.11, R 4.3.2, and Quarto 1.3.353. Use these versions when comparing environments. Setup requires internet access; it may take several minutes.
+Install the versions recorded in `workflow/toolchain.json` before continuing: Python 3.11.6, R 4.3.2, and Quarto 1.3.353. Python patch releases from 3.11.6 up to, but not including, 3.12 are supported; CI validates 3.11.6. Use the recorded versions when comparing environments. Setup requires internet access; it may take several minutes.
 
 Check that the tools are available:
 
@@ -45,7 +45,7 @@ Rscript workflow/restore_r.R
 quarto install tinytex
 ```
 
-The R restore command installs the recorded R packages, including ggplot2 and Shiny, into `.r-library/`. TinyTeX is needed for PDFs. Do not update dependency versions during the reproduction test.
+The R restore command installs the recorded R packages, including ggplot2 and Shiny, into `.r-library/`. TinyTeX is needed for PDFs. Its actual version is recorded in release metadata because the installer is not byte-locked. Do not update dependency versions during the reproduction test.
 
 Each time you open a new terminal, return to the repository folder and activate Python again:
 
@@ -101,7 +101,7 @@ Rscript tests/shiny_smoke.R results/reports/public_health_expert/app
 snakemake --dry-run --cores 2
 ```
 
-Expected for the current code: 30 Python tests pass, both R checks pass, and the final command reports that nothing needs to be done. If you built with an explicit Quarto path, use the same `--config quarto=...` option for the dry run.
+Expected for the current code: all Python tests pass, both R checks pass, and the final command reports that nothing needs to be done. If you built with an explicit Quarto path, use the same `--config quarto=...` option for the dry run.
 
 ### Verify the numerical results against the current demo
 
