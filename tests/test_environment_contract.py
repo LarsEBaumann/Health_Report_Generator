@@ -41,9 +41,10 @@ def test_r_and_quarto_contract_is_aligned():
 def test_tinytex_contract_is_aligned():
     tinytex = CONTRACT["tinytex"]
     installer = text("scripts/ci/install_tinytex.sh")
-    assert f'version="${{1:-{tinytex["validated"]}}}"' in installer
-    assert tinytex["asset"] in installer
-    assert tinytex["sha256"] in installer
+    assert f'version="{tinytex["validated"]}"' in installer
+    assert f'asset="{tinytex["asset"]}"' in installer
+    assert f'expected_sha256="{tinytex["sha256"]}"' in installer
+    assert 'requested_version="${1:-$version}"' in installer
     for workflow in WORKFLOWS:
         content = text(workflow)
         assert "tinytex: true" not in content
