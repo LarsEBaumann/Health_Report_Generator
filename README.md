@@ -9,7 +9,7 @@ Data/ -> snapshot + hashes -> harmonised.parquet -> blocking quality checks
 
 ## Setup and run
 
-Run commands from the repository root. Python 3.11 and R 4.3.2 were used for validation.
+Run commands from the repository root. The supported and validated toolchain is recorded in `workflow/toolchain.json`: Python 3.11.6 (supported range `>=3.11.6,<3.12`), R 4.3.2, Quarto 1.3.353, and uv 0.8.14. CI, Conda metadata, Docker, and project metadata are checked against this contract.
 
 ```sh
 python3 -m venv .venv
@@ -18,7 +18,7 @@ pip install -r scripts/health_pipeline/requirements.lock.txt
 Rscript workflow/restore_r.R
 ```
 
-Install Quarto (tested with **1.3.353**) and its PDF engine (`quarto install tinytex`; tested with **TinyTeX v2026.10**). Place `quarto` on PATH, or supply its path below. These are explicit installation steps; ordinary builds never fetch new data or install packages deliberately. Quarto's automatic TeX package installation is disabled in the template so PDF builds fail clearly if their TeX environment is incomplete.
+Install Quarto **1.3.353** and its PDF engine (`quarto install tinytex`; the baseline observed **TinyTeX v2026.10**). TinyTeX is installed by the Quarto setup action rather than locked byte-for-byte, so every release records the actual TeX version; PDF byte identity across installations is not claimed. Place `quarto` on PATH, or supply its path below. These are explicit installation steps; ordinary builds never fetch new data or install packages deliberately. Quarto's automatic TeX package installation is disabled in the template so PDF builds fail clearly if their TeX environment is incomplete.
 
 ```sh
 snakemake --cores 2
@@ -93,7 +93,7 @@ Tests cover subgroup safety, incomplete months/years/baselines, denominators, so
 
 CI runs tests, builds all outputs, checks Shiny server outputs, and uploads a release bundle only after success. It does not deploy or overwrite a production site. A failed local build may leave older reports on disk; treat only a successfully completed build and its matching `release.json` as a release. Preserve previously uploaded successful artifacts independently of a new build.
 
-The Python lock pins transitive packages; `renv.lock` records R dependencies. The R setup script restores those into `.r-library/`; `.Rprofile` and the renderer use that isolated library. A pre-existing global R installation can also run the workflow, and its actual versions are recorded, but use the restored library for reproduction. `workflow/environment.yml` describes the base Python/R environment, not a platform-specific binary lock. Reproducing identical metric tables is tested; bit-identical PDF bytes across platforms/toolchain versions are not claimed. Quarto and TeX versions are recorded in release metadata. Upgrade locks intentionally and rerun tests; `workflow/write_r_lock.R` records the current R dependency set when explicitly invoked.
+The production Python lock at `scripts/health_pipeline/requirements.lock.txt` pins the Snakemake/report pipeline; `uv.lock` pins the optional Marimo/connector environment from `pyproject.toml`; `renv.lock` records R dependencies. `workflow/toolchain.json` is the machine-readable runtime contract, and `tests/test_environment_contract.py` prevents supported entry points from drifting away from it. The R setup script restores those into `.r-library/`; `.Rprofile` and the renderer use that isolated library. A pre-existing global R installation can also run the workflow, and its actual versions are recorded, but use the restored library for reproduction. `workflow/environment.yml` describes the base Python/R environment, not a platform-specific binary lock. Reproducing identical metric tables is tested; bit-identical PDF bytes across platforms/toolchain versions are not claimed. Quarto and TeX versions are recorded in release metadata. Upgrade locks intentionally and rerun tests; `workflow/write_r_lock.R` records the current R dependency set when explicitly invoked.
 
 Legacy files in `scripts/health_pipeline/example_output/` are historical examples, not results from this workflow. Existing untracked files and raw datasets are not modified by the implementation.
 
