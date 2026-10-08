@@ -81,15 +81,27 @@ def main() -> None:
 
     changed = 0
     unchanged = 0
+
+
     for dataset_id in dataset_ids:
         encoded_id = quote(dataset_id, safe="")
         csv_url = f"{API_ROOT}/{encoded_id}/csv"
         metadata_url = f"{API_ROOT}/{encoded_id}/metadata"
 
+        print(f"CHECKING {dataset_id}: {csv_url}", flush=True)
+
         csv_response = session.get(csv_url, timeout=120)
         csv_response.raise_for_status()
         csv_content = csv_response.content
-        columns, row_count = csv_info(csv_content)
+
+        try:
+            columns, row_count = csv_info(csv_content)
+        except (ValueError, csv.Error) as exc:
+            raise RuntimeError(
+                f"Export validation failed for {dataset_id} "
+                f"from {csv_url}: {exc}"
+            ) from exc
+
 
         metadata_response = session.get(metadata_url, timeout=60)
         metadata_response.raise_for_status()
