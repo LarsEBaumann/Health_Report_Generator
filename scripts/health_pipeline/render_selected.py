@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 """Render one selected report from a versioned lineage artifact."""
 import argparse
-import os
 import json
 import re
 import shutil
 import tempfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
 from analyse import analyse, load_config
 from checks import validate
-from common import write_json
 from publish import build_provenance, render
 
 HERE = Path(__file__).resolve().parent
