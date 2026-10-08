@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 import pandas as pd
-from common import digest, object_hash, write_json, verify_gate
+from common import digest, write_json, verify_gate
 
 SECTIONS = ['headline','group_index','group_totals','small_multiples','change_table','excluded','quality','sources']
 FIELDS = {'id','title','question','needs_roles','period_type','years','reference_year','geography',

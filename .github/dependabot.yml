@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # Proposes SHA bumps for the pinned GitHub Actions; each update goes through CI.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns: ["*"]

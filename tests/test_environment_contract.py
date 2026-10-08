@@ -107,3 +107,14 @@ def test_legacy_data_root_remains_removed_and_auditable():
     assert removal["legacy_dataset_directories"] == migration["legacy_dataset_directories"] == 37
     assert removal["legacy_files_removed"] == 74
     assert removal["unmapped_legacy_directories"] == 0
+
+
+def test_uv_lock_matches_declared_python_range():
+    """`uv sync --locked` (container smoke test) fails if the lock targets another Python range."""
+    project = tomllib.loads(text("pyproject.toml"))
+    lock = tomllib.loads(text("uv.lock"))
+    normalise = lambda spec: spec.replace(" ", "")  # uv writes ">=3.11.6, <3.12"
+    assert normalise(lock["requires-python"]) == normalise(project["project"]["requires-python"])
+    declared = {d.split(">")[0].split("=")[0].split("<")[0].strip().lower().replace("_", "-")
+                for d in project["project"]["dependencies"]}
+    assert declared <= {p["name"] for p in lock["package"]}
