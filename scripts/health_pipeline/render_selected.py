@@ -21,8 +21,8 @@ CLASSES = HERE / "config/pathogen_class.csv"
 LINEAGE_STAKEHOLDERS = ("researcher", "public_health_expert")
 AUDIENCES = {
     "researcher": ("Technical disease-surveillance report", "Technical view of the selected disease-surveillance series."),
-    "policy_maker": ("Disease-surveillance monitoring brief", "Monitoring summary of the selected disease notifications for decision support."),
-    "general_public": ("Selected disease data: public summary", "Plain-language summary of the selected disease data. Notifications are not all infections."),
+    "health_institution": ("Disease-surveillance monitoring brief", "Monitoring summary of the selected disease notifications for decision support."),
+    "public": ("Selected disease data: public summary", "Plain-language summary of the selected disease data. Notifications are not all infections."),
 }
 
 def results_root(path: Path) -> Path:

@@ -16,7 +16,7 @@ on:
         description: Report stakeholder
         required: true
         type: choice
-        options: [researcher, policy_maker, general_public]
+        options: [researcher, health_institution, public]
       dataset_ids_json:
         description: JSON array of selected lineage dataset IDs
         required: true

@@ -6,6 +6,8 @@ from pathlib import Path
 
 import requests
 
+from github_config import resolve_repository
+
 API = "https://api.github.com"
 
 
@@ -14,8 +16,7 @@ def download_latest_report():
     if not token:
         raise RuntimeError("Set GITHUB_TOKEN with Actions read and write access.")
 
-    owner = os.getenv("GITHUB_OWNER", "LarsEBaumann")
-    repo = os.getenv("GITHUB_REPO", "Health_Report_Generator")
+    owner, repo = resolve_repository()
     workflow = os.getenv("GITHUB_WORKFLOW", "update-lyme-data.yml")
     branch = os.getenv("GITHUB_BRANCH", "main")
     # `researcher` is the default lineage bundle since Phase 5; older artifacts

@@ -22,3 +22,6 @@ outputs/
 
 # Marimo session snapshots
 /src/__marimo__/session/
+
+# Local build environments and generated files
+.venv-pipeline/

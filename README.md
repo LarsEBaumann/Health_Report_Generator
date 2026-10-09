@@ -6,17 +6,50 @@ Built for the hackathon challenge *One Data Source, Many Audiences: reproducible
 
 ## Quick start
 
-Prerequisites (versions pinned in `workflow/toolchain.json`): Python 3.11.6, R 4.3.2, Quarto 1.3.353, and TinyTeX v2026.10 for PDFs. Install steps: [reproduction guide](docs/reproduction.md#setup-and-run).
+Recommended local path: Docker with Docker Compose, on Linux/amd64.
+You do not need a GitHub token, fork, GitHub Actions, or host installations
+of Python, R, Quarto, or TinyTeX to generate reports this way.
 
 ```sh
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r scripts/health_pipeline/requirements.lock.txt
-Rscript workflow/restore_r.R
+git clone [https://github.com/LarsEBaumann/Health_Report_Generator.git](https://github.com/LarsEBaumann/Health_Report_Generator.git)
+cd Health_Report_Generator
+export LOCAL_UID="$(id -u)"
+export LOCAL_GID="$(id -g)"
 
-snakemake --cores 2          # or: bash scripts/health_pipeline/run_all.sh
+# One-time software setup; requires internet access.
+docker compose build report
+
+# One command generates all three audience releases.
+docker compose run --rm report snakemake --cores 2
 ```
 
-Open `results/reports/public/report.html` in a browser. Keep each `results/reports/<id>/` folder together so links and downloads work. No network access is needed: the committed data in `data/reference/` is read directly.
+The report image uses `Dockerfile.report`; the separate optional UI uses
+`Dockerfile`. Runtime versions are declared in `workflow/toolchain.json`.
+The build reads committed data in `data/reference/`; it does not fetch
+new IDD data or require GitHub credentials.
+
+Open `results/reports/public/report.html` in your browser. Keep each
+`results/reports/<id>/` folder together so links and downloads work.
+
+Verify a completed release:
+
+```sh
+docker compose run --rm report python scripts/health_pipeline/check_outputs.py
+docker compose run --rm report python scripts/health_pipeline/verify_release.py --out results
+```
+
+The repository also provides the one-command wrapper
+`scripts/health_pipeline/run_all.sh`. With the native pipeline environment
+and rendering tools configured, run:
+
+```sh
+bash scripts/health_pipeline/run_all.sh
+```
+
+For native setup, diagnostics, and reproduction checks, see
+[GETTING_STARTED.md](GETTING_STARTED.md).
+The optional fork-backed Marimo interface is a separate path described in
+[CONNECTOR_SETUP.md](CONNECTOR_SETUP.md); it is not required for local reports.
 
 ## What you get
 
@@ -86,7 +119,7 @@ Rscript tests/shiny_smoke.R results/reports/researcher/app
 
 Tests cover subgroup safety, incomplete months/years/baselines, denominators, source completeness, metadata conflicts, overlapping exports, nonzero CLI failures, stale gates, snapshot relocation/tampering, deterministic tables, and independent reconstruction of every fixture metric from raw records and formula inputs. The final dry run should say no work is needed after a successful unchanged build.
 
-CI is split into gated jobs (`docs/phase-6-ci-hardening.md`): `fast` (Ruff, tests, dry run), `secrets` (pinned gitleaks history scan), `container` (Docker build and smoke run) and `full` (all three audiences, output and provenance checks, release-hash and rendered-link verification, Shiny checks, no-op rebuild). It uploads a release bundle only after every `full` step succeeds. It does not deploy or overwrite a production site. A failed local build may leave older reports on disk; treat only a successfully completed build and its matching `release.json` as a release. Preserve previously uploaded successful artifacts independently of a new build.
+CI is split into gated jobs (`docs/phase-6-ci-hardening.md`): `fast` (Ruff, tests, dry run), `secrets` (pinned gitleaks history scan), `container` (optional UI image smoke test plus report-image build, all-audience rendering, provenance/release verification, app smoke tests and no-op rebuild) and `full` (all three audiences, output and provenance checks, release-hash and rendered-link verification, Shiny checks, no-op rebuild). It uploads a release bundle only after every `full` step succeeds. It does not deploy or overwrite a production site. A failed local build may leave older reports on disk; treat only a successfully completed build and its matching `release.json` as a release. Preserve previously uploaded successful artifacts independently of a new build.
 
 The production Python lock at `scripts/health_pipeline/requirements.lock.txt` pins the Snakemake/report pipeline; `uv.lock` pins the optional Marimo/connector environment from `pyproject.toml`; `renv.lock` records R dependencies. `workflow/toolchain.json` is the machine-readable source of runtime version policy. `workflow/environment.yml` is an alternative convenience environment, not an additional authoritative lock.
 

@@ -1,6 +1,26 @@
 services:
   report:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.report
+    platform: linux/amd64
+    working_dir: /app
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    volumes:
+      - .:/app
+    environment:
+      HOME: /tmp
+      XDG_CONFIG_HOME: /tmp/health-report-config
+      XDG_CACHE_HOME: /tmp/health-report-cache
+      HEALTH_REPORT_R_LIBRARY: /opt/health-report-r-library
+      R_LIBS_USER: /opt/health-report-r-library
+    command: ["snakemake", "--cores", "2"]
+
+  ui:
+    profiles: ["ui"]
+    build:
+      context: .
+      dockerfile: Dockerfile
     working_dir: /app
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     volumes:
@@ -8,7 +28,10 @@ services:
       - ./.cache/uv:/tmp/uv-cache
     environment:
       UV_CACHE_DIR: /tmp/uv-cache
-      LINEAGE_DIR: ${LINEAGE_DIR:-/app/data/lineage}
-      LINEAGE_RUN_ID: ${LINEAGE_RUN_ID:-}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
-      GITHUB_REPOSITORY: ${GITHUB_REPOSITORY:-LarsEBaumann/Health_Report_Generator}
+      GITHUB_REPOSITORY: ${GITHUB_REPOSITORY:-}
+      GITHUB_OWNER: ${GITHUB_OWNER:-LarsEBaumann}
+      GITHUB_REPO: ${GITHUB_REPO:-Health_Report_Generator}
+      GITHUB_APP_REF: ${GITHUB_APP_REF:-main}
+      GITHUB_BRANCH: ${GITHUB_BRANCH:-main}
+      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-update-lyme-data.yml}

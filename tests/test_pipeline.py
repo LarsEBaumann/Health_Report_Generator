@@ -204,8 +204,8 @@ def test_requested_single_class_still_requires_eligible_members(project):
     "audience,display_name,layout,detail_level",
     [
         ("researcher", "Researcher", "technical", "full"),
-        ("policy_maker", "Public health", "dashboard", "monitoring"),
-        ("general_public", "General public", "editorial", "plain_language"),
+        ("health_institution", "Public health", "dashboard", "monitoring"),
+        ("public", "General public", "editorial", "plain_language"),
     ],
 )
 def test_audience_presentation_config(
