@@ -49,13 +49,42 @@ jobs:
     name: container
     needs: fast
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Build container
         run: docker build --tag health-report:ci .
       - name: Container smoke test (locked uv sync, Quarto, Marimo)
         run: docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/app" health-report:ci
+
+      - name: Build report container
+        run: docker build --file Dockerfile.report --tag health-report:reports-ci .
+
+      - name: Build all audiences inside report container
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp \
+            --volume "$PWD:/app" \
+            health-report:reports-ci \
+            snakemake --cores 2 --config out=reproduced/container-ci
+
+      - name: Verify container reports and packaged apps
+        run: |
+          docker run --rm \
+            --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp \
+            --volume "$PWD:/app" \
+            health-report:reports-ci \
+            sh -ec '
+              python scripts/health_pipeline/check_outputs.py --out reproduced/container-ci
+              python scripts/health_pipeline/verify_release.py --out reproduced/container-ci
+              Rscript tests/shiny_smoke.R reproduced/container-ci/reports/researcher/app
+              Rscript tests/dashboard_smoke.R reproduced/container-ci/reports/researcher/app
+              snakemake --dry-run --cores 1 --config out=reproduced/container-ci > /tmp/noop.log 2>&1
+              cat /tmp/noop.log
+              grep -q "Nothing to be done" /tmp/noop.log
+            '
 
   full:
     name: full

@@ -6,12 +6,12 @@
       "layout": "technical",
       "detail_level": "full"
     },
-    "policy_maker": {
+    "health_institution": {
       "display_name": "Public health",
       "layout": "dashboard",
       "detail_level": "monitoring"
     },
-    "general_public": {
+    "public": {
       "display_name": "General public",
       "layout": "editorial",
       "detail_level": "plain_language"

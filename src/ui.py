@@ -15,8 +15,30 @@ def _():
     import requests
 
     from artifact_download import download_latest_report
+    from github_config import resolve_repository
 
-    return download_latest_report, json, mo, os, pd, requests, uuid
+    return download_latest_report, json, mo, os, pd, requests, resolve_repository, uuid
+
+
+@app.cell
+def _(mo, resolve_repository):
+    try:
+        _owner, _repo = resolve_repository()
+        _repository_status = mo.callout(
+            mo.md(
+                f"GitHub repository: `{_owner}/{_repo}`. "
+                "Artifact lookup and report requests use this repository. "
+                "Fork users must configure their own repository and token."
+            ),
+            kind="info",
+        )
+    except ValueError as _error:
+        _repository_status = mo.callout(
+            mo.md(f"Repository configuration error: {_error}"),
+            kind="danger",
+        )
+    _repository_status
+    return
 
 
 @app.cell
@@ -54,7 +76,7 @@ def _(download_latest_report, pd):
 @app.cell
 def _(datasets, message, mo, ready, source_artifact, source_run):
     audience_widget = mo.ui.dropdown(
-        options={"Researcher": "researcher", "Public health": "policy_maker", "General public": "general_public"},
+        options={"Researcher": "researcher", "Public health": "health_institution", "General public": "public"},
         value="Researcher",
         label="Who is this report for?",
         full_width=True,
@@ -105,7 +127,7 @@ def _(datasets, message, mo, ready, source_artifact, source_run):
 
 
 @app.cell
-def _(json, mo, os, report_form, requests, source_run, uuid):
+def _(json, mo, os, report_form, requests, resolve_repository, source_run, uuid):
     if report_form.value is None:
         result = mo.md("Choose a stakeholder and diseases, then select **Generate report**.")
     else:
@@ -118,20 +140,19 @@ def _(json, mo, os, report_form, requests, source_run, uuid):
             result = mo.callout(mo.md("Select at least one disease."), kind="warn")
         else:
             token = os.getenv("GITHUB_TOKEN")
-            owner = os.getenv("GITHUB_OWNER", "LarsEBaumann")
-            repo = os.getenv("GITHUB_REPO", "Health_Report_Generator")
             ref = os.getenv("GITHUB_APP_REF", "main")
             if not token:
                 result = mo.callout(mo.md("Set GITHUB_TOKEN with Actions read/write permission."), kind="warn")
             else:
                 request_id = uuid.uuid4().hex
-                url = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/render-selected-report.yml/dispatches"
                 headers = {
                     "Accept": "application/vnd.github+json",
                     "Authorization": f"Bearer {token}",
                     "X-GitHub-Api-Version": "2022-11-28",
                 }
                 try:
+                    owner, repo = resolve_repository()
+                    url = f"https://api.github.com/repos/{owner}/{repo}/actions/workflows/render-selected-report.yml/dispatches"
                     response = requests.post(
                         url, headers=headers,
                         json={"ref": ref, "inputs": {
@@ -153,11 +174,30 @@ def _(json, mo, os, report_form, requests, source_run, uuid):
                         )
                     else:
                         result = mo.callout(
-                            mo.md(f"Workflow dispatch failed ({response.status_code}): `{response.text}`"),
+                            mo.md(
+                                f"Workflow dispatch failed ({response.status_code}). "
+                                + {
+                                    401: "Check that the token is valid and has not expired.",
+                                    403: "Check token access to this repository, Actions write permission, repository policy, and API rate limits.",
+                                    404: "Check the configured repository, token access, and whether render-selected-report.yml exists and Actions is enabled.",
+                                    422: "Check the workflow branch and input values against the workflow definition.",
+                                }.get(
+                                    response.status_code,
+                                    "Inspect the GitHub Actions/API status and retry after resolving the error.",
+                                )
+                            ),
                             kind="danger",
                         )
-                except requests.RequestException as exc:
-                    result = mo.callout(mo.md(f"Could not contact GitHub: `{exc}`"), kind="danger")
+                except ValueError as exc:
+                    result = mo.callout(
+                        mo.md(f"Repository configuration error: {exc}"),
+                        kind="danger",
+                    )
+                except requests.RequestException:
+                    result = mo.callout(
+                        mo.md("Could not contact GitHub. Check network connectivity and retry."),
+                        kind="danger",
+                    )
     result
 
 

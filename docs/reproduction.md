@@ -4,28 +4,80 @@ How to set up the toolchain, build all audience reports, and reproduce an archiv
 
 ## Setup and run
 
-The fastest path is `bash scripts/health_pipeline/run_all.sh`, which runs the same `snakemake --cores 2` described here.
+Run commands from the repository root. The version policy is recorded in
+`workflow/toolchain.json`: Python 3.11.6, R 4.3.2, Quarto 1.3.353,
+uv 0.8.14, and checksum-pinned TinyTeX v2026.10.
 
-Run commands from the repository root. The supported and validated toolchain is recorded in `workflow/toolchain.json`: Python 3.11.6 (supported range `>=3.11.6,<3.12`), R 4.3.2, Quarto 1.3.353, and uv 0.8.14. CI, Conda metadata, Docker, and project metadata are checked against this contract.
+### Recommended: Docker
+
+The current report image targets Linux/amd64. Docker and Docker Compose
+must be installed, and the Docker daemon must be reachable.
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r scripts/health_pipeline/requirements.lock.txt
+export LOCAL_UID="$(id -u)"
+export LOCAL_GID="$(id -g)"
+docker compose build report
+docker compose run --rm report snakemake --cores 2
+```
+
+Image creation downloads software and restores packages.
+The report command reads committed reference data and requires no GitHub
+token, fork, or GitHub Actions. It does not perform an IDD data update.
+
+`Dockerfile.report` provides the report environment.
+The original `Dockerfile` provides the separate optional UI environment.
+
+### Alternative: native setup
+
+Install the declared R and Quarto versions and required TeX toolchain.
+Use a separate pipeline environment, not the optional UI's `.venv`:
+the two current dependency specifications require incompatible pandas versions.
+
+With uv installed:
+
+```sh
+uv venv --python 3.11.6 .venv-pipeline
+uv pip install --python .venv-pipeline/bin/python \
+  -r scripts/health_pipeline/requirements.lock.txt
 Rscript workflow/restore_r.R
 ```
 
-Install Quarto **1.3.353**. CI installs the checksum-pinned full **TinyTeX v2026.10** bundle through `scripts/ci/install_tinytex.sh`; local PDF builds require an equivalent TeX installation. The installer verifies the archive digest and the required KOMA-Script class before rendering. Place `quarto` on PATH, or supply its path below. These are explicit installation steps; ordinary builds never fetch new data or install packages deliberately. Quarto's automatic TeX package installation is disabled in the template so PDF builds fail clearly if their TeX environment is incomplete.
+Inspect `scripts/ci/install_tinytex.sh` before running it:
+it replaces `$HOME/.TinyTeX`. To intentionally install the pinned bundle:
 
 ```sh
-snakemake --cores 2
-# On this Mac, when Quarto is bundled with RStudio:
-snakemake --cores 2 --config quarto=/Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto
+bash scripts/ci/install_tinytex.sh 2026.10
+export PATH="$HOME/.TinyTeX/bin/x86_64-linux:$PATH"
+.venv-pipeline/bin/python -m snakemake --cores 2
 ```
 
-Optional targets: `snakemake tables --cores 1`, `snakemake html --cores 1`, `snakemake pdf --cores 1`, `snakemake shiny --cores 1`.
+The installer verifies the archive digest and required KOMA-Script class.
+Quarto's automatic TeX package installation is disabled in the template.
 
-`bash scripts/health_pipeline/run_all.sh [data_root] [out_dir] [extra snakemake args]` is a thin wrapper around `snakemake --cores ${CORES:-2}` (defaults from `workflow/config.yaml`). Set `QUARTO` to override the renderer path and `CORES` to change parallelism. The former Python-generated HTML is replaced by the shared QMD to avoid duplicate statistical logic.
+### Targets and wrapper
+
+For Docker, replace the final command with any partial target:
+
+```sh
+docker compose run --rm report snakemake tables --cores 2
+docker compose run --rm report snakemake html --cores 2
+docker compose run --rm report snakemake pdf --cores 2
+docker compose run --rm report snakemake shiny --cores 2
+```
+
+Partial targets do not establish that a complete release works.
+
+The native wrapper
+`bash scripts/health_pipeline/run_all.sh [data_root] [out_dir] [extra snakemake args]`
+runs Snakemake from PATH. Activate `.venv-pipeline` before using it:
+
+```sh
+source .venv-pipeline/bin/activate
+bash scripts/health_pipeline/run_all.sh
+```
+
+Set `QUARTO` to override the renderer path and `CORES` to change parallelism.
+See GETTING_STARTED.md for complete output and verification instructions.
 
 ## Reproduce a specific archived release
 

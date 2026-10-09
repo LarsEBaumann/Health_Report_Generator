@@ -21,7 +21,13 @@ rm -rf "$HOME/.TinyTeX"
 tar -xJf "$archive" -C "$HOME"
 
 tinytex_bin="$HOME/.TinyTeX/bin/x86_64-linux"
-echo "$tinytex_bin" >> "$GITHUB_PATH"
+# Register the installation for later GitHub Actions steps when applicable.
+if [[ -n "${GITHUB_PATH:-}" ]]; then
+  echo "$tinytex_bin" >> "$GITHUB_PATH"
+fi
+
+# Make the tools available to this installer process as well.
+export PATH="$tinytex_bin:$PATH"
 "$tinytex_bin/tlmgr" --version
 "$tinytex_bin/kpsewhich" scrartcl.cls >/dev/null || {
   echo "Pinned TinyTeX bundle does not contain required class scrartcl.cls" >&2
