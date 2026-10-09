@@ -7,6 +7,18 @@ Data/ -> snapshot + hashes -> harmonised.parquet -> blocking quality checks
   -> stakeholder analysis -> report CSVs + lineage -> Quarto HTML / PDF + Shiny bundle
 ```
 
+## New: request-driven dataset trends
+
+Use [REQUEST_WORKFLOW.md](REQUEST_WORKFLOW.md) for the JSON-driven workflow agreed after the demo. It reports trends for exactly the selected exports, supports all three audience identifiers, and renders requested HTML/PDF formats from a shared QMD:
+
+```sh
+snakemake --cores 2 --config request_file=examples/requests/public-health.json
+```
+
+This route has its own documented selection rules, selected-dataset checks, prepared-data cache and `result.json` artifact manifest. The audience-specific design is an initial shared template. Marimo integration and broader dataset adapters remain separate work.
+
+**The remaining instructions describe the original demo route**, which is still used when `request_file` is omitted, including its viral/bacterial comparisons and optional Shiny package.
+
 ## Setup and run
 
 Run commands from the repository root. Python 3.11 and R 4.3.2 were used for validation.

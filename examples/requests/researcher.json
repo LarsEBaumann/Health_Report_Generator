@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0",
+  "request_id": "example-researcher",
+  "audience": "researcher",
+  "datasets": ["INFLUENZA_oblig", "LYME_sentinella"],
+  "formats": ["html"]
+}

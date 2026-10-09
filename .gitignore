@@ -1,15 +1,63 @@
-.DS_Store
+# Local Python environments (including .venv311), caches and test output
+.venv*/
+venv/
+env/
 __pycache__/
-*.pyc
+*.py[cod]
 .pytest_cache/
-.venv/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Snakemake state and generated workflow artifacts
 .snakemake/
-results/
-reproduced/
-out/
+/results/
+/reproduced/
+/out/
+/_site/
+# Transient dispatch input; keep reusable examples/requests/*.json tracked.
+/request.json
+
+# Installed R packages and local R session state; keep renv.lock and .Rprofile.
 renv/library/
 renv/staging/
-.Rhistory
-.RData
+renv/cache/
 .r-library/
 .r-bootstrap/
+.Rproj.user/
+.Rhistory
+.RData
+.RDataTmp
+.Ruserdata
+
+# Quarto/knitr working files; do not blanket-ignore HTML, PDF, CSV or JSON.
+.quarto/
+*_cache/
+*.knit.md
+*.utf8.md
+
+# Local secrets; commit only deliberately sanitised example files.
+.env
+.env.*
+!.env.example
+!.env.template
+.Renviron
+.Renviron.*
+!.Renviron.example
+!.Renviron.template
+/secrets/
+/credentials/
+
+# OS/editor temporary files and logs
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+*.log

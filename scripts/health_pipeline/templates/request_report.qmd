@@ -1,0 +1,104 @@
+---
+title: "Selected health trends"
+format-links: false
+format:
+  html:
+    embed-resources: true
+    include-after-body: provenance.html
+    theme: cosmo
+    toc: false
+  pdf:
+    latex-auto-install: false
+    papersize: a4
+    toc: false
+    geometry: margin=22mm
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| results: asis
+library(ggplot2)
+library(jsonlite)
+library(knitr)
+request <- fromJSON("request.json")
+provenance <- fromJSON("provenance.json", simplifyVector=FALSE)
+series <- read.csv("series.csv", stringsAsFactors=FALSE)
+selection <- read.csv("selection.csv", stringsAsFactors=FALSE)
+coverage <- read.csv("coverage.csv", stringsAsFactors=FALSE)
+series$date <- as.Date(series$date)
+escape_text <- function(x) gsub("([\\\\`*_{}\\[\\]<>#])", "\\\\\\1", x, perl=TRUE)
+audience <- switch(request$audience, researcher="Research overview", public_health_expert="Public health overview", general_public="Health at a glance")
+cat("## ", audience, "\n\n", sep="")
+cat(length(request$datasets), " selected dataset(s). Each chart shows published values over time for one dataset.\n\n")
+cat("**Snapshot:** `", provenance$snapshot_id, "`\n\n", sep="")
+cat("**Reading these charts:** missing observations remain gaps. Sources can cover different populations and use different reporting methods; the values are not combined.\n\n")
+```
+
+```{r}
+#| results: asis
+#| fig-alt: "Published values over time for the selected dataset. Missing observations appear as gaps."
+#| fig-width: 10
+#| fig-height: 3.7
+for (i in seq_len(nrow(selection))) {
+  s <- selection[i, ]
+  d <- series[series$dataset == s$dataset, ]
+  c <- coverage[coverage$dataset == s$dataset, ]
+  geo_label <- if (s$geography == "CHFL") "Switzerland and Liechtenstein" else "Switzerland"
+  cat("## ", escape_text(s$label), "\n\n", sep="")
+  last <- d[nrow(d), ]
+  latest <- if (is.na(last$value)) "Not available" else format(last$value, big.mark=",", scientific=FALSE, trim=TRUE)
+  cat("**Latest published period: ", latest, "** · ", escape_text(s$unit), " · ", as.character(last$date), "\n\n", sep="")
+  cat(geo_label, " · ", switch(s$period_type, iso_week="Weekly", week="Weekly", month="Monthly", year="Annual", day="Daily"), " observations · completeness: ", last$completeness, ".\n\n", sep="")
+  # Separate runs ensure absent values are visible as gaps rather than bridged lines.
+  d$segment <- cumsum(is.na(d$value))
+  p <- ggplot(d, aes(date, value)) +
+    geom_line(aes(group=segment), colour="#126B80", linewidth=0.8, na.rm=TRUE) +
+    geom_point(aes(shape=completeness), colour="#126B80", size=1.5, na.rm=TRUE) +
+    scale_shape_manual(values=c(complete=16, incomplete=1, unknown=4), drop=FALSE) +
+    labs(x=NULL, y=s$unit, shape="Source completeness") +
+    theme_minimal(base_size=12) +
+    theme(panel.grid.minor=element_blank(), plot.background=element_rect(fill="white", colour=NA),
+          legend.position="bottom", axis.title.y=element_text(margin=margin(r=12)))
+  print(p)
+  cat("\n\n", c$observed_values, " observed values across ", c$expected_periods,
+      " periods; ", c$missing_periods, " absent periods and ", c$missing_values, " recorded missing values.\n\n", sep="")
+  if (!is.na(s$value_description) && nzchar(s$value_description)) cat(escape_text(s$value_description), "\n\n")
+  cat("*Source: ", escape_text(s$source_system), ". National totals; published ", s$measure,
+      "; no aggregation or baseline comparison. Unknown completeness means the source did not provide a usable flag.*\n\n", sep="")
+}
+```
+
+## Sources and interpretation
+
+```{r}
+#| results: asis
+sources <- read.csv("sources.csv", stringsAsFactors=FALSE)
+shown <- sources[, c("dataset", "source_file", "publishing_date"), drop=FALSE]
+names(shown) <- c("Selected dataset", "Snapshot source file", "Source publication date")
+print(kable(shown, row.names=FALSE))
+```
+
+*Table guide: dataset identifies the selected export. Source file is its location inside the frozen snapshot; publication date comes from its metadata. It is not a download date. The accompanying data bundle links every plotted observation to its original CSV row and file checksum. Missing values are never treated as zero. These descriptive trends do not establish changes in infection risk or causality.*
+
+```{r}
+#| results: asis
+if (request$audience == "researcher") {
+  cat("## Reuse the analysis\n\nThe download bundle contains series.csv, coverage.csv, selection.csv, checks.csv and lineage.csv. Use metric_id to connect an observation to its source row. resolved_settings.json records the exact filters; snapshot.json identifies the source bytes. Reproduction also requires the repository and archived snapshot.\n\n")
+}
+if (knitr::is_html_output()) {
+  cat('<details><summary>Reproducibility record</summary><p>The full machine-readable record is embedded in this HTML under report-provenance.</p><pre>')
+  txt <- toJSON(provenance, auto_unbox=TRUE, pretty=TRUE)
+  txt <- gsub('&', '&amp;', txt, fixed=TRUE)
+  txt <- gsub('<', '&lt;', txt, fixed=TRUE)
+  cat(txt, '</pre></details>')
+} else {
+  cat("## Reproducibility record\n\nMachine-readable JSON (the full record also accompanies this PDF):\n\n")
+  compact <- list(schema_version="1.0", request=request, snapshot_id=provenance$snapshot_id,
+                  rendered_at=provenance$rendered_at, git_commit=provenance$git_commit,
+                  bundle_sha256=provenance$bundle_sha256, filters=provenance$filters)
+  cat("```json\n", toJSON(compact, auto_unbox=TRUE, pretty=TRUE), "\n```\n")
+}
+```
