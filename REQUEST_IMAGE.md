@@ -1,6 +1,6 @@
 # Request environment image: test branch only
 
-Purpose: install report software when building an image, then reuse that image for requests. This stage builds and tests the image; the working `request-report.yml` job is deliberately not switched until an image passes.
+Purpose: install report software when building an image, then reuse that image for requests. The image passed build and offline report tests in run 38077323216. The request job now uses that tested image; its first normal request run still needs remote verification.
 
 ## What changes
 
@@ -32,14 +32,24 @@ Artifacts:
 - `request-image-test-<run-id>`: generated test reports and `image-test.json` with timings; also the built image inspection record.
 - `request-image-reference-<run-id>`: `image-reference.txt`, the published `ghcr.io/...@sha256:...` reference.
 
-## Next gate
+## Active request environment
 
-After a green build/test/publish run, supply the exact digest from `image-reference.txt`. A separate change will make the request workflow use it and remove per-request installation steps. Do not use `latest` or assume a tag can never change. Record the chosen image digest with report provenance when enabling that route.
+`request-report.yml` is pinned to:
+
+```
+ghcr.io/larsebaumann/health_report_generator-request-test@sha256:86f29ed4333f29648d13bfa007b157d232abc196d720edb41d4d2c83a79e721a
+```
+
+The job authenticates using the repository's automatic token with `packages: read`. There are no Python/R/Quarto/TeX installation steps. It compares repository dependency locks with those in the image, failing explicitly if they differ. Regression tests run on code pushes; every report still performs request validation, data checks and bundle integrity verification. Report provenance records the image reference under `software.container_image` (null for native runs without an image).
+
+Push this change on `test`, then inspect **Build requested health report**. It should initialise the container, verify the environment, and generate the requested report. Download `requested-health-report-<run-id>` and check its request and provenance. This push does not rebuild the image unless an environment build input also changes. Compare complete run timings, including image pull and startup, before claiming a speed improvement.
+
+When dependencies change, build/test a new image first and update both the container image and its provenance environment value to the new exact digest. Do not use `latest`. A fork needs access to this package or its own tested image; it must not silently fall back to an unverified environment.
 
 This workflow neither changes other branches nor merges anything. It creates a separately named GHCR package in the workflow repository owner's namespace when publication is allowed. It does not change package visibility or existing image tags.
 
 ## Limits
 
-The local authoring environment did not have Docker available; an actual container build is still required in Actions. Do not claim a faster request before timing a request against the published image. Image pull, runner startup and queue time remain. Prepared-data reuse across different GitHub runs is a separate change.
+The local authoring environment did not have Docker available. Container build and offline tests passed in Actions: first HTML generation took 28.620 seconds; a second audience with HTML/PDF took 17.441 seconds using the same preparation. These exclude initial build, queue and image-transfer time. Prepared-data reuse across different GitHub runs is a separate change.
 
 This is an amd64 image intended for the GitHub Linux runner. Running it on Apple Silicon would require an explicit emulation test; it is not a native Mac/ARM support claim. No local Docker installation is needed for the GitHub build.

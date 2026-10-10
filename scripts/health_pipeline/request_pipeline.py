@@ -210,7 +210,8 @@ def render(bundle, fmt, output, quarto='quarto'):
                   'filters': json.loads((bundle / 'resolved_settings.json').read_text()),
                   'sources': pd.read_csv(bundle / 'sources.csv').fillna('').to_dict('records'),
                   'rendered_at': datetime.now(timezone.utc).isoformat(), 'git_commit': commit,
-                  'software': {'python': platform.python_version(), 'pandas': pd.__version__,
+                  'software': {'container_image': os.environ.get('REQUEST_ENVIRONMENT_IMAGE'),
+                               'python': platform.python_version(), 'pandas': pd.__version__,
                                'quarto': subprocess.check_output([quarto, '--version'], text=True).strip(),
                                'r': subprocess.check_output(['Rscript', '-e', 'cat(R.version.string)'], text=True).strip()},
                   'code_sha256': {str(p.relative_to(REPO)): digest(p) for p in
