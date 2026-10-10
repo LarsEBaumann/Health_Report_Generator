@@ -34,4 +34,4 @@ services:
       GITHUB_REPO: ${GITHUB_REPO:-Health_Report_Generator}
       GITHUB_APP_REF: ${GITHUB_APP_REF:-main}
       GITHUB_BRANCH: ${GITHUB_BRANCH:-main}
-      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-update-lyme-data.yml}
+      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-refresh-idd-data.yml}

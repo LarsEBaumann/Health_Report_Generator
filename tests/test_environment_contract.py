@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = json.loads((ROOT / "workflow/toolchain.json").read_text())
 WORKFLOWS = (
     ".github/workflows/validate.yml",
-    ".github/workflows/update-lyme-data.yml",
+    ".github/workflows/refresh-idd-data.yml",
     ".github/workflows/render-selected-report.yml",
 )
 
@@ -62,7 +62,7 @@ def test_validation_runs_for_push_and_pull_requests():
 
 def test_workflow_branch_refs_are_main():
     for workflow in (
-        ".github/workflows/update-lyme-data.yml",
+        ".github/workflows/refresh-idd-data.yml",
         ".github/workflows/render-selected-report.yml",
     ):
         content = text(workflow)

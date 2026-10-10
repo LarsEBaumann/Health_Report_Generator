@@ -20,7 +20,7 @@ def connector_modules(monkeypatch):
     monkeypatch.setenv("GITHUB_OWNER", "wrong-owner")
     monkeypatch.setenv("GITHUB_REPO", "wrong-repo")
     monkeypatch.setenv("GITHUB_APP_REF", "main")
-    monkeypatch.setenv("GITHUB_WORKFLOW", "update-lyme-data.yml")
+    monkeypatch.setenv("GITHUB_WORKFLOW", "refresh-idd-data.yml")
     monkeypatch.setenv("GITHUB_BRANCH", "main")
 
     config = importlib.import_module("github_config")
@@ -49,7 +49,7 @@ def test_artifact_lookup_targets_configured_fork(
     assert len(calls) == 1
     assert calls[0][0] == (
         f"https://api.github.com/repos/{FORK}/actions/workflows/"
-        "update-lyme-data.yml/runs"
+        "refresh-idd-data.yml/runs"
     )
     assert calls[0][1]["params"]["branch"] == "main"
 
