@@ -39,6 +39,24 @@ snakemake --cores 2 results/reports/clinicians/report.html
 
 A fourth report appears with its own provenance. The `id` must equal the file name. Remove the file and the config entry afterwards (a committed fourth audience needs a test update: the default build is asserted to contain exactly the three audiences).
 
-## 5. Reproduce a past release (optional)
+## 5. A custom request, built once and reused (3 min)
+
+```sh
+docker compose run --rm report python scripts/health_pipeline/custom_report.py \
+  examples/request-2022-2025.json --out results/custom
+docker compose run --rm report python scripts/health_pipeline/custom_report.py \
+  examples/request-2022-2025.json --out results/custom2
+```
+
+The first run prints `cache miss` and renders. The second prints `cache hit` with the same key in a few seconds, and `results/custom2` is identical to `results/custom`, including the original render time. Open `results/custom/report.html`: the title reads "Custom request: 2022 to 2025". Then compare the two provenance files:
+
+```sh
+python -c "import json;p=json.load(open('results/custom/provenance.json'));print(p['filters']['years'],p['effective_parameters']['title'])"
+python -c "import json;r=json.load(open('results/custom/request_provenance.json'));print(r['cache_key'][:12],list(r['components']),r['rendered_utc'])"
+```
+
+The reference year stays 2019, so a 2022 to 2025 report is still compared with the pre-COVID baseline. This is a stated choice, and a request can change `reference_year` and `index_base_year`.
+
+## 6. Reproduce a past release (optional)
 
 Use the snapshot command in [reproduction.md](reproduction.md#reproduce-a-specific-archived-release) with an earlier `results/snapshots/<id>/manifest.json`.
