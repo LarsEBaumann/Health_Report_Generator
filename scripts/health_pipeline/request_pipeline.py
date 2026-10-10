@@ -193,6 +193,27 @@ def analyse_request(prepared, request_path, snapshot_path, dest):
                                      'files': {n: digest(dest / n) for n in BUNDLE_FILES}})
 
 
+def source_commit():
+    """Read the actual checkout, including container mounts owned by the runner."""
+    in_actions = os.environ.get('GITHUB_ACTIONS') == 'true'
+    try:
+        # Trust only this known checkout for this command. Do not change global
+        # Git configuration or disable ownership checks for other repositories.
+        commit = subprocess.check_output(
+            ['git', '-c', f'safe.directory={REPO.resolve()}', 'rev-parse', '--verify', 'HEAD'],
+            cwd=REPO, text=True, stderr=subprocess.PIPE,
+        ).strip()
+    except (subprocess.CalledProcessError, FileNotFoundError) as exc:
+        if in_actions:
+            raise RuntimeError('Cannot identify the checked-out Git commit; report provenance would be incomplete') from exc
+        return 'unavailable'
+    if not re.fullmatch(r'(?:[0-9a-f]{40}|[0-9a-f]{64})', commit):
+        raise RuntimeError('Git returned an invalid commit identifier')
+    if in_actions and commit != os.environ.get('GITHUB_SHA'):
+        raise RuntimeError('Checked-out commit does not match GITHUB_SHA; refusing to label the wrong code version')
+    return commit
+
+
 def render(bundle, fmt, output, quarto='quarto'):
     bundle, output = Path(bundle), Path(output)
     manifest = json.loads((bundle / 'bundle.json').read_text())
@@ -202,10 +223,7 @@ def render(bundle, fmt, output, quarto='quarto'):
     request = read_request(bundle / 'request.json')
     if fmt not in request['formats']:
         raise ValueError(f'Format {fmt} was not requested')
-    try:
-        commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip()
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        commit = 'unavailable'
+    commit = source_commit()
     provenance = {'schema_version': '1.0', 'request': request, 'snapshot_id': manifest['snapshot_id'],
                   'filters': json.loads((bundle / 'resolved_settings.json').read_text()),
                   'sources': pd.read_csv(bundle / 'sources.csv').fillna('').to_dict('records'),

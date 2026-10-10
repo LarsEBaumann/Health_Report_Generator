@@ -1,5 +1,6 @@
 """Request contracts, scientific selection and cache integrity regression tests."""
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -145,3 +146,51 @@ def test_default_workflow_target_builds_request(request_project):
     assert 'request_render' in proc.stdout
     assert 'request_analyse' in proc.stdout
     assert 'request_prepare' in proc.stdout
+
+
+@pytest.fixture
+def provenance_checkout(tmp_path, monkeypatch):
+    import subprocess
+    import request_pipeline
+    repo = tmp_path / 'checkout'
+    repo.mkdir()
+    monkeypatch.setenv('GIT_CONFIG_NOSYSTEM', '1')
+    monkeypatch.setenv('GIT_CONFIG_GLOBAL', os.devnull)
+    monkeypatch.delenv('GITHUB_ACTIONS', raising=False)
+    subprocess.run(['git', 'init', '-q', str(repo)], check=True)
+    subprocess.run(['git', '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                    'commit', '-q', '--allow-empty', '-m', 'Fixture'], cwd=repo, check=True)
+    commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip()
+    monkeypatch.setattr(request_pipeline, 'REPO', repo)
+    return repo, commit
+
+
+def test_commit_on_runner_owned_mount(provenance_checkout, monkeypatch):
+    import subprocess
+    from request_pipeline import source_commit
+    repo, expected = provenance_checkout
+    monkeypatch.setenv('GIT_TEST_ASSUME_DIFFERENT_OWNER', '1')
+    denied = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=repo, capture_output=True, text=True)
+    assert denied.returncode != 0 and 'dubious ownership' in denied.stderr
+    assert source_commit() == expected
+
+
+def test_commit_matches_actions_run(provenance_checkout, monkeypatch):
+    from request_pipeline import source_commit
+    _, expected = provenance_checkout
+    monkeypatch.setenv('GITHUB_ACTIONS', 'true')
+    monkeypatch.setenv('GITHUB_SHA', expected)
+    assert source_commit() == expected
+    monkeypatch.setenv('GITHUB_SHA', '0' * 40)
+    with pytest.raises(RuntimeError, match='does not match'):
+        source_commit()
+
+
+def test_actions_missing_checkout_blocks_report(tmp_path, monkeypatch):
+    import request_pipeline
+    monkeypatch.setattr(request_pipeline, 'REPO', tmp_path)
+    monkeypatch.setenv('GITHUB_ACTIONS', 'true')
+    with pytest.raises(RuntimeError, match='Cannot identify'):
+        request_pipeline.source_commit()
+    monkeypatch.delenv('GITHUB_ACTIONS')
+    assert request_pipeline.source_commit() == 'unavailable'
