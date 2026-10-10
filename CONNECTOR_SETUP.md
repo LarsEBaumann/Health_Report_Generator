@@ -18,7 +18,7 @@ before claiming end-to-end connector success.
 2. Enable GitHub Actions in the fork.
 3. Ensure the repair changes exist in the fork's `main` branch:
    the UI, selected-report workflow, and renderer must use matching audience IDs.
-4. Run the workflow defined in `.github/workflows/update-lyme-data.yml`
+4. Run the workflow defined in `.github/workflows/refresh-idd-data.yml`
    on the fork's `main` branch.
 5. Wait for successful completion and confirm that it produced the
    `health-report-<run-id>` artifact.
@@ -55,7 +55,7 @@ Optional settings, normally left at their defaults:
 ```bash
 export GITHUB_BRANCH=main
 export GITHUB_APP_REF=main
-export GITHUB_WORKFLOW=update-lyme-data.yml
+export GITHUB_WORKFLOW=refresh-idd-data.yml
 ```
 
 `GITHUB_BRANCH` selects source workflow runs.
