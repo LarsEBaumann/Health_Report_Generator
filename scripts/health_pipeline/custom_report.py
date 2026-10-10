@@ -30,7 +30,7 @@ def snakemake_render(request, rid, manifest_path, work_out):
     try:
         write_json(stakeholder_file, {**request, 'id': rid})
         subprocess.run(
-            ['snakemake', '--cores', '2', '--configfile', str(cfg_file), 'html'],
+            ['snakemake', 'html', '--cores', '2', '--configfile', str(cfg_file)],
             cwd=ROOT, check=True,
         )
     finally:
