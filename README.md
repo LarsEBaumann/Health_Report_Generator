@@ -69,7 +69,7 @@ Beyond the three standard audiences, one command builds a report from a request 
 
 ```sh
 docker compose run --rm report python scripts/health_pipeline/custom_report.py \
-  results/requests/request.json --out results/custom
+  examples/request-2022-2025.json --out results/custom
 ```
 
 The last line printed is either `cache miss: key=<sha256> -> <folder>` or `cache hit: key=<sha256> -> <folder>`.
