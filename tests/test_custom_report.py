@@ -66,3 +66,35 @@ def test_invalid_request_renders_nothing(setup):
     with pytest.raises(ValueError):
         run(tmp_path, path, render)
     assert calls == []
+
+
+@pytest.fixture
+def stakeholder_dir(tmp_path, monkeypatch):
+    d = tmp_path / "stakeholders"
+    d.mkdir()
+    monkeypatch.setattr(cr, "STAKEHOLDER_DIR", d)
+    return d
+
+
+def test_temp_stakeholder_removed_after_success(stakeholder_dir, tmp_path, monkeypatch):
+    seen = {}
+
+    def fake_run(cmd, **kwargs):
+        seen["files"] = [p.name for p in stakeholder_dir.iterdir()]
+        seen["cmd"] = cmd
+
+    monkeypatch.setattr(cr.subprocess, "run", fake_run)
+    cr.snakemake_render({"years": [2022, 2025]}, "custom_abc123", tmp_path / "m.json", tmp_path / "results")
+    assert seen["files"] == ["custom_abc123.json"]
+    assert seen["cmd"][:2] == ["snakemake", "html"]
+    assert list(stakeholder_dir.iterdir()) == []
+
+
+def test_temp_stakeholder_removed_after_failed_render(stakeholder_dir, tmp_path, monkeypatch):
+    def failing_run(cmd, **kwargs):
+        raise cr.subprocess.CalledProcessError(1, cmd)
+
+    monkeypatch.setattr(cr.subprocess, "run", failing_run)
+    with pytest.raises(cr.subprocess.CalledProcessError):
+        cr.snakemake_render({"years": [2022, 2025]}, "custom_abc123", tmp_path / "m.json", tmp_path / "results")
+    assert list(stakeholder_dir.iterdir()) == []
