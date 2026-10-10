@@ -89,7 +89,7 @@ snakemake --cores 2 --config \
 
 This mode verifies and reads only that archived snapshot, without requiring the live `data/reference/` tree or any API. Retain the snapshot **and** code/config/environment versions with the report. Hashes cannot recover deleted data. Paths inside a snapshot and its lineage are relative, so the archive can move between computers. Original source record numbers count CSV records (header = 1), not physical lines in multiline CSV fields.
 
-For an update, place a new release in `data/reference/` and run the ordinary workflow. It creates a new content-addressed archive rather than replacing the old snapshot. Building never contacts the network. Acquisition from the public IDD API is a separate step: `src/sync_idd_exports.py` (run weekly by `.github/workflows/update-lyme-data.yml`, or manually) downloads each export into `data/reference/<DATASET>/` together with a `retrieval.json` recording the source URLs, retrieval time and hashes; changes are committed so every release is a reviewable change to `data/reference/`.
+For an update, place a new release in `data/reference/` and run the ordinary workflow. It creates a new content-addressed archive rather than replacing the old snapshot. Building never contacts the network. Acquisition from the public IDD API is a separate step: `src/sync_idd_exports.py` (run weekly by `.github/workflows/refresh-idd-data.yml`, or manually) downloads each export into `data/reference/<DATASET>/` together with a `retrieval.json` recording the source URLs, retrieval time and hashes; changes are committed so every release is a reviewable change to `data/reference/`.
 
 ## Verify a build
 

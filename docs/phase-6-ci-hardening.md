@@ -15,7 +15,7 @@ data, scientific calculations or report content.
 | `container` | `fast` | `docker build` of the `Dockerfile`, then a smoke run of its default command (`uv sync --locked`, Quarto and Marimo versions) |
 | `full` | `fast` | Full `snakemake --cores 2`; `check_outputs.py`; `verify_release.py`; Shiny and dashboard smoke tests; rebuild dry run must report “Nothing to be done”; upload of `results/` only after all of these succeed (`if-no-files-found: error`) |
 
-`update-lyme-data.yml` runs the same output and release verification before uploading the
+`refresh-idd-data.yml` runs the same output and release verification before uploading the
 lineage artifact consumed by the selected-report UI.
 
 ## Release verification (`scripts/health_pipeline/verify_release.py`)
