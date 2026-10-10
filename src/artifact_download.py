@@ -17,7 +17,7 @@ def download_latest_report():
         raise RuntimeError("Set GITHUB_TOKEN with Actions read and write access.")
 
     owner, repo = resolve_repository()
-    workflow = os.getenv("GITHUB_WORKFLOW", "update-lyme-data.yml")
+    workflow = os.getenv("GITHUB_WORKFLOW", "refresh-idd-data.yml")
     branch = os.getenv("GITHUB_BRANCH", "main")
     # `researcher` is the default lineage bundle since Phase 5; older artifacts
     # only contain `public_health_expert`. An explicit setting is never overridden.

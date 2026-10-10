@@ -1,4 +1,4 @@
-name: Update IDD reference data and build report artifact
+name: Refresh IDD reference data
 
 on:
   schedule:
@@ -9,11 +9,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: update-idd-reference-data
+  group: refresh-idd-data
   cancel-in-progress: false
 
 jobs:
-  update-and-build:
+  refresh:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -45,18 +45,6 @@ jobs:
         run: python -m pytest -q
       - name: Pull the latest IDD CSV and metadata exports
         run: python -u src/sync_idd_exports.py
-      - name: Commit changed source snapshots
-        shell: bash
-        run: |
-          git add -- data/reference
-          if git diff --cached --quiet -- data/reference; then
-            echo "IDD exports unchanged; no data commit needed."
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "Update IDD reference data"
-            git push origin HEAD:main
-          fi
       - name: Build validated reports and lineage bundle
         run: |
           set -o pipefail
@@ -79,6 +67,18 @@ jobs:
         run: python scripts/health_pipeline/verify_release.py --out results
       - name: Check Shiny bundle
         run: Rscript tests/shiny_smoke.R results/reports/researcher/app
+      - name: Commit changed source snapshots
+        shell: bash
+        run: |
+          git add -- data/reference
+          if git diff --cached --quiet -- data/reference; then
+            echo "IDD exports unchanged; no data commit needed."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Update IDD reference data"
+            git push origin HEAD:main
+          fi
       - name: Upload successful versioned report bundle
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:

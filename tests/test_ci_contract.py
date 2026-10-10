@@ -41,7 +41,7 @@ def test_validate_has_fast_and_full_gates_on_push_and_pr():
     assert jobs['secrets']['steps'][0]['with']['fetch-depth'] == 0
 
 
-@pytest.mark.parametrize('name,job', [('validate.yml', 'full'), ('update-lyme-data.yml', 'update-and-build')])
+@pytest.mark.parametrize('name,job', [('validate.yml', 'full'), ('refresh-idd-data.yml', 'refresh')])
 def test_artifacts_are_uploaded_only_after_all_verification(name, job):
     steps = workflow(name)['jobs'][job]['steps']
     upload = next(i for i, s in enumerate(steps) if 'upload-artifact' in s.get('uses', ''))

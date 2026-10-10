@@ -63,6 +63,25 @@ Each folder also holds `methods.html`, PDFs, `provenance.json` (also embedded in
 
 To add an audience, copy a file in `scripts/health_pipeline/config/stakeholders/`, change its `id`, wording, sections and presentation, and list the id in `workflow/config.yaml`. The template does not change.
 
+## Custom reports
+
+Beyond the three standard audiences, one command builds a report from a request file. A request is a stakeholder settings file, the same format as the files in `scripts/health_pipeline/config/stakeholders/`. Copy one (for example `public.json`) and change the fields you need, such as `years`, `title` or `geography`. The request is validated before anything renders, and an invalid one stops with `Invalid request: ...`.
+
+```sh
+docker compose run --rm report python scripts/health_pipeline/custom_report.py \
+  results/requests/request.json --out results/custom
+```
+
+The last line printed is either `cache miss: key=<sha256> -> <folder>` or `cache hit: key=<sha256> -> <folder>`.
+
+**Cache.** Finished reports are stored in `results/cache/custom_reports/`. The cache key is a SHA-256 over the request, the data snapshot id, the report code hash, the toolchain hash and the schema version. An identical request returns the stored report in seconds, with its original provenance and render time. A different request, a data refresh or a template change produces a new key and a new render. The cache is local to one machine and grows with each distinct request. You can delete `results/cache/` at any time; the next run simply renders again.
+
+**Output.** The `--out` folder is replaced on every run and holds `report.html`, `methods.html`, `provenance.json` and `request_provenance.json`. In `provenance.json`, `filters` and `effective_parameters` record the years and other settings that were applied. `request_provenance.json` records `cache_key`, the key components (including `code_hash`) and `rendered_utc`.
+
+**Reference year.** A request carries its own `reference_year` and `index_base_year`. A request copied from `public.json` compares with 2019, so a 2022 to 2025 report is still compared with the pre-COVID baseline. Change both fields in the request if you want another baseline.
+
+Custom reports are not part of `results/release.json`, which describes only the three standard audiences.
+
 ## How it works
 
 ```mermaid

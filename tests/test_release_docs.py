@@ -45,16 +45,6 @@ def test_readme_documents_one_command_and_expected_outputs():
         assert required in readme
 
 
-def test_run_all_is_a_snakemake_wrapper_without_retired_paths():
-    script = (ROOT / 'scripts/health_pipeline/run_all.sh').read_text()
-    assert 'snakemake' in script and 'Data' not in script.replace('data_root', '')
-    out = subprocess.run(['bash', str(ROOT / 'scripts/health_pipeline/run_all.sh'), '', '', '--dry-run', '--forceall'],
-                         capture_output=True, text=True, env={'PATH': str(Path(sys.executable).parent) + ':/usr/bin:/bin'})
-    assert out.returncode == 0, out.stderr[-500:]
-    for sid in yaml.safe_load((ROOT / 'workflow/config.yaml').read_text())['stakeholders']:
-        assert f'results/reports/{sid}/report.html' in out.stdout
-
-
 def test_citation_metadata_is_valid():
     cff = yaml.safe_load((ROOT / 'CITATION.cff').read_text())
     for key in ['cff-version', 'message', 'title', 'authors', 'repository-code', 'abstract']:
@@ -79,3 +69,18 @@ def test_documented_headline_numbers_match_provenance_free_inputs():
     for value in ['+124%', '+21%', '-3%']:
         assert value in smoke
         assert value in docs
+
+
+def test_run_all_is_a_snakemake_wrapper_without_retired_paths(tmp_path):
+    script = (ROOT / 'scripts/health_pipeline/run_all.sh').read_text()
+    assert 'snakemake' in script and 'Data' not in script.replace('data_root', '')
+    env = {
+        'PATH': str(Path(sys.executable).parent) + ':/usr/bin:/bin',
+        'HOME': str(tmp_path),
+        'XDG_CACHE_HOME': str(tmp_path / 'cache'),
+    }
+    out = subprocess.run(['bash', str(ROOT / 'scripts/health_pipeline/run_all.sh'), '', '', '--dry-run', '--forceall'],
+                         capture_output=True, text=True, env=env)
+    assert out.returncode == 0, out.stderr[-500:]
+    for sid in yaml.safe_load((ROOT / 'workflow/config.yaml').read_text())['stakeholders']:
+        assert f'results/reports/{sid}/report.html' in out.stdout

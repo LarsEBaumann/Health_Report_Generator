@@ -380,7 +380,7 @@ provenance_summary <- function(b) {
   pr <- read_provenance()
   row <- function(k, v) paste0('<dt>', esc(k), '</dt><dd>', v, '</dd>')
   p <- presentation_profile(b)
-  items <- c(row('Audience profile', esc(paste0(b$cfg$id, ' (', p$display_name, ', ', p$layout, ', ', p$detail_level, ')'))),
+  items <- c(row('Audience profile', esc(if (startsWith(b$cfg$id, 'custom_') && !is.null(b$cfg$title)) paste0(b$cfg$title, ' (custom request based on ', p$display_name, ', ', p$layout, ', ', p$detail_level, ')') else paste0(b$cfg$id, ' (', p$display_name, ', ', p$layout, ', ', p$detail_level, ')'))),
              row('Data snapshot', paste0('<code>', esc(b$manifest$snapshot_id), '</code>')))
   if(!is.null(pr)) {
     rng <- function(x) if(is.null(x)) 'not recorded' else esc(paste(unique(substr(unlist(x), 1, 10)), collapse=' to '))

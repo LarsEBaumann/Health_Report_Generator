@@ -28,7 +28,7 @@ This map distinguishes the supported production workflow from optional, experime
 | `src/ui.py` | Marimo interface that dispatches selected audience/dataset reports through GitHub Actions. | Optional interface |
 | `src/artifact_download.py` | Downloads the versioned source artifact used by the Marimo interface. | Optional interface |
 | `.github/workflows/render-selected-report.yml` | Renders a selected report from an exact lineage artifact. | Optional but supported |
-| `src/fetch_idd.py`, `src/sync_idd_exports.py`, `src/update_idd_reference.py` | IDD acquisition and synchronization utilities. | Active connector utilities |
+| `src/sync_idd_exports.py` | IDD acquisition and synchronization utilities. | Active connector utilities |
 | `Dockerfile`, `compose.yaml` | Container environment for the Marimo/connector path. | Experimental |
 
 ## Historical material
