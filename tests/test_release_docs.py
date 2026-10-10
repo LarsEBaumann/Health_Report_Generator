@@ -79,3 +79,16 @@ def test_documented_headline_numbers_match_provenance_free_inputs():
     for value in ['+124%', '+21%', '-3%']:
         assert value in smoke
         assert value in docs
+def test_run_all_is_a_snakemake_wrapper_without_retired_paths(tmp_path):
+    script = (ROOT / 'scripts/health_pipeline/run_all.sh').read_text()
+    assert 'snakemake' in script and 'Data' not in script.replace('data_root', '')
+    env = {
+        'PATH': str(Path(sys.executable).parent) + ':/usr/bin:/bin',
+        'HOME': str(tmp_path),
+        'XDG_CACHE_HOME': str(tmp_path / 'cache'),
+    }
+    out = subprocess.run(['bash', str(ROOT / 'scripts/health_pipeline/run_all.sh'), '', '', '--dry-run', '--forceall'],
+                         capture_output=True, text=True, env=env)
+    assert out.returncode == 0, out.stderr[-500:]
+    for sid in yaml.safe_load((ROOT / 'workflow/config.yaml').read_text())['stakeholders']:
+        assert f'results/reports/{sid}/report.html' in out.stdout
