@@ -2,6 +2,8 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below, and cite the data source (FOPH Infectious Diseases Dashboard)."
 title: "Reproducible infectious-disease reports: one data source, many audiences"
 type: software
+version: "1.0.0"
+date-released: "2026-10-11"
 authors:
   - alias: "LarsEBaumann"
 repository-code: "https://github.com/LarsEBaumann/Health_Report_Generator"
