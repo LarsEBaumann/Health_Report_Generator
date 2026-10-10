@@ -42,8 +42,10 @@ def read_request(path):
 
 def preparation_key(snapshot_id):
     names = ['scripts/health_pipeline/' + n for n in ['harmonise.py', 'inventory.py', 'common.py', 'request_pipeline.py', 'requirements.lock.txt']]
+    names += ['workflow/request.smk', 'workflow/environment.yml', 'renv.lock', '.Rprofile']
     return object_hash({'snapshot_id': snapshot_id,
                         'code_and_environment': {n: digest(REPO / n) for n in names},
+                        'container_image': os.environ.get('REQUEST_ENVIRONMENT_IMAGE'),
                         'runtime': {'python': platform.python_version(), **{n: importlib.metadata.version(n) for n in ['pandas', 'pyarrow']}}})
 
 
@@ -52,7 +54,7 @@ def seal_prepared(out):
     write_json(out / 'prepared.json', {'files': {n: digest(out / n) for n in PREP_FILES}})
 
 
-def verify_prepared(out):
+def verify_prepared(out, snapshot_id=None):
     out = Path(out)
     marker = json.loads((out / 'prepared.json').read_text())
     if set(marker['files']) != set(PREP_FILES):
@@ -60,6 +62,34 @@ def verify_prepared(out):
     for n, h in marker['files'].items():
         if digest(out / n) != h:
             raise ValueError(f'Prepared cache integrity failure: {n}; remove this cache entry and rerun')
+    if snapshot_id is not None:
+        if json.loads((out / 'harmonised_snapshot.json').read_text())['snapshot_id'] != snapshot_id:
+            raise ValueError('Prepared cache belongs to a different snapshot')
+
+
+def cache_plan(config_path):
+    """Freeze current inputs before requesting an exact preparation cache match."""
+    import yaml
+    from inventory import build
+    config = yaml.safe_load(Path(config_path).read_text())
+    if config.get('snapshot_manifest'):
+        snapshot = Path(config['snapshot_manifest'])
+        _, manifest = verify(snapshot)
+    else:
+        manifest = build(config['data_root'], config['out'])
+        snapshot = Path(config['out']) / 'snapshots' / manifest['snapshot_id'] / 'manifest.json'
+    key = preparation_key(manifest['snapshot_id'])
+    prepared = Path(config['out']) / 'cache' / 'prepared' / key
+    values = {'key': 'request-prepared-v1-' + key, 'prepared': str(prepared),
+              'snapshot': str(snapshot), 'snapshot_id': manifest['snapshot_id']}
+    if os.environ.get('GITHUB_OUTPUT'):
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as stream:
+            for name, value in values.items():
+                if '\n' in value or '\r' in value:
+                    raise ValueError('Cache output must be a single line')
+                stream.write(f'{name}={value}\n')
+    print(json.dumps(values, indent=2))
+    return values
 
 
 def catalogue(reg):
@@ -273,6 +303,8 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='command', required=True)
     p = sub.add_parser('seal'); p.add_argument('--prepared', required=True)
+    p = sub.add_parser('cache-plan'); p.add_argument('--config', default='workflow/config.yaml')
+    p = sub.add_parser('cache-check'); p.add_argument('--prepared', required=True); p.add_argument('--snapshot-id', required=True)
     p = sub.add_parser('analyse')
     for n in ['prepared', 'request', 'snapshot', 'dest']: p.add_argument('--' + n, required=True)
     p = sub.add_parser('render')
@@ -281,6 +313,8 @@ if __name__ == '__main__':
     p = sub.add_parser('release'); p.add_argument('--dest', required=True); p.add_argument('--formats', nargs='+', required=True)
     args = ap.parse_args()
     if args.command == 'seal': seal_prepared(args.prepared)
+    elif args.command == 'cache-plan': cache_plan(args.config)
+    elif args.command == 'cache-check': verify_prepared(args.prepared, args.snapshot_id)
     elif args.command == 'analyse': analyse_request(args.prepared, args.request, args.snapshot, args.dest)
     elif args.command == 'render': render(args.bundle, args.format, args.output, args.quarto)
     else: release(args.dest, args.formats)

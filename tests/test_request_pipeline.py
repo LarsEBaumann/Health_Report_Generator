@@ -194,3 +194,64 @@ def test_actions_missing_checkout_blocks_report(tmp_path, monkeypatch):
         request_pipeline.source_commit()
     monkeypatch.delenv('GITHUB_ACTIONS')
     assert request_pipeline.source_commit() == 'unavailable'
+
+
+def test_preparation_identity_changes_with_inputs_and_environment(request_project, monkeypatch):
+    from inventory import build
+    from request_pipeline import preparation_key
+    raw, prepared, _, _ = request_project
+    sid = build(raw, prepared)['snapshot_id']
+    key = preparation_key(sid)
+    data = raw / 'alpha' / 'data.csv'
+    frame = pd.read_csv(data)
+    frame.loc[0, 'value'] = 6
+    frame.to_csv(data, index=False)
+    new_sid = build(raw, prepared)['snapshot_id']
+    assert new_sid != sid
+    assert preparation_key(new_sid) != key
+    monkeypatch.setenv('REQUEST_ENVIRONMENT_IMAGE', 'different-tested-image')
+    assert preparation_key(sid) != key
+    import request_pipeline
+    before_code_change = preparation_key(sid)
+    original_digest = request_pipeline.digest
+    monkeypatch.setattr(request_pipeline, 'digest', lambda p: 'changed' if Path(p).name == 'harmonise.py' else original_digest(p))
+    assert preparation_key(sid) != before_code_change
+
+
+def test_fresh_runner_reuses_preparation_for_new_selection(request_project, tmp_path):
+    import subprocess, sys
+    from request_pipeline import REPO, cache_plan, PREP_FILES
+    raw, _, request, _ = request_project
+    config = tmp_path / 'config.json'
+    out = tmp_path / 'runner-output'
+    config.write_text(json.dumps({'data_root': str(raw), 'out': str(out)}))
+    plan = cache_plan(config)
+    request.write_text(json.dumps({'schema_version': '1.0', 'request_id': 'first',
+                                  'audience': 'public_health_expert', 'datasets': ['alpha'], 'formats': ['html']}))
+    # Use repository paths for code; each output root has independent rule outputs.
+    command = [sys.executable, '-m', 'snakemake', 'request_analyse', '--cores', '1',
+               '--config', f'request_file={request}', f'snapshot_manifest={plan["snapshot"]}', f'out={out}']
+    cold = subprocess.run(command, cwd=REPO, text=True, capture_output=True)
+    assert cold.returncode == 0, cold.stdout + cold.stderr
+    assert 'localrule request_prepare:' in cold.stderr
+    prepared = Path(plan['prepared'])
+    saved = tmp_path / 'saved-preparation'
+    shutil.copytree(prepared, saved)
+    # Restore into another output root, with no Snakemake metadata for these paths.
+    second_out = tmp_path / 'second-runner'
+    restored = second_out / 'cache' / 'prepared' / prepared.name
+    shutil.copytree(saved, restored)
+    for p in restored.iterdir():
+        os.utime(p, (1, 1))
+    before = {n: (restored / n).stat().st_mtime_ns for n in PREP_FILES + ['prepared.json']}
+    request.write_text(json.dumps({'schema_version': '1.0', 'request_id': 'second',
+                                  'audience': 'researcher', 'datasets': ['beta', 'gamma'], 'formats': ['html']}))
+    command[-1] = f'out={second_out}'
+    warm = subprocess.run(command, cwd=REPO, text=True, capture_output=True)
+    assert warm.returncode == 0, warm.stdout + warm.stderr
+    assert 'localrule request_prepare:' not in warm.stderr
+    assert before == {n: (restored / n).stat().st_mtime_ns for n in before}
+    series = next((second_out / 'requests').glob('*/data/series.csv'))
+    assert set(pd.read_csv(series).dataset) == {'beta', 'gamma'}
+    with pytest.raises(ValueError, match='different snapshot'):
+        verify_prepared(restored, 'wrong-snapshot')

@@ -1,6 +1,6 @@
 # Request environment image: test branch only
 
-Purpose: install report software when building an image, then reuse that image for requests. The image passed build and offline report tests in run 38077323216. The request job now uses that tested image; its first normal request run still needs remote verification.
+Purpose: install report software when building an image, then reuse that image for requests. The image passed build and offline report tests in run 38077323216. Normal request runs 38078992233 and 38079569356 also succeeded; the latter records the actual checkout commit in both embedded and sidecar provenance.
 
 ## What changes
 
@@ -50,6 +50,24 @@ This workflow neither changes other branches nor merges anything. It creates a s
 
 ## Limits
 
-The local authoring environment did not have Docker available. Container build and offline tests passed in Actions: first HTML generation took 28.620 seconds; a second audience with HTML/PDF took 17.441 seconds using the same preparation. These exclude initial build, queue and image-transfer time. Prepared-data reuse across different GitHub runs is a separate change.
+The local authoring environment did not have Docker available. Container build and offline tests passed in Actions: first HTML generation took 28.620 seconds; a second audience with HTML/PDF took 17.441 seconds using the same preparation. These exclude initial build, queue and image-transfer time. Prepared-data reuse across different GitHub runs is described below; its remote timing must be measured separately.
 
 This is an amd64 image intended for the GitHub Linux runner. Running it on Apple Silicon would require an explicit emulation test; it is not a native Mac/ARM support claim. No local Docker installation is needed for the GitHub build.
+
+## Prepared-data cache between requests
+
+The request job freezes and hashes the current source files, then restores an exact cache entry for the prepared data. The key includes the snapshot, preparation code, rule file, environment files, Python/pandas/pyarrow versions, and container image reference. It deliberately excludes audience, selected datasets, requested formats and the commit identifier. Code/environment changes covered by the key still invalidate it even when the data stays the same. Currently `request_pipeline.py` includes reporting code too, so edits there conservatively invalidate preparation.
+
+Only the matching preparation directory is cached: not reports, requests, credentials, or Snakemake execution history. The workflow verifies every prepared file's checksum and its snapshot identity before use. Source snapshots are recreated and verified from the checkout on each run. Snakemake ignores timestamps for preparation inputs because content changes select a new preparation directory; this prevents a fresh checkout's timestamps from forcing unnecessary harmonisation. Selection, checks and rendering still run for each request.
+
+On a miss, normal Snakemake preparation runs and the verified directory is saved after successful reporting. On a hit, it is reused. Corrupt entries fail explicitly instead of silently producing a report: delete the named cache in GitHub Actions' cache management and rerun. Cache eviction or an unavailable cache does not remove the ability to rebuild from the source. Concurrent misses may both prepare the same data; cache saving does not provide a job queue or lock.
+
+### Acceptance test on `test`
+
+1. Push the cache change. In **Build requested health report**, expect a first cache miss and a successful save. The run summary says **Prepared data built; cache save requested**; inspect the save step to confirm success.
+2. Rerun that workflow at the same commit. The summary should say **Reused verified prepared data**, and the Snakemake job list must not contain `request_prepare`.
+3. Submit another valid request on `test`, changing the audience and/or datasets while retaining the same code, data and image. Expect the same preparation cache key and a newly generated report matching that request.
+4. Inspect `result.json`, the report, and `report.html.provenance.json`; the current request and actual commit must still be recorded.
+5. Compare total run durations. A cache saves harmonisation work, but source hashing, runner startup, image pulling, rendering and artifact transfer remain. Do not assume every cache hit is faster for a small dataset.
+
+No Docker image rebuild is needed for this cache change. GitHub cache restore/save follows the [official cache action documentation](https://github.com/actions/cache); no broad restore-prefix fallback is configured.

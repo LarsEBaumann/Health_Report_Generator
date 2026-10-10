@@ -48,11 +48,15 @@ else:
 
 PREPARED = f'{OUT}/cache/prepared/{preparation_key(SID)}'
 if Path(PREPARED + '/prepared.json').exists():
-    verify_prepared(PREPARED)
+    verify_prepared(PREPARED, SID)
+
+# The directory identity hashes the input contents, preparation code and environment.
+# Fresh checkouts have newer timestamps than restored cache files; timestamps must
+# not invalidate a verified content-addressed preparation. Missing files still build.
 
 rule request_prepare:
-    input: snapshot=SNAPSHOT, archived=ARCHIVED,
-           code=[f'{P}/harmonise.py', f'{P}/inventory.py', f'{P}/common.py', f'{P}/request_pipeline.py'], env=ENVIRONMENT
+    input: snapshot=ancient(SNAPSHOT), archived=ancient(ARCHIVED),
+           code=ancient([f'{P}/harmonise.py', f'{P}/inventory.py', f'{P}/common.py', f'{P}/request_pipeline.py']), env=ancient(ENVIRONMENT)
     output: [f'{PREPARED}/{n}' for n in PREP_FILES + ['prepared.json']]
     params: out=PREPARED
     shell:

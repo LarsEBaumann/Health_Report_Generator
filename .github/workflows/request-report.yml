@@ -67,8 +67,47 @@ jobs:
       - name: Regression tests for code pushes
         if: github.event_name == 'push'
         run: python -m pytest -q
+      - name: Identify source snapshot and preparation cache
+        id: preparation
+        run: python scripts/health_pipeline/request_pipeline.py cache-plan
+      - name: Restore matching prepared data
+        id: prepared-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.preparation.outputs.prepared }}
+          key: ${{ steps.preparation.outputs.key }}
+      - name: Verify restored preparation
+        if: steps.prepared-cache.outputs.cache-hit == 'true'
+        env:
+          PREPARED: ${{ steps.preparation.outputs.prepared }}
+          SNAPSHOT_ID: ${{ steps.preparation.outputs.snapshot_id }}
+        run: python scripts/health_pipeline/request_pipeline.py cache-check --prepared "$PREPARED" --snapshot-id "$SNAPSHOT_ID"
       - name: Generate requested report using the installed environment
-        run: snakemake --cores 2 --config request_file=request.json
+        env:
+          SNAPSHOT: ${{ steps.preparation.outputs.snapshot }}
+        run: snakemake --cores 2 --config request_file=request.json snapshot_manifest="$SNAPSHOT"
+      - name: Verify preparation before saving
+        env:
+          PREPARED: ${{ steps.preparation.outputs.prepared }}
+          SNAPSHOT_ID: ${{ steps.preparation.outputs.snapshot_id }}
+        run: python scripts/health_pipeline/request_pipeline.py cache-check --prepared "$PREPARED" --snapshot-id "$SNAPSHOT_ID"
+      - name: Save prepared data for later requests
+        if: steps.prepared-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ steps.preparation.outputs.prepared }}
+          key: ${{ steps.preparation.outputs.key }}
+      - name: Record preparation reuse
+        env:
+          CACHE_HIT: ${{ steps.prepared-cache.outputs.cache-hit }}
+          CACHE_KEY: ${{ steps.preparation.outputs.key }}
+        run: |
+          python - <<'PY'
+          import os
+          status = 'Reused verified prepared data' if os.environ['CACHE_HIT'] == 'true' else 'Prepared data built; cache save requested'
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as f:
+              f.write(f"### Preparation cache\n{status}\n\nKey: `{os.environ['CACHE_KEY']}`\n")
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: requested-health-report-${{ github.run_id }}
