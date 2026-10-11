@@ -6,7 +6,8 @@ Usage:
     python run.py --cores 2          # release is the default
 
 The command builds (or reuses) the Docker image defined by Dockerfile.request,
-then runs this branch's Snakefile inside it.  Results are written to ./results.
+then runs the legacy release plus all three audience request reports inside it.
+Results are written to ./results.
 """
 from __future__ import annotations
 
@@ -44,7 +45,7 @@ def main() -> None:
         env.setdefault("LOCAL_GID", str(os.getgid()))
     compose = ["docker", "compose", "-f", str(COMPOSE)]
     run([*compose, "build", "full-report"], env)
-    run([*compose, "run", "--rm", "full-report", "snakemake", "--cores", str(args.cores)], env)
+    run([*compose, "run", "--rm", "full-report", "bash", "workflow/run_full_release.sh", str(args.cores)], env)
 
 
 if __name__ == "__main__":

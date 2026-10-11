@@ -27,7 +27,7 @@ Build all standard stakeholder outputs inside the locked Docker environment:
 python run.py release --cores 2
 ```
 
-This is the current-branch equivalent of the colleague’s `run.py release` command. It builds or reuses `Dockerfile.request`, then runs this branch’s `Snakefile` in the container. The resulting HTML, PDF and Shiny bundles are written to `results/`. On Apple Silicon, Docker runs the required Linux `amd64` image through its configured emulation.
+This is the current-branch equivalent of the colleague’s `run.py release` command. It builds or reuses `Dockerfile.request`, then runs this branch’s `Snakefile` in the container. The resulting HTML/PDF reports for researcher, health institution and public audiences, plus the legacy Shiny bundle, are written to `results/`. On Apple Silicon, Docker runs the required Linux `amd64` image through its configured emulation.
 
 GitHub Actions runs the same command automatically when data, analysis, reporting, or Docker environment files change. It also runs weekly on Monday at 04:00 UTC and can be started manually from **Actions → Build full health-report release**. The complete release is uploaded as a GitHub artifact.
 
