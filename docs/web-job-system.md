@@ -578,3 +578,52 @@ Limitations:
   remain separate verification gates.
 - No persistent loop, automatic restart policy, HTTP integration,
   resource-budget enforcement or retention policy is implemented here.
+
+## Real report through the PID-1 worker entry point
+
+Recorded: 2026-10-11
+Implementation checkpoint: 5956ca2
+
+Experiment:
+- Workspace: results/web-worker-cli-ogxhsk
+- Dedicated container: health-report-worker-web-worker-cli-ogxhsk
+- Job ID: f17e285dbedd4c0aa0e3b21302b0970c
+- Request key:
+  3df09c705ee190161998cc12d24317f639bf4b7bc28fbc1f2908ef3fda7471e0
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Validated public request with a fresh experiment-local database,
+  workspace, publication root and report cache.
+- Launched worker_once.py directly through the report service.
+
+Verified runtime:
+- Default private container PID namespace.
+- No separate init wrapper or configured entry-point wrapper.
+- Nonprivileged container.
+- PID-1 command matched the expected worker_once.py invocation.
+- Worker exit code: 0.
+
+Verified output:
+- Actual renderer completed a real report with a fresh cache miss.
+- Rendered cache identity matched the queued request identity.
+- Completed state persisted after database reopening.
+- Publication manifest and all 14 report-file hashes verified.
+- Container log contained only the approved job summary fields.
+- Working tree remained clean after the experiment.
+
+Retained evidence:
+- Container inspection: results/web-worker-cli-ogxhsk/container-inspect.json
+- Container log: results/web-worker-cli-ogxhsk/container.log
+- Experiment identity: results/web-worker-cli-ogxhsk/experiment.json
+- Database: results/web-worker-cli-ogxhsk/state/jobs.sqlite3
+- Published report:
+  results/web-worker-cli-ogxhsk/published/f17e285dbedd4c0aa0e3b21302b0970c
+- Stopped dedicated worker container retained for inspection.
+
+Limitations:
+- This verifies successful rendering through the actual PID-1 entry point.
+- Forced termination of this launch path during real rendering remains
+  a separate containment rehearsal.
+- PID-1 checks do not independently validate all deployment settings.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.
