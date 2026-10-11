@@ -15,7 +15,7 @@ Use [REQUEST_WORKFLOW.md](REQUEST_WORKFLOW.md) for the JSON-driven workflow agre
 snakemake --cores 2 --config request_file=examples/requests/public-health.json
 ```
 
-This route has its own documented selection rules, selected-dataset checks, prepared-data cache and `result.json` artifact manifest. The audience-specific design is an initial shared template. Marimo integration and broader dataset adapters remain separate work.
+This route has its own documented selection rules, selected-dataset checks, prepared-data cache and `result.json` artifact manifest. It is available through both the compact Marimo form and the visual Infection Data Explorer; see [marimo-ui/README.md](marimo-ui/README.md). Broader dataset adapters remain separate work.
 
 **The remaining instructions describe the original demo route**, which is still used when `request_file` is omitted, including its viral/bacterial comparisons and optional Shiny package.
 
