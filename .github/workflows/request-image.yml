@@ -85,9 +85,15 @@ jobs:
         run: |
           python - <<'PY'
           import os
+          import re
           from pathlib import Path
           log = Path(os.environ['EVIDENCE'])
-          lines = log.read_text(errors='replace').splitlines()[-30:] if log.exists() else ['offline test log was not written']
+          all_lines = log.read_text(errors='replace').splitlines() if log.exists() else ['offline test log was not written']
+          matches = [i for i, line in enumerate(all_lines)
+                     if re.search(r'traceback|exception|error|failed|cannot|missing|keyerror|valueerror|module', line, re.I)
+                     and not re.search(r'process completed|one of the commands|command exited|failing rule', line, re.I)]
+          pivot = matches[-1] if matches else len(all_lines) - 1
+          lines = all_lines[max(0, pivot - 12):pivot + 18]
           for line in lines:
               print('::error title=Request image offline test::' + line.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
           PY
