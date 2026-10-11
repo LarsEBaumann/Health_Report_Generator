@@ -14,6 +14,7 @@
   --bg:#F3F6F5;--surface:#FFFFFF;--surface-2:#EAF0EF;--ink:#132120;--ink-2:#3C4D4B;--muted:#647573;--line:#D8E1DF;
   --accent:#0A6B70;--accent-ink:#FFFFFF;--accent-soft:#DCEEEE;--accent-2:#B4561A;
   --ok:#2B7A4B;--ok-soft:#E0F1E6;--warn:#94600F;--warn-soft:#FBF0D9;--crit:#B8382A;--crit-soft:#F9E2DE;--prev:#A7B4B2;
+  --who-1:#0A6B70;--who-1-bg:#DCEEEE;--who-2:#3A4FB0;--who-2-bg:#E3E7F8;--who-3:#8A3E72;--who-3-bg:#F7E6F1;
   --scrim:rgb(10 22 21 / .5);
   --f-display:"Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,sans-serif;
   --f-body:"Segoe UI",system-ui,-apple-system,sans-serif;
@@ -24,12 +25,16 @@
   --bg:#0F1716;--surface:#16211F;--surface-2:#1D2A28;--ink:#E4ECEA;--ink-2:#B4C3C0;--muted:#8A9C99;--line:#2A3936;
   --accent:#4DB3B5;--accent-ink:#06201F;--accent-soft:#163A3A;--accent-2:#E39058;
   --ok:#62C08A;--ok-soft:#173326;--warn:#E2B356;--warn-soft:#3A2E14;--crit:#F07D6B;--crit-soft:#3F1F1A;--prev:#5E6E6B;
-  --scrim:rgb(0 0 0 / .6);color-scheme:dark}}
+  --scrim:rgb(0 0 0 / .6);
+  --who-1:#4DB3B5;--who-1-bg:#163A3A;--who-2:#8FA3F0;--who-2-bg:#1E2544;--who-3:#DF93C6;--who-3-bg:#3A2031;
+color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0F1716;--surface:#16211F;--surface-2:#1D2A28;--ink:#E4ECEA;--ink-2:#B4C3C0;--muted:#8A9C99;--line:#2A3936;
   --accent:#4DB3B5;--accent-ink:#06201F;--accent-soft:#163A3A;--accent-2:#E39058;
   --ok:#62C08A;--ok-soft:#173326;--warn:#E2B356;--warn-soft:#3A2E14;--crit:#F07D6B;--crit-soft:#3F1F1A;--prev:#5E6E6B;
-  --scrim:rgb(0 0 0 / .6);color-scheme:dark}
+  --scrim:rgb(0 0 0 / .6);
+  --who-1:#4DB3B5;--who-1-bg:#163A3A;--who-2:#8FA3F0;--who-2-bg:#1E2544;--who-3:#DF93C6;--who-3-bg:#3A2031;
+color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding:0 16px 48px;margin:0}
@@ -45,31 +50,43 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .mark{width:40px;height:40px;color:var(--accent);flex:none}
 .brand h1{font-family:var(--f-display);font-size:1.4rem;font-weight:700;margin:0;letter-spacing:-.01em;line-height:1.1}
 .tagline{display:block;margin:2px 0 0;color:var(--muted);font-size:.84rem}
-.local-tag{font-family:var(--f-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ok);background:var(--ok-soft);padding:3px 8px;border-radius:4px;white-space:nowrap}
 .hright{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .switch{display:flex;align-items:center;gap:8px;white-space:nowrap}
 .lbl,.field label{font-family:var(--f-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 select{font:inherit;font-size:.92rem;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);min-width:min(170px,100%)}
 
 .hero{padding:36px 0 26px;max-width:720px}
+.facts{display:flex;flex-wrap:wrap;gap:10px 28px;margin:18px 0 0}
+.facts div{min-width:0}
+.facts b{display:block;font-family:var(--f-display);font-size:1.5rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.facts span{font-size:.76rem;color:var(--muted);font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.06em}
 .hero h2{font-family:var(--f-display);font-size:clamp(1.8rem,4.4vw,2.8rem);font-weight:700;letter-spacing:-.02em;line-height:1.08;margin:0}
 .eyebrow{font-family:var(--f-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:0 0 8px}
 .lede{color:var(--ink-2);max-width:66ch;margin:10px 0 0}
-.who-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
-.who{display:flex;flex-direction:column;gap:12px;text-align:left;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px;cursor:pointer;font:inherit;transition:border-color .15s,transform .15s}
-.who:hover{border-color:var(--accent)}
-@media (prefers-reduced-motion:no-preference){.who:hover{transform:translateY(-2px)}}
-.who-ic{width:52px;height:52px;border-radius:14px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
-.who-name{font-family:var(--f-display);font-size:1.5rem;font-weight:700;letter-spacing:-.01em;line-height:1.1}
-.who-q{color:var(--ink-2);font-size:.92rem}
-.who-list{display:flex;flex-direction:column;gap:5px;padding-top:12px;border-top:1px solid var(--line);font-size:.86rem;color:var(--ink-2)}
-.who-list span{display:flex;gap:8px;align-items:center}
-.who-list .ic{width:15px;height:15px;color:var(--muted)}
-.who-list .rep{color:var(--accent);font-weight:500}
-.who-list .rep .ic{color:var(--accent)}
-.who-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:6px}
-.go{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--accent);font-size:.92rem}
-.home-foot{margin:28px 0 0;font-size:.82rem;color:var(--muted)}
+.setup{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-end;padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.setup .field{flex:1 1 200px}
+.setup select{width:100%}
+/* One column per stakeholder, sharing the full width; they wrap on narrow screens. */
+.who-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px}
+/* Each stakeholder carries its own colour. These are identity hues, deliberately not the
+   green/amber/red used for quality and level status elsewhere on the page. */
+.who-pick{--who:var(--who-1);--who-bg:var(--who-1-bg);
+  display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;padding:22px 16px;
+  background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--who);
+  border-radius:14px;cursor:pointer;font:inherit;color:var(--ink);text-align:center;
+  transition:border-color .15s,transform .15s,background .15s}
+.who-row .who-pick:nth-child(2){--who:var(--who-2);--who-bg:var(--who-2-bg)}
+.who-row .who-pick:nth-child(3){--who:var(--who-3);--who-bg:var(--who-3-bg)}
+.who-pick:hover{border-color:var(--who);border-top-color:var(--who);background:var(--who-bg)}
+.who-pick:focus-visible{outline:2px solid var(--who);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.who-pick:hover{transform:translateY(-2px)}}
+.who-pick .who-ic{width:52px;height:52px;border-radius:14px;background:var(--who-bg);color:var(--who);display:grid;place-items:center}
+.who-pick:hover .who-ic{background:var(--surface)}
+.who-pick b{font-size:1rem;font-weight:650;line-height:1.2;color:var(--who)}
+.who-pick small{font-size:.72rem;color:var(--muted);font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.05em}
+.who-pick[disabled]{opacity:.55;cursor:not-allowed}
+.who-pick[disabled]:hover{border-color:var(--line);border-top-color:var(--who);background:var(--surface);transform:none}
+.whoami{font-family:var(--f-display);font-size:clamp(1.35rem,2.6vw,1.75rem);font-weight:700;letter-spacing:-.01em;margin:30px 0 14px}
 
 .filters{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;padding:10px 0 12px;border-bottom:1px solid var(--line);margin-bottom:16px}
 .field{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -80,9 +97,13 @@ select{font:inherit;font-size:.92rem;padding:7px 10px;border:1px solid var(--lin
 .dtab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0 / .1)}
 .dtab.rep{margin-left:auto;color:var(--accent)}
 .dtab.rep[aria-selected="true"]{background:var(--accent);color:var(--accent-ink)}
-.viewhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:20px}
-.viewhead>div{min-width:0;flex:1 1 420px}
-.viewhead h2{font-family:var(--f-display);font-size:clamp(1.45rem,3.2vw,2.1rem);font-weight:700;margin:0;letter-spacing:-.015em;line-height:1.15}
+/* The text takes every column the button does not, so a long audience title fills the
+   width instead of being balanced into short lines in a narrow box. */
+.viewhead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 28px;align-items:end;margin-bottom:26px}
+.viewhead>div{min-width:0}
+.viewhead h2{font-family:var(--f-display);font-size:clamp(1.5rem,3.4vw,2.2rem);font-weight:700;margin:4px 0 0;letter-spacing:-.015em;line-height:1.2;text-wrap:pretty}
+.viewhead .lede{max-width:none;margin-top:12px}
+@media (max-width:680px){.viewhead{grid-template-columns:minmax(0,1fr)}.viewhead .btn{justify-self:start}}
 
 .dgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px}
 .s-full{grid-column:span 6}.s-half{grid-column:span 3}.s-wide{grid-column:span 4}.s-narrow{grid-column:span 2}
@@ -163,6 +184,17 @@ ul.files .when{color:var(--muted);font-size:.8rem;font-family:var(--f-mono)}
 .cover-ic{width:56px;height:68px;border-radius:6px 16px 6px 6px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none;font:600 .74rem var(--f-mono)}
 .cover-top h3{font-family:var(--f-display);font-size:1.25rem;font-weight:700;line-height:1.15}
 .status{font-size:.86rem;color:var(--ink-2);min-height:1.3em;margin:0}
+.repsec{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0;overflow-x:auto}
+.repsec>h3{font-size:1rem;font-weight:600;margin:0 0 10px;display:flex;gap:8px;align-items:center}
+.repsec>h3 .ic{color:var(--accent)}
+.repsec .body>p:first-child{margin-top:0}
+.repsec table{margin:8px 0}
+.repsec td,.repsec th{white-space:nowrap}
+.repsec h3,.repsec h4{font-size:.95rem;margin:16px 0 6px}
+.repsec details{margin:10px 0 0}
+.repsec summary{cursor:pointer;color:var(--accent);font-weight:500;font-size:.88rem}
+.repsec pre{background:var(--surface-2);border-radius:8px;padding:12px 14px;overflow-x:auto;font-size:12px;max-height:340px}
+.repsec a{color:var(--accent)}
 .figpanel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;min-width:0}
 .figpanel h3{font-size:1rem;font-weight:600;margin:0;display:flex;gap:8px;align-items:center}
 .figpanel h3 .ic{color:var(--accent)}
@@ -182,7 +214,6 @@ dl.prov dd.hash{font-family:var(--f-mono);font-size:.78rem}
 details.more{margin:12px 0 0;border-top:1px solid var(--line);padding-top:10px}
 details.more summary{cursor:pointer;font-weight:500;font-size:.88rem;color:var(--accent)}
 details.more[open] summary{margin-bottom:10px}
-footer.pagefoot{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){#dash{animation:fade .25s ease-out}@keyframes fade{from{opacity:.4}to{opacity:1}}}
 </style>
 
@@ -190,26 +221,28 @@ footer.pagefoot{margin-top:32px;padding-top:16px;border-top:1px solid var(--line
 <header class="top">
   <button class="brand" data-home aria-label="Infection Data Explorer, back to the start page">
     <svg class="mark" viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="17" stroke="currentColor" stroke-width="2.4"/><circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3"/><circle cx="15" cy="16" r="2.6" fill="currentColor"/><circle cx="24" cy="14" r="1.6" fill="currentColor"/><circle cx="25" cy="24" r="3" fill="currentColor"/><circle cx="16" cy="25" r="1.4" fill="currentColor"/></svg>
-    <span><h1>Infection Data Explorer</h1><span class="tagline">One data source, three audiences</span></span>
+    <span><h1>Infection Data Explorer</h1><span class="tagline">One data source, many audiences</span></span>
   </button>
   <div class="hright">
     <div class="switch" id="switch" hidden>
       <label class="lbl" for="f-who">Viewing as</label>
       <select id="f-who"></select>
     </div>
-    <span class="local-tag" id="tag">Local build · FOPH data</span>
   </div>
 </header>
 
 <main>
 <section id="home">
   <div class="hero">
-    <p class="eyebrow">Start here</p>
     <h2>Who is looking at the data today?</h2>
-    <p class="lede">Pick an audience. You get the dashboards its report is built from, and you can generate the report itself for the diseases you choose. Every figure comes from the committed FOPH data snapshot in this repository.</p>
+    <div class="facts" id="facts"></div>
   </div>
-  <div class="who-grid" id="who-grid"></div>
-  <p class="home-foot" id="home-foot"></p>
+  <div class="setup">
+    <div class="field"><label for="h-cls">Pathogen class</label><select id="h-cls"></select></div>
+    <div class="field"><label for="h-year">Year</label><select id="h-year"></select></div>
+  </div>
+  <h3 class="whoami">Who am I?</h3>
+  <div class="who-row" id="who-row"></div>
 </section>
 
 <section id="app" hidden>
@@ -223,7 +256,6 @@ footer.pagefoot{margin-top:32px;padding-top:16px;border-top:1px solid var(--line
   <div id="dash"></div>
 </section>
 </main>
-<footer class="pagefoot">Figures are officially notified cases from the Federal Office of Public Health (FOPH), not a count of all infections. Built locally; nothing is sent anywhere.</footer>
 </div>
 
 <script>
@@ -254,7 +286,7 @@ const dec=(v,d=1)=>v==null?"—":Number(v).toFixed(d);
 const pct=v=>v==null?"—":(v>=0?"+":"−")+Math.abs(v).toFixed(0)+"%";
 const CLASS_ICON={researcher:"flask",health_institution:"shield",public:"users"};
 
-const S={who:null,tab:null,cls:"all",year:null,chosen:new Set(),ctx:null,data:{},figs:{},labels:{}};
+const S={who:null,tab:null,cls:"all",year:null,chosen:new Set(),ctx:null,data:{},figs:{},secs:{},labels:{}};
 const audience=()=>S.ctx.audiences.find(a=>a.id===S.who);
 const payload=()=>S.data[S.who];
 const tabs=()=>audience().tabs;
@@ -301,45 +333,91 @@ const legend=items=>`<div class="legend">${items.map(([l,c,d])=>`<span><i class=
 const inClass=r=>S.cls==="all"||r.pathogen_class===S.cls;
 const diseases=()=>payload().diseases.filter(inClass);
 const seriesFor=topic=>payload().series.filter(r=>r.topic===topic).sort((a,b)=>a.year-b.year);
-const yearRows=()=>payload().series.filter(r=>r.year===S.year&&inClass(r));
 function groupSeries(kind){const p=payload(),keep=S.cls==="all"?["viral:main","bacterial:main"]:[S.cls+":main"];
   return keep.map((subject,i)=>{const rows=p.metrics[kind].filter(m=>m.subject===subject).sort((a,b)=>a.year-b.year);
     return{subject,label:subject.split(":")[0],values:p.years.map(y=>{const m=rows.find(r=>r.year===y);return m?m.value:null}),color:COLS[i]}})}
+// The audience's own group total, which already applies its exclusion rules. Summing the
+// series instead would double-count AIDS against HIV, which those rules exist to prevent.
+function groupTotal(year){const p=payload(),keep=S.cls==="all"?["viral:main","bacterial:main"]:[S.cls+":main"];
+  const rows=p.metrics.group_total.filter(m=>m.year===year&&keep.includes(m.subject));
+  return rows.length?rows.reduce((a,m)=>a+m.value,0):null}
 function changeRows(){const p=payload(),ref=new Map(p.metrics.reference_change.map(m=>[m.subject,m.value])),per=new Map(p.metrics.period_change.map(m=>[m.subject,m.value]));
   return p.diseases.filter(inClass).map(d=>({...d,ref:ref.get(d.topic),per:per.get(d.topic)})).sort((a,b)=>(b.ref??-1e9)-(a.ref??-1e9))}
 
 /* ---------- panels: one per `outputs` entry in the stakeholder config ---------- */
 const PANEL={};
-PANEL.headline={tab:"overview",bare:true,t:"Key figures",html(){const p=payload(),ch=p.checks.totals,total=Object.values(ch).reduce((a,b)=>a+b,0);
-  const rows=yearRows(),cases=rows.reduce((s,r)=>s+(r.value||0),0),g=changeRows().filter(r=>r.ref!=null);
+PANEL.headline={bare:true,t:"Key figures",html(){const p=payload(),ch=p.checks.totals,total=Object.values(ch).reduce((a,b)=>a+b,0);
+  const g=changeRows().filter(r=>r.ref!=null),excluded=p.parameters["Excluded from group totals"];
   const biggest=g[0];
   return kpis([
     ["Diseases in this report",diseases().length+`<small> of ${p.diseases.length}</small>`,S.cls==="all"?"Viral and bacterial":S.cls[0].toUpperCase()+S.cls.slice(1)],
-    [`Reported cases, ${S.year}`,num(cases),`${p.geography}, notified cases`],
+    [`Reported cases, ${S.year}`,num(groupTotal(S.year)),
+      `${p.geography} group total${excluded&&excluded!=="none"?`, excludes ${esc(excluded)}`:""}`],
     ["Datasets ingested",num(p.sources.used)+`<small> of ${p.sources.datasets}</small>`,`${num(p.sources.rows)} source rows`],
     ["Quality checks passed",`${Math.round((ch.PASS||0)/total*100)}%`,`${num(ch.PASS||0)} pass · ${num(ch.WARN||0)} warn · ${num(ch.SKIP||0)} skipped`,(ch.WARN||0)?"up":""]])
   +(biggest?`<p class="warnline">Largest change vs ${p.reference_year}: <b>${esc(biggest.label)}</b> ${pct(biggest.ref)}.</p>`:"")}};
 
-PANEL.group_totals={tab:"overview",t:"Reported cases by pathogen class",ic:"layers",span:"wide",
-  sub(){return`Notified cases summed per class, ${payload().geography}. Excludes the diseases the audience's rules keep out of group sums.`},
-  html(){const p=payload(),ser=groupSeries("group_total");
-    return lineChart({labels:p.years.map(String),every:1,series:ser.map(s=>({values:s.values,color:s.color,area:ser.length===1})),aria:"Reported cases by pathogen class and year"})
-      +legend(ser.map(s=>[s.label,s.color]))}};
+PANEL.disease_table={t:"Every disease in this report",ic:"list",span:"full",
+  sub(){const p=payload();return `Latest published year per disease, ${p.geography}. Incidence is per 100,000 residents; coverage says whether that year is complete.`},
+  html(){const p=payload(),rows=changeRows();
+    if(!rows.length)return`<p class="empty">No diseases in this class.</p>`;
+    return table([["Disease"],["Class"],["Year",1],["Cases",1],["Per 100,000",1],["Coverage"],[`vs ${p.reference_year}`,1],["vs previous",1]],
+      rows.map(r=>{const ser=seriesFor(r.topic),last=ser.length?ser[ser.length-1]:null;
+        return`<tr><td>${esc(r.label)}</td><td>${esc(r.pathogen_class)}</td>`
+          +`<td class="num">${last?last.year:"—"}</td>`
+          +`<td class="num">${last?num(last.value):"—"}</td>`
+          +`<td class="num">${last&&last.incidence!=null?dec(last.incidence,1):"—"}</td>`
+          +`<td>${last?esc(last.coverage):"—"}</td>`
+          +`<td class="num ${r.ref>0?"up":r.ref<0?"down":""}">${pct(r.ref)}</td>`
+          +`<td class="num ${r.per>0?"up":r.per<0?"down":""}">${pct(r.per)}</td></tr>`}))}};
 
-PANEL.group_index={tab:"trends",t:"Index against the reference year",ic:"trend",span:"wide",
+PANEL.priority_table={t:"Largest changes first",ic:"alertc",span:"full",
+  sub(){const p=payload();return `Every disease ranked by how far it moved against ${p.reference_year}. Ranking only: the size of a change is not itself a judgement that action is needed.`},
+  html(){const p=payload();
+    const rows=changeRows().filter(r=>r.ref!=null)
+      .sort((a,b)=>Math.abs(b.ref)-Math.abs(a.ref));
+    if(!rows.length)return`<p class="empty">No change metrics for this class.</p>`;
+    const widest=Math.max(...rows.map(r=>Math.abs(r.ref)));
+    return table([["#",1],["Disease"],["Class"],["Cases",1],[`vs ${p.reference_year}`,1],["vs previous",1],["Size of change"]],
+      rows.map((r,i)=>{const ser=seriesFor(r.topic),last=ser.length?ser[ser.length-1]:null;
+        const w=Math.abs(r.ref)/widest*100;
+        return`<tr><td class="num">${i+1}</td><td>${esc(r.label)}</td><td>${esc(r.pathogen_class)}</td>`
+          +`<td class="num">${last?num(last.value):"—"}</td>`
+          +`<td class="num ${r.ref>0?"up":"down"}">${pct(r.ref)}</td>`
+          +`<td class="num ${r.per>0?"up":r.per<0?"down":""}">${pct(r.per)}</td>`
+          +`<td><span class="t" style="display:block;height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden">`
+          +`<span style="display:block;height:100%;width:${w.toFixed(1)}%;border-radius:4px;background:${r.ref>0?"var(--crit)":"var(--ok)"}"></span></span></td></tr>`}))
+      +`<p class="warnline">Red bars rose against the reference year, green fell. Small counts can move a long way on a handful of cases.</p>`}};
+
+PANEL.sensitivity={t:"How robust is the comparison?",ic:"shield",span:"wide",
+  sub(){const p=payload();return `The same group change against ${p.reference_year}, recomputed without ${p.parameters["Sensitivity exclusion"]}. A large gap means one disease is carrying the result.`},
+  html(){const p=payload(),excl=p.parameters["Sensitivity exclusion"];
+    if(!excl||excl==="none")return`<p class="empty">This audience applies no sensitivity exclusion.</p>`;
+    const ref=new Map(p.metrics.reference_change.map(m=>[m.subject,m.value]));
+    const classes=(S.cls==="all"?["viral","bacterial"]:[S.cls]).filter(c=>ref.has(c+":main"));
+    if(!classes.length)return`<p class="empty">No group metrics for this class.</p>`;
+    return table([["Pathogen class"],["All diseases",1],[`Excluding ${excl}`,1],["Difference",1]],
+      classes.map(c=>{const a=ref.get(c+":main"),b=ref.get(c+":sensitivity"),d=(a!=null&&b!=null)?b-a:null;
+        return`<tr><td>${esc(c)}</td>`
+          +`<td class="num ${a>0?"up":a<0?"down":""}">${pct(a)}</td>`
+          +`<td class="num ${b>0?"up":b<0?"down":""}">${pct(b)}</td>`
+          +`<td class="num">${d==null?"—":(d>=0?"+":"−")+Math.abs(d).toFixed(0)+" pts"}</td></tr>`}))
+      +`<p class="warnline">Excluding ${esc(excl)} is the robustness check the report applies; it is not an alternative headline figure.</p>`}};
+
+PANEL.group_index={t:"Index against the reference year",ic:"trend",span:"wide",
   sub(){const p=payload();return`Group total each year as a percentage of ${p.reference_year}, so classes with very different case counts can be compared.`},
   html(){const p=payload(),ser=groupSeries("group_index");
     return lineChart({labels:p.years.map(String),every:1,series:ser.map(s=>({values:s.values,color:s.color})),lines:[{y:100,color:"var(--crit)",label:p.reference_year+" = 100"}],aria:"Index against the reference year"})
       +legend(ser.map(s=>[s.label,s.color]).concat([[p.reference_year+" = 100","",1]]))}};
 
-PANEL.small_multiples={tab:"trends",t:"Each disease over time",ic:"chart",span:"full",
+PANEL.small_multiples={t:"Each disease over time",ic:"chart",span:"full",
   sub(){return"Notified cases per year. Each panel has its own scale, because levels differ by orders of magnitude."},
   html(){const p=payload(),ds=diseases();if(!ds.length)return`<p class="empty">No diseases in this class.</p>`;
     return`<div class="smalls">${ds.map((d,i)=>{const rows=seriesFor(d.topic),vals=p.years.map(y=>{const r=rows.find(x=>x.year===y);return r?r.value:null}),last=[...vals].reverse().find(v=>v!=null);
       return`<div><p class="small-t">${esc(d.label)}</p><p class="small-s">${num(last)} in ${p.years.at(-1)}</p>${miniLine(vals,p.years.map(String),COLS[i%COLS.length])}</div>`}).join("")}</div>
       <p class="warnline">Years with no published value are left out of the line rather than drawn as zero.</p>`}};
 
-PANEL.change_table={tab:"changes",t:"Change per disease",ic:"list",span:"wide",
+PANEL.change_table={t:"Change per disease",ic:"list",span:"wide",
   sub(){const p=payload();return`Latest year against ${p.reference_year} (reference change) and against the previous year (period change).`},
   html(){const p=payload(),rows=changeRows();
     return table([["Disease"],["Class"],[`vs ${p.reference_year}`,1],["vs previous year",1]],
@@ -348,14 +426,14 @@ PANEL.change_table={tab:"changes",t:"Change per disease",ic:"list",span:"wide",
         +`<td class="num ${r.per>0?"up":r.per<0?"down":""}">${pct(r.per)}</td></tr>`))
       +`<p class="warnline">A dash means the metric was not computed for that disease, usually because a year has no published value.</p>`}};
 
-PANEL.excluded={tab:"changes",t:"Datasets left out",ic:"alertc",span:"narrow",
+PANEL.excluded={t:"Datasets left out",ic:"alertc",span:"narrow",
   sub(){const p=payload();return`${p.selection.excluded} of ${p.selection.included+p.selection.excluded} datasets, with the rule that excluded them.`},
   html(){const p=payload(),seen=new Map();
     p.selection.table.forEach(r=>{const k=r.reason||r.status;seen.set(k,(seen.get(k)||0)+1)});
     return hbars([...seen.entries()].sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,v]),{fmt:v=>num(v)})
       +`<p class="warnline">Exclusions are rules in the audience's configuration, not data errors.</p>`}};
 
-PANEL.quality={tab:"quality",t:"Quality checks",ic:"quality",span:"wide",
+PANEL.quality={t:"Quality checks",ic:"quality",span:"wide",
   sub(){const p=payload(),t=p.checks.totals;return`${num(Object.values(t).reduce((a,b)=>a+b,0))} checks ran before any report was built. A failure stops the build.`},
   html(){const p=payload(),f=p.checks.flagged;
     return table([["Check"],["Pass",1],["Warn",1],["Skipped",1]],
@@ -364,7 +442,7 @@ PANEL.quality={tab:"quality",t:"Quality checks",ic:"quality",span:"wide",
       +(f.length?`<p class="warnline">${f.length} warning${f.length>1?"s":""}: ${f.map(r=>esc(r.check)+" ("+esc(r.dataset_id.split("__")[0])+")").join(", ")}.</p>`
         :`<p class="warnline">No warnings.</p>`)}};
 
-PANEL.sources={tab:"quality",t:"Sources and provenance",ic:"database",span:"narrow",
+PANEL.sources={t:"Sources and provenance",ic:"database",span:"narrow",
   sub(){const p=payload();return`Publisher dates from ${p.sources.published_from} to ${p.sources.published_to}.`},
   html(){const p=payload();
     return`<dl class="meta"><dt>Data snapshot</dt><dd class="mono"><span class="trunc" title="${esc(p.snapshot_id)}">${esc(p.snapshot_id)}</span></dd>
@@ -374,22 +452,35 @@ PANEL.sources={tab:"quality",t:"Sources and provenance",ic:"database",span:"narr
       <dt>Source</dt><dd>FOPH Infectious Diseases Dashboard exports</dd></dl>
       <p class="warnline">Each dataset is archived with its SHA-256 before analysis; the report embeds the full record.</p>`}};
 
-PANEL.parameters={tab:"quality",t:"Report parameters",ic:"book",span:"full",
+PANEL.parameters={t:"Report parameters",ic:"book",span:"full",
   sub(){return"The audience's configuration file decides every one of these. The report template does not change between audiences."},
   html(){const p=payload();
     return`<dl class="meta">${Object.entries(p.parameters).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v==null?"—":v)}</dd>`).join("")}</dl>`
       +(Object.keys(p.exclusion_notes).length?`<ul class="notes">${Object.entries(p.exclusion_notes).map(([k,v])=>`<li><b>${esc(k)}</b>: ${esc(v)}</li>`).join("")}</ul>`:"")}};
 
 /* ---------- views ---------- */
-function renderHome(){const c=S.ctx;
-  $("#who-grid").innerHTML=c.audiences.map(a=>`<button class="who" data-who="${esc(a.id)}">
+function renderHome(){const c=S.ctx,f=c.filters||{years:[],classes:[]};
+  if(!S.year&&f.years.length)S.year=f.years.at(-1);
+  $("#h-cls").innerHTML=`<option value="all">All diseases</option>`
+    +f.classes.map(x=>`<option value="${esc(x)}">${esc(x[0].toUpperCase()+x.slice(1))}</option>`).join("");
+  $("#h-cls").value=S.cls;
+  $("#h-year").innerHTML=f.years.map(y=>`<option value="${y}">${y}</option>`).join("");
+  if(S.year)$("#h-year").value=S.year;
+
+  $("#who-row").innerHTML=c.audiences.map(a=>`<button class="who-pick" data-who="${esc(a.id)}"
+      ${a.ready?"":"disabled"} aria-label="${esc(a.name)}: ${esc(a.question)}">
     <span class="who-ic">${icon(CLASS_ICON[a.id]||"users","ic lg")}</span>
-    <span class="who-name">${esc(a.name)}</span>
-    <span class="who-q">${esc(a.question)}</span>
-    <span class="who-list">${a.tabs.map(t=>`<span>${icon(t.icon)}${esc(t.name)}</span>`).join("")}
-      <span class="rep">${icon(a.report?"download":"alertc")}${a.report?"Build the report here":"Report needs the R toolchain"}</span></span>
-    <span class="who-foot"><span class="pill ${a.ready?"p-ok":"p-warn"}">${a.ready?"Data ready":"Run python run.py"}</span><span class="go">Open ${icon("arrow")}</span></span></button>`).join("");
-  $("#home-foot").textContent="Figures come from the committed FOPH snapshot in this repository. Nothing here is synthetic, and nothing is sent anywhere.";
+    <b>${esc(a.name)}</b>
+    <small>${a.ready?esc(a.detail.replace("_"," ")):"no data"}</small></button>`).join("");
+
+  const m=c.summary||{};
+  $("#facts").innerHTML=m.diseases?[
+    [m.diseases,"diseases"],
+    [m.datasets,"source datasets"],
+    [`${m.year_from}–${m.year_to}`,"years covered"],
+    [m.published_to||"—","last published"],
+  ].map(([v,k])=>`<div><b>${esc(v)}</b><span>${esc(k)}</span></div>`).join(""):"";
+
   $("#f-who").innerHTML=c.audiences.map(a=>`<option value="${esc(a.id)}">${esc(a.name)}</option>`).join("")}
 
 function renderChrome(){const a=audience(),p=payload();
@@ -405,10 +496,8 @@ function panelHTML(id){const d=PANEL[id];if(!d)return"";const t=typeof d.t==="fu
   if(d.bare)return`<section class="bare s-full"><p class="lbl bare-h">${esc(t)}</p>${d.html()}</section>`;
   return`<section class="panel s-${d.span||"full"}"><div class="ph"><div><h3>${d.ic?icon(d.ic):""}${esc(t)}</h3>${sub?`<p class="sub">${esc(sub)}</p>`:""}</div></div>${d.html()}</section>`}
 
-function panelsFor(tab){const a=audience();
-  const ids=Object.keys(PANEL).filter(id=>PANEL[id].tab===tab);
-  // `parameters` is always shown: it is the audience's own configuration, not an output.
-  return ids.filter(id=>id==="parameters"||a.outputs.includes(id))}
+// The API decides which panels a tab carries, and in which order.
+function panelsFor(tab){return (tab.panels||[]).filter(id=>PANEL[id])}
 
 function renderDash(){const a=audience(),p=payload(),el=$("#dash");
   if(S.tab==="report"){el.innerHTML=reportView();wireReport();return}
@@ -417,8 +506,9 @@ function renderDash(){const a=audience(),p=payload(),el=$("#dash");
     <h2>${esc(a.title)}</h2><p class="lede">${esc(a.question)}</p></div>
     <button class="btn" data-save>${icon("download")}Save this dashboard</button></div>
     <div class="dgrid" id="figs"></div>
-    <div class="dgrid" style="margin-top:16px">${panelsFor(tab.id).map(panelHTML).join("")}</div>`;
-  drawFigures(tab.id)}
+    <div class="dgrid" style="margin-top:16px">${panelsFor(tab).map(panelHTML).join("")}</div>
+    <div class="dgrid" id="repsecs" style="margin-top:16px"></div>`;
+  drawFigures(tab.id);drawSections(tab.id)}
 
 function reportView(){const a=audience(),p=payload(),c=S.ctx;
   const groups={};p.diseases.forEach(d=>{(groups[d.pathogen_class]=groups[d.pathogen_class]||[]).push(d)});
@@ -519,7 +609,7 @@ function saveDashboard(){const a=audience(),css=$("#app-css").textContent,grid=$
     +`<header class="top"><div><p class="eyebrow">${esc(a.name)} · ${esc(S.tab)}</p><h1>${esc(a.title)}</h1>`
     +`<p class="tagline">${esc(payload().geography)} · snapshot ${esc(payload().snapshot_id)} · saved ${new Date().toISOString().slice(0,10)}</p></div></header>`
     +`<div class="dgrid">${grid.innerHTML}</div>`
-    +`<footer class="pagefoot">Officially notified FOPH cases, not all infections. Generated by Infection Data Explorer from a local build.</footer>`
+    +`<p class="warnline">Officially notified FOPH cases, not all infections. Generated by Infection Data Explorer from a local build.</p>`
     +`</div></body></html>`;
   const name=`${S.who}-${S.tab}-${new Date().toISOString().slice(0,10)}.html`;
   const url=URL.createObjectURL(new Blob([doc],{type:"text/html"})),link=document.createElement("a");
@@ -556,6 +646,19 @@ async function drawFigures(tab){const host=$("#figs");if(!host)return;
     window.Plotly.newPlot(el,f.spec.data,layout,{displaylogo:false,responsive:true,
       modeBarButtonsToRemove:["lasso2d","select2d"]})})}
 
+async function sectionsFor(who){if(S.secs[who])return S.secs[who];
+  const r=await fetch("/api/sections/"+encodeURIComponent(who));const d=await r.json();
+  S.secs[who]=r.ok?(d.sections||[]):[];return S.secs[who]}
+
+async function drawSections(tab){const host=$("#repsecs");if(!host)return;
+  let secs=[];
+  try{secs=await sectionsFor(S.who)}catch(e){host.innerHTML="";return}
+  const mine=secs.filter(x=>x.tab===tab);
+  // Taken from the rendered report, so this is the report's own table or prose, verbatim.
+  host.innerHTML=mine.map(x=>`<section class="repsec s-full"><h3>${icon("file")}${esc(x.title)}
+    <span class="pill p-acc" style="margin-left:auto;font-weight:400">from the report</span></h3>
+    <div class="body">${x.html}</div></section>`).join("")}
+
 /* ---------- loading and routing ---------- */
 async function load(audienceId){if(S.data[audienceId])return;
   const r=await fetch("/api/overview/"+encodeURIComponent(audienceId));
@@ -588,6 +691,8 @@ document.addEventListener("click",e=>{
   else if("save" in d)saveDashboard()});
 $("#f-who").addEventListener("change",e=>go(e.target.value,S.tab));
 $("#f-cls").addEventListener("change",e=>{S.cls=e.target.value;renderDash()});
+$("#h-cls").addEventListener("change",e=>{S.cls=e.target.value});
+$("#h-year").addEventListener("change",e=>{S.year=+e.target.value});
 $("#f-year").addEventListener("change",e=>{S.year=+e.target.value;renderDash()});
 window.addEventListener("hashchange",()=>{const[w,t]=(location.hash||"").slice(1).split("-");
   if(w&&S.ctx.audiences.some(a=>a.id===w))go(w,t)});
@@ -595,7 +700,7 @@ window.addEventListener("hashchange",()=>{const[w,t]=(location.hash||"").slice(1
 (async function start(){
   try{const r=await fetch("/api/context");S.ctx=await r.json()}
   catch(e){document.querySelector("main").innerHTML=`<div class="note err">Could not reach the local server. Start it with <span class="mono">python run.py web</span>.</div>`;return}
-  const ready=S.ctx.audiences.filter(a=>a.ready);
+  const ready=(S.ctx&&S.ctx.audiences||[]).filter(a=>a.ready);
   if(!ready.length){document.querySelector("main").innerHTML=`<div class="note err">No analysis tables yet. Run <span class="mono">python run.py</span> once, then reload.</div>`;return}
   const[w,t]=(location.hash||"").slice(1).split("-");
   if(w&&S.ctx.audiences.some(a=>a.id===w))await go(w,t);else render()})();

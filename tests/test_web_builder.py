@@ -131,3 +131,100 @@ def test_generated_reports_are_listed_newest_first(web):
 
     listed = [item["name"] for item in web.previous_reports()]
     assert listed[0] == "newer.html" and "older.html" in listed
+
+
+def test_context_carries_the_home_page_filters(web):
+    """The home page offers pathogen class and year before an audience is chosen, so the
+    context has to supply them without loading an audience payload."""
+    data = body_of(web.context(Request()))
+    assert set(data["filters"]) == {"years", "classes"}
+
+
+def test_home_page_offers_class_year_and_stakeholder_icons():
+    page = (ROOT / "frontend" / "web" / "page.html").read_text(encoding="utf-8")
+    for needed in ('id="h-cls"', 'id="h-year"', 'class="who-pick"', 'data-who='):
+        assert needed in page, needed
+    # The large audience cards were replaced by the icon row.
+    assert 'class="who-grid"' not in page
+
+
+EXPECTED_TABS = {
+    "researcher": ["Disease Explorer", "Seasonality & Geography",
+                   "Comparative Analysis", "Data & Methods"],
+    "health_institution": ["Surveillance Summary", "Priority Changes",
+                           "Regional Monitoring", "Data Reliability"],
+    "public": ["What's Happening?", "Explore Diseases",
+               "In My Region", "Understanding the Data"],
+}
+
+
+def test_each_audience_has_its_own_named_dashboards(web):
+    """Every audience's tabs follow its own report's argument."""
+    audiences = {a["id"]: a for a in body_of(web.context(Request()))["audiences"]}
+    for audience, names in EXPECTED_TABS.items():
+        assert [t["name"] for t in audiences[audience]["tabs"]] == names, audience
+
+
+def test_every_tab_carries_panels_or_charts(web):
+    """A tab with neither would render as an empty page."""
+    from frontend.web import figures
+    for audience in body_of(web.context(Request()))["audiences"]:
+        placed = {figures.tab_of(audience["id"], kind)
+                  for kind in ("map", "annual", "season", "ages", "watch", "mover")}
+        for tab in audience["tabs"]:
+            assert tab["panels"] or tab["id"] in placed, (audience["id"], tab["id"])
+
+
+def test_a_tab_without_panels_is_kept_for_its_charts(web):
+    """Seasonality & Geography carries the report's map and heatmaps, and no panels."""
+    audiences = {a["id"]: a for a in body_of(web.context(Request()))["audiences"]}
+    geography = [t for t in audiences["researcher"]["tabs"] if t["id"] == "geography"]
+    assert geography and geography[0]["panels"] == []
+    # The same holds for the other audiences' map-only tabs.
+    for audience, tab_id in [("health_institution", "regional"), ("public", "region")]:
+        found = [t for t in audiences[audience]["tabs"] if t["id"] == tab_id]
+        assert found and found[0]["panels"] == [], audience
+
+
+def test_charts_are_placed_on_the_tabs_that_exist(web):
+    """A chart must never be routed to a tab the audience does not have."""
+    from frontend.web import figures
+    for audience in body_of(web.context(Request()))["audiences"]:
+        tabs = {t["id"] for t in audience["tabs"]}
+        for kind in ("map", "annual", "season", "ages", "watch", "mover"):
+            assert figures.tab_of(audience["id"], kind) in tabs, (audience["id"], kind)
+
+
+def test_report_sections_are_served_verbatim(web):
+    """The dashboards must show the report's own tables and prose, not a rewrite."""
+    from frontend.web import sections
+    found = sections.sections("researcher", "researcher")
+    if not found:
+        pytest.skip("no rendered report; run `python run.py` first")
+    titles = {s["title"] for s in found}
+    assert {"Methods", "Limitations", "Quality checks", "Provenance"} <= titles, titles
+    for section in found:
+        # A section that draws a chart is rebuilt by figures.py instead, because its
+        # inline script would not run when the markup is injected into the page.
+        assert "<script" not in section["html"], section["id"]
+        assert section["html"].strip()
+
+
+def test_data_and_methods_tab_carries_the_reports_methods(web):
+    """The tab is named after the report's own sections, so it must contain them."""
+    from frontend.web import sections
+    found = sections.sections("researcher", "researcher")
+    if not found:
+        pytest.skip("no rendered report")
+    on_tab = {s["title"] for s in found if s["tab"] == "methods"}
+    assert {"Data at a glance", "Data coverage", "Quality checks",
+            "Methods", "Limitations", "Provenance"} == on_tab
+
+
+def test_sections_do_not_duplicate_a_panel(web):
+    """Where the report supplies a section, the panel covering the same ground is gone."""
+    audiences = {a["id"]: a for a in body_of(web.context(Request()))["audiences"]}
+    methods = [t for t in audiences["researcher"]["tabs"] if t["id"] == "methods"][0]
+    assert "quality" not in methods["panels"] and "sources" not in methods["panels"]
+    diseases = [t for t in audiences["researcher"]["tabs"] if t["id"] == "diseases"][0]
+    assert "disease_table" not in diseases["panels"]

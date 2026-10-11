@@ -20,6 +20,42 @@ if str(SHARED) not in sys.path:
     sys.path.insert(0, str(SHARED))
 
 _cache: dict[str, list] = {}
+# Where each kind of chart belongs, per audience. The researcher's tabs follow its report's
+# argument; every other audience uses the generic layout.
+TABS_OF = {
+    "researcher": {"map": "geography", "season": "geography",
+                   "annual": "diseases", "ages": "diseases"},
+    "health_institution": {"map": "regional", "season": "regional", "annual": "summary",
+                           "ages": "summary", "watch": "priority", "mover": "priority"},
+    "public": {"map": "region", "season": "diseases", "annual": "diseases",
+               "ages": "diseases", "watch": "happening", "mover": "happening"},
+    "_default": {"map": "overview", "season": "trends", "annual": "trends",
+                 "ages": "trends", "watch": "overview", "mover": "overview"},
+}
+
+
+def tab_ids(audience: str) -> list:
+    """The tabs this audience actually has, so no chart is routed into a missing one."""
+    from frontend.web import data
+    config = data.STAKEHOLDERS / f"{audience}.json"
+    if not config.exists():
+        return []
+    outputs = json.loads(config.read_text(encoding="utf-8")).get("outputs", [])
+    return [tab["id"] for tab in data.tabs_for(audience, outputs)]
+
+
+def tab_of(audience: str, kind: str) -> str:
+    """The tab a chart belongs on.
+
+    Falls back to the generic layout, and then to the audience's first tab: a chart that
+    has nowhere to go would otherwise be built and never shown.
+    """
+    table = TABS_OF.get(audience, TABS_OF["_default"])
+    chosen = table.get(kind) or TABS_OF["_default"].get(kind, "overview")
+    available = tab_ids(audience)
+    if available and chosen not in available:
+        return available[0]
+    return chosen
 # Diseases FOPH publishes monthly with a clear season; the report hard-codes the same set.
 SEASONAL = ["influenza", "campylobacteriosis", "ehec", "lyme_borreliosis"]
 
@@ -47,7 +83,7 @@ def build(audience: str, detail: str) -> list[dict]:
     # Where cases are, on the map the report draws. Every audience gets this.
     out.append(_fig(h.canton_map(frame), "map", "Cases by canton",
                     "Choose a disease above the map. Grey cantons had fewer than 5 cases.",
-                    "overview"))
+                    tab_of(audience, "map")))
 
     # The long-term picture, one small panel per disease.
     annual = {}
@@ -59,7 +95,7 @@ def build(audience: str, detail: str) -> list[dict]:
         out.append(_fig(h.small_multiples(annual, "Cases or consultations per 100,000 per year"),
                         "annual", "Long-term trends",
                         "Annual rate per 100,000 from the first published year. Each panel has its own scale.",
-                        "trends"))
+                        tab_of(audience, "annual")))
 
     table = h.status(frame)
 
@@ -70,18 +106,21 @@ def build(audience: str, detail: str) -> list[dict]:
             series = h.series(frame, row.topic)
             out.append(_fig(h.trend_figure(series), f"watch-{row.topic}",
                             f"{row.disease}: {row.level_label}",
-                            f"{row.period_label}. {h.versus_usual(row.ratio)}", "overview"))
+                            f"{row.period_label}. {h.versus_usual(row.ratio)}",
+                            tab_of(audience, "watch")))
         if not len(above):
             out.append(_fig(h._no_data("No indicator is above its usual level."),
                             "watch-none", "Nothing above its usual level",
-                            "Every monitored indicator sits within its comparison window.", "overview"))
+                            "Every monitored indicator sits within its comparison window.",
+                            tab_of(audience, "watch")))
 
     if detail == "full":
         # The diagnostic detail: seasonality and who is affected.
         for topic in h.covered(SEASONAL):
             out.append(_fig(h.season_heatmap(frame, topic), f"season-{topic}",
                             f"Seasonality: {h.label(topic)}",
-                            "Monthly cases by year. Darker means more cases.", "trends"))
+                            "Monthly cases by year. Darker means more cases.",
+                            tab_of(audience, "season")))
         ages = {}
         for topic in h.DISEASES:
             rows, basis = h.by_age(frame, topic)
@@ -91,7 +130,7 @@ def build(audience: str, detail: str) -> list[dict]:
             out.append(_fig(h.small_multiples(ages, "Per 100,000", kind="bar"), "ages",
                             "Age distribution",
                             "Rate per 100,000 by age group. Age bands differ between disease families.",
-                            "trends"))
+                            tab_of(audience, "ages")))
 
     if detail == "plain_language":
         # The two or three series that moved most, with their comparison window.
@@ -101,7 +140,7 @@ def build(audience: str, detail: str) -> list[dict]:
             out.append(_fig(h.trend_figure(h.series(frame, row.topic)), f"mover-{row.topic}",
                             f"{row.disease}",
                             f"{row.period_label}. Change {row.change_pct:+.0f}% {row.change_basis}.",
-                            "overview"))
+                            tab_of(audience, "mover")))
     return out
 
 

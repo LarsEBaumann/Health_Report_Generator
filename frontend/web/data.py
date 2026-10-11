@@ -19,13 +19,51 @@ RESULTS = PROJECT / "results"
 STAKEHOLDERS = PROJECT / "backend" / "config" / "stakeholders"
 CONFIG = PROJECT / "workflow" / "config.yaml"
 
-# Panel ids come from each audience's `outputs`; these group them into tabs, in order.
-TABS = [
-    {"id": "overview", "name": "Overview", "icon": "chart", "panels": ["headline", "group_totals"]},
+# Tabs are per audience, because the questions differ. Each lists the panels it shows, in
+# order; a panel named in an audience's `outputs` only appears if that audience asks for it.
+DEFAULT_TABS = [
+    {"id": "overview", "name": "Overview", "icon": "chart", "panels": ["headline"]},
     {"id": "trends", "name": "Trends", "icon": "trend", "panels": ["group_index", "small_multiples"]},
     {"id": "changes", "name": "Changes", "icon": "list", "panels": ["change_table", "excluded"]},
     {"id": "quality", "name": "Quality & sources", "icon": "quality", "panels": ["quality", "sources"]},
 ]
+TABS = {
+    # The researcher report asks how viral and bacterial notifiable diseases developed
+    # against 2019 and how robust that comparison is, so its tabs follow that argument.
+    "researcher": [
+        # `current-status-of-every-series` comes from the report itself, so the generic
+        # disease table is not repeated here.
+        {"id": "diseases", "name": "Disease Explorer", "icon": "dna",
+         "panels": ["headline", "small_multiples"]},
+        {"id": "geography", "name": "Seasonality & Geography", "icon": "map", "panels": []},
+        {"id": "comparative", "name": "Comparative Analysis", "icon": "layers",
+         "panels": ["group_index", "change_table", "sensitivity"]},
+        # The report supplies Data at a glance, Data coverage, Quality checks, Methods,
+        # Limitations and Provenance; only the audience's own selection rules are added.
+        {"id": "methods", "name": "Data & Methods", "icon": "quality",
+         "panels": ["excluded", "parameters"]},
+    ],
+    # Monitoring staff need what changed and where, before anything else.
+    "health_institution": [
+        {"id": "summary", "name": "Surveillance Summary", "icon": "shield",
+         "panels": ["headline", "group_index"]},
+        {"id": "priority", "name": "Priority Changes", "icon": "alertc",
+         "panels": ["priority_table"]},
+        {"id": "regional", "name": "Regional Monitoring", "icon": "map", "panels": []},
+        {"id": "reliability", "name": "Data Reliability", "icon": "quality",
+         "panels": ["quality", "sources", "excluded", "parameters"]},
+    ],
+    # Plain language: what is happening, which diseases, where, and how sure we can be.
+    "public": [
+        {"id": "happening", "name": "What's Happening?", "icon": "trend",
+         "panels": ["headline"]},
+        {"id": "diseases", "name": "Explore Diseases", "icon": "dna",
+         "panels": ["disease_table", "small_multiples", "change_table"]},
+        {"id": "region", "name": "In My Region", "icon": "map", "panels": []},
+        {"id": "understanding", "name": "Understanding the Data", "icon": "book",
+         "panels": ["quality", "sources", "parameters"]},
+    ],
+}
 
 
 def _rows(frame: pd.DataFrame) -> list[dict]:
@@ -73,10 +111,66 @@ def audiences(local_reports: dict) -> list[dict]:
             "geography": spec.get("geography"),
             "report": local_reports.get(audience),
             "ready": bundle(audience) is not None,
-            "tabs": [tab for tab in TABS
-                     if any(panel in spec.get("outputs", []) for panel in tab["panels"])],
+            "tabs": tabs_for(audience, spec.get("outputs", [])),
         })
     return out
+
+
+def filters() -> dict:
+    """The years and pathogen classes a reader can choose from, before any audience is
+    picked. They come from the analysis bundles, so an empty build offers nothing."""
+    for audience in stakeholder_ids():
+        directory = bundle(audience)
+        if directory is None:
+            continue
+        series = pd.read_csv(directory / "series.csv", usecols=["year", "pathogen_class"])
+        return {"years": sorted(int(y) for y in series.year.unique()),
+                "classes": sorted(str(c) for c in series.pathogen_class.unique())}
+    return {"years": [], "classes": []}
+
+
+def summary() -> dict:
+    """Headline facts about the snapshot the whole site is built from.
+
+    Read from the first available bundle: the tables are identical across audiences,
+    because every audience analyses the same cleaned data.
+    """
+    for audience in stakeholder_ids():
+        directory = bundle(audience)
+        if directory is None:
+            continue
+        series = pd.read_csv(directory / "series.csv", usecols=["topic", "year"])
+        sources = pd.read_csv(directory / "sources.csv", usecols=["status", "publishing_date"])
+        used = sources[sources.status == "ok"]
+        published = sorted(d for d in used.publishing_date.dropna().astype(str))
+        info = json.loads((directory / "bundle.json").read_text(encoding="utf-8"))
+        return {
+            "diseases": int(series.topic.nunique()),
+            "datasets": int(len(used)),
+            "year_from": int(series.year.min()),
+            "year_to": int(series.year.max()),
+            "published_to": published[-1] if published else None,
+            "snapshot_id": info.get("snapshot_id", ""),
+        }
+    return {}
+
+
+def tabs_for(audience: str, outputs: list) -> list:
+    """The tabs this audience shows.
+
+    A tab is kept when it carries a figure (its `panels` may be empty, as the geography tab
+    is: its content is the report's own map and heatmaps) or at least one panel the
+    audience's `outputs` asks for. Panels that are not output names, such as the report
+    parameters, always count.
+    """
+    named = {"headline", "group_index", "group_totals", "small_multiples",
+             "change_table", "excluded", "quality", "sources"}
+    kept = []
+    for tab in TABS.get(audience, DEFAULT_TABS):
+        wanted = [p for p in tab["panels"] if p not in named or p in outputs]
+        if wanted or not tab["panels"]:
+            kept.append({**tab, "panels": wanted})
+    return kept
 
 
 def _checks(directory: Path) -> dict:

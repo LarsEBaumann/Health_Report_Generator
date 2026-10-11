@@ -22,7 +22,7 @@ from starlette.routing import Route
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 import local_build  # noqa: E402  (the path above makes this importable)
-from frontend.web import data, figures  # noqa: E402
+from frontend.web import data, figures, sections  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 PAGE = HERE / "page.html"
@@ -100,6 +100,8 @@ def context(request):
     """Who the audiences are, what each one's panels and parameters are, and what exists."""
     return JSONResponse({
         "audiences": data.audiences(local_build.LOCAL_REPORTS),
+        "filters": data.filters(),
+        "summary": data.summary(),
         "full_reports": full_reports(),
         "previous": previous_reports(),
     })
@@ -148,6 +150,15 @@ def charts(request):
         return JSONResponse({"error": f"charts could not be built: {error}"}, status_code=500)
 
 
+def report_sections(request):
+    """Tables and prose taken verbatim from the audience's rendered report."""
+    audience = request.path_params["audience"]
+    report = local_build.LOCAL_REPORTS.get(audience)
+    if not report:
+        return JSONResponse({"sections": []})
+    return JSONResponse({"sections": sections.sections(report, audience)})
+
+
 def plotly_bundle(request):
     """Served from the installed plotly package, so the page loads nothing remotely."""
     return Response(figures.plotly_js(), media_type="application/javascript",
@@ -178,6 +189,7 @@ app = Starlette(routes=[
     Route("/api/overview/{audience}", overview),
     Route("/api/render", render, methods=["POST"]),
     Route("/api/figures/{audience}", charts),
+    Route("/api/sections/{audience}", report_sections),
     Route("/static/plotly.js", plotly_bundle),
     Route("/api/provenance/{name}", provenance),
     Route("/report/{name}", one_report),
