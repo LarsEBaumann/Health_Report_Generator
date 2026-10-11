@@ -18,6 +18,6 @@ services:
       GITHUB_REPO: ${GITHUB_REPO:-Health_Report_Generator}
       GITHUB_APP_REF: ${GITHUB_APP_REF:-main}
       GITHUB_BRANCH: ${GITHUB_BRANCH:-main}
-      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-update-lyme-data.yml}
+      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-validate.yml}
       GITHUB_REQUEST_WORKFLOW: ${GITHUB_REQUEST_WORKFLOW:-request-report.yml}
     command: ["sh", "-lc", "mkdir -p /tmp/ui-home/.config /tmp/ui-home/.cache && export HOME=/tmp/ui-home XDG_CONFIG_HOME=/tmp/ui-home/.config XDG_CACHE_HOME=/tmp/ui-home/.cache && uv sync --locked && uv run marimo run src/ui.py --host 0.0.0.0 --port 2718"]

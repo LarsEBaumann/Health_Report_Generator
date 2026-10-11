@@ -1,4 +1,5 @@
 name: Build requested health report
+run-name: "Requested report: ${{ inputs.request_id || github.sha }}"
 on:
   push:
     branches: [test, integration/marimo-reporting]
