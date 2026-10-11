@@ -627,3 +627,62 @@ Limitations:
 - PID-1 checks do not independently validate all deployment settings.
 - Resource-budget enforcement, persistent service operation, artifact
   access and retention remain pending.
+
+## Actual PID-1 worker crash during real rendering
+
+Recorded: 2026-10-11
+Implementation checkpoint: 5956ca2
+Documentation checkpoint at experiment start: c9d4879
+
+Experiment:
+- Workspace: results/web-real-crash-Vv1LO0
+- Dedicated container: health-report-real-crash-web-real-crash-Vv1LO0
+- Running job: e688fd8b0aa44440a223deda6c6d886c
+- Waiting job: 7d4acd60f019495bb0517a8f6b65c661
+- Request key:
+  3df09c705ee190161998cc12d24317f639bf4b7bc28fbc1f2908ef3fda7471e0
+- Actual worker_once.py launched directly as PID 1.
+- Fresh queue and report cache with a validated public request.
+
+Verified before termination:
+- Private PID namespace, no init/entry-point wrapper, nonprivileged launch.
+- PID-1 command matched the actual worker entry point.
+- custom_report.py renderer observed as container PID 13.
+- Real Snakemake html descendant observed as container PID 22.
+- Replacement-worker reconciliation was blocked by active ownership.
+
+Termination and recovery:
+- Only the dedicated experiment container received SIGKILL.
+- Container exit code: 137.
+- Container was confirmed stopped before replacement reconciliation.
+- Replacement container acquired ownership against the same database.
+- No published bundle existed.
+- Running job became failed / WORKER_INTERRUPTED.
+- Waiting job record remained unchanged.
+- Reconciliation was idempotent.
+- Terminal state persisted after database reopening.
+- Experiment-owned temporary stakeholder configuration was preserved
+  outside the shared stakeholder directory.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Container configuration: container-inspect.json
+- Pre-termination process observation: processes-before-kill.json
+- Before/after job records and classification: recovery.json
+- Job identities: experiment.json
+- Private renderer log and container.log
+- Preserved temporary configuration: generated-stakeholder-preserved.json
+- All files above remain under results/web-real-crash-Vv1LO0.
+- Stopped dedicated container retained for inspection.
+
+Limitations:
+- Observed real rendering descendant was Snakemake; the rehearsal does
+  not establish termination specifically during Quarto or R execution.
+- Container termination was explicit; no host power-loss test was performed.
+- Process observation and termination were separate operations.
+- This does not establish ownership inheritance through every real
+  descendant or support nested/shared-PID worker launch modes.
+- Temporary stakeholder preservation was experiment cleanup, not an
+  implemented automatic production cleanup policy.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.
