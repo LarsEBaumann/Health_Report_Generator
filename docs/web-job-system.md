@@ -66,3 +66,33 @@ A different database must not be used to bypass pipeline serialization.
 - Twenty-request end-to-end load rehearsal.
 
 The tests establish the foundation, not production readiness.
+
+## Subprocess supervision checkpoint
+
+Recorded: 2026-10-11
+
+Implemented:
+- Trusted argument-list execution without shell interpretation.
+- Non-interactive subprocess input.
+- New process session/group for supervised commands.
+- Explicit ownership descriptor passed to the direct child.
+- Exclusive creation of private logs with mode 0600.
+- Positive finite timeout and cleanup-grace validation.
+- Group termination followed by forced termination where necessary.
+- Cleanup of ordinary same-group descendants even after direct-child exit.
+- Preservation of nonzero exit codes and explicit timeout status.
+
+Evidence:
+- 14 supervisor unit/integration tests passed in 3.26 seconds.
+- Complete regression suite: 191 passed in 19.11 seconds.
+- Descendant cleanup tested for timeout and successful parent exit.
+- Direct-child ownership retention tested after parent descriptor closure.
+
+Outstanding safety boundaries:
+- Tests do not establish containment of descendants that create a new
+  session or close the ownership descriptor after supervisor death.
+- Worker-container lifecycle and forced-restart tests remain required.
+- Do not enable automatic real-render recovery until that boundary is tested.
+- Logs still need storage budgets/retention controls.
+- The 300-second timeout is provisional.
+- Real renderer integration and atomic artifact publication are pending.
