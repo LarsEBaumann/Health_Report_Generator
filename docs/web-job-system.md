@@ -774,3 +774,67 @@ Status and limitations:
   remains a separate verification gate.
 - Resource-budget enforcement, persistent service operation, artifact
   access and retention remain pending.
+
+## Real-render crash with private stakeholder configuration
+
+Recorded: 2026-10-11
+Implementation checkpoint: 64ec658
+Documentation checkpoint at experiment start: 02f0f06
+
+Experiment:
+- Workspace: results/web-private-config-crash-Y51hik
+- Dedicated container:
+  health-report-private-crash-web-private-config-crash-Y51hik
+- Running job: e5e27a16c23f4e0dbddc0ba9a12017c3
+- Waiting job: 5e2cd9734d5c4070879f4ae239935a78
+- Request key:
+  44680082474a4b5dd2c80142986722ddc7b8014a5fdb0a83865bb35fa59d80b5
+- Actual worker_once.py entry point launched as PID 1.
+- Validated public request with a fresh queue and report cache.
+- Shared stakeholder JSON inventory recorded before rendering.
+
+Verified during rendering:
+- Required private-PID, no-wrapper, nonprivileged launch settings.
+- custom_report.py observed as container PID 13.
+- Active Snakemake html process observed as container PID 22.
+- Snakemake workflow override used a private stakeholder directory:
+  /tmp/tmpiw_cfubp/stakeholder-d56c51hj
+- Generated custom_44680082474a settings matched the experiment request,
+  with the expected internal report ID.
+- Shared configuration inventory, hashes, sizes and modification times
+  matched the pre-render baseline at the observation point.
+- Active worker ownership blocked replacement reconciliation.
+
+Termination and recovery:
+- Only the dedicated experiment container received SIGKILL.
+- Container exit code: 137.
+- Shared configuration remained unchanged after termination.
+- No generated stakeholder file remained in the shared directory.
+- No shared-config move, deletion or cleanup was performed.
+- Replacement container acquired worker ownership.
+- No published bundle existed.
+- Interrupted job became failed / WORKER_INTERRUPTED.
+- Waiting job record remained unchanged.
+- Recovery was idempotent and terminal state persisted after reopening.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- experiment.json and shared-config-before.json
+- container-inspect.json and container.log
+- active-render-evidence.json, including the observed private settings
+  and Snakemake command
+- recovery.json and state/jobs.sqlite3
+- Private renderer log
+- All files above remain under results/web-private-config-crash-Y51hik.
+- Stopped dedicated container retained for inspection.
+
+Status and limitations:
+- Real-render interruption no longer required manual shared-stakeholder
+  cleanup at the tested boundary.
+- Inventory checks were before, during observation and after termination,
+  not continuous filesystem monitoring.
+- Observed rendering descendant was Snakemake; termination specifically
+  during Quarto or R execution was not established.
+- Private temporary files are not required to survive container removal.
+- Host power loss, resource-budget enforcement, persistent service
+  operation, artifact access and retention remain separate work.
