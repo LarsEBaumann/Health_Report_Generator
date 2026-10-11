@@ -2,6 +2,7 @@
 """Build one custom stakeholder report, or reuse an identical earlier one."""
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -32,6 +33,7 @@ def snakemake_render(request, rid, manifest_path, work_out):
         subprocess.run(
             ['snakemake', 'html', '--cores', '2', '--configfile', str(cfg_file)],
             cwd=ROOT, check=True,
+            env={**os.environ, 'HEALTH_REPORT_HTML_ONLY': '1'},
         )
     finally:
         stakeholder_file.unlink(missing_ok=True)

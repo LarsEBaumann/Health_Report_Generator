@@ -143,7 +143,10 @@ report_navigation <- function(b,methods=FALSE,format='html') {
   paste0('<header class="dash-nav"><span class="dash-brand">SURVEILLANCE / ',if(b$cfg$geography=='CHFL')'SWITZERLAND + LIECHTENSTEIN' else 'SWITZERLAND','</span><nav aria-label="Reports">',
          if(!methods)'<span class="nav-active">Findings</span>' else '<a href="report.html">Findings</a>',
          if(methods)'<span class="nav-active">Methods &amp; sources</span>' else '<a href="methods.html">Methods &amp; sources</a>',
-         '<a href="',if(methods)'methods.pdf' else 'report.pdf','">PDF version</a></nav></header>')
+         if(Sys.getenv('HEALTH_REPORT_PDF_AVAILABLE', '1') == '1')
+           paste0('<a href="',if(methods)'methods.pdf' else 'report.pdf','">PDF version</a>')
+         else '',
+         '</nav></header>')
 }
 report_metadata <- function(b) paste0('<div class="report-meta"><span>',length(group_topics(b)),' diseases in the group comparison</span><span>National case notifications</span><span class="snapshot">Snapshot ',substr(b$manifest$snapshot_id,1,16),'</span></div>')
 summary_cards <- function(b) {

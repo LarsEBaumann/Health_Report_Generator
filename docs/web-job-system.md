@@ -96,3 +96,42 @@ Outstanding safety boundaries:
 - Logs still need storage budgets/retention controls.
 - The 300-second timeout is provisional.
 - Real renderer integration and atomic artifact publication are pending.
+
+## Report-bundle verification and HTML-only downloads
+
+Recorded: 2026-10-11
+
+Implemented verification:
+- Required non-empty HTML and provenance artifacts.
+- Effective settings match the validated internal request.
+- Custom-report identifier and cache-key format checks.
+- Symlink and non-regular-entry rejection.
+- Explicit HTML href/src/poster reference checks.
+- Local resource containment and existence checks.
+- SHA-256 inventory of bundle files.
+
+A real custom report exposed missing PDF downloads in both Quarto's
+automatic alternate-format links and the shared navigation helper.
+The custom path now explicitly declares HTML-only generation.
+The publisher suppresses automatic format links in that mode, and the
+shared R navigation omits unavailable PDF links.
+Standard release PDF-link behavior is preserved by default.
+
+Evidence:
+- 13 synthetic bundle-verification tests passed.
+- 6 HTML-only download regression tests passed in 1.19 seconds.
+- Complete suite: 210 passed in 21.99 seconds.
+- Fresh researcher HTML-only bundle passed real-output verification.
+- Verified file count: 14.
+- Experiment: results/web-download-fix-zbYvfd.
+- Cache key:
+  b4bf4ba52d1490d0541cef10d9fe354b212724084cf7514c622580c5d8104962
+- Render duration was not supplied in the recorded output.
+
+Limits:
+- Explicit reference checks do not cover CSS URLs, JavaScript requests,
+  srcset, fragment targets or external resource availability.
+- This verifier does not independently recompute scientific results.
+- Full standard-release rendering after the fix remains to be verified.
+- Atomic publication and publication/database reconciliation are pending.
+- Earlier cached HTML is not retroactively repaired.
