@@ -302,3 +302,42 @@ Limitations:
 - Inherited descriptors were deliberately retained by the synthetic
   renderer and descendant; this is not evidence that every real
   rendering descendant retains the worker descriptor.
+
+## Worker-process-only death rehearsal
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-parent-death-VI0wdB
+- Guardian remained alive inside the experiment container.
+- Synthetic renderer deliberately passed inherited descriptors to
+  its sleeping descendant.
+- Fresh database with one running job and one waiting job.
+- Worker, renderer and descendant were terminated separately.
+
+Verified:
+- Worker-only death left the renderer and descendant alive.
+- Surviving renderer tree prevented replacement-worker reconciliation.
+- After renderer termination, the surviving descendant still retained
+  worker ownership and prevented reconciliation.
+- Ownership became available after the final holder stopped.
+- Interrupted job became failed / WORKER_INTERRUPTED.
+- Waiting job remained queued.
+- No report was published.
+- Repeated reconciliation left the terminal record unchanged.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database: results/web-parent-death-VI0wdB/state/jobs.sqlite3
+- Job identities: results/web-parent-death-VI0wdB/jobs.json
+- Rehearsal, renderer and PID markers in the experiment workspace.
+
+Limitations:
+- Descriptor inheritance was deliberately enabled in the synthetic tree.
+- This does not establish descriptor retention throughout the real
+  Snakemake, Quarto or R process tree.
+- The actual renderer launch path still requires a separate containment
+  decision before deployment.
+- Forced termination after publication but before SQLite completion
+  remains a separate experiment.
