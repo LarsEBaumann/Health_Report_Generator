@@ -52,13 +52,16 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Build container
-        run: docker build --tag health-report:ci .
-      - name: Container smoke test (locked uv sync, Quarto, Marimo)
-        run: docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/app" health-report:ci
-
       - name: Build report container
         run: docker build --file Dockerfile.report --tag health-report:reports-ci .
+
+      - name: Verify report image tools and absence of Marimo
+        run: |
+          docker run --rm -i \
+            --user "$(id -u):$(id -g)" \
+            --env HOME=/tmp \
+            health-report:reports-ci \
+            python - < scripts/ci/check_report_runtime.py
 
       - name: Build all audiences inside report container
         run: |
