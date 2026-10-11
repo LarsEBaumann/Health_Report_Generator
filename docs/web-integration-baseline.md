@@ -91,3 +91,26 @@ Limitations:
 
 Earlier outstanding-check lists describe the baseline at that time;
 this section records subsequent progress.
+
+## Marimo-free report image checkpoint
+
+Recorded: 2026-10-11
+
+- Removed the UI dependency installation from Dockerfile.report.
+- Kept existing dependency lockfiles unchanged.
+- Rebuilt report image successfully; reported build duration: 920.3 seconds.
+- Verified Marimo module, executable and distribution are absent.
+- Installed dependency consistency check passed.
+- Complete Python regression suite: 159 passed in 14.60 seconds.
+- Fresh-cache researcher report for 2022–2025 rendered successfully.
+- End-to-end render duration: 39.968 seconds.
+- Core artifacts were non-empty.
+- Effective configuration matched every request field except the id,
+  which the renderer intentionally replaces with a custom identifier.
+- Experiment workspace: results/web-no-marimo-5n0skF.
+
+Scope:
+This verifies the current development report image and one fresh render.
+It does not certify a production stack or complete the legacy UI audit.
+Remaining work includes deployment-reference review, report browser/link
+checks, API/queue/worker implementation and production release gates.
