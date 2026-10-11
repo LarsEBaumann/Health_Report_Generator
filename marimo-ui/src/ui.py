@@ -10,6 +10,8 @@ def _():
     import json
     import os
     import uuid
+    from pathlib import Path
+    from urllib.parse import quote
 
     import marimo as mo
     import pandas as pd
@@ -18,7 +20,7 @@ def _():
     from artifact_download import download_latest_report, wait_for_requested_report
     from github_config import resolve_repository
 
-    return download_latest_report, html, json, mo, os, pd, requests, resolve_repository, uuid, wait_for_requested_report
+    return Path, download_latest_report, html, json, mo, os, pd, quote, requests, resolve_repository, uuid, wait_for_requested_report
 
 
 @app.cell
@@ -128,7 +130,7 @@ def _(datasets, message, mo, ready, source_artifact, source_run):
 
 
 @app.cell
-def _(html, json, mo, os, report_form, requests, resolve_repository, source_run, uuid, wait_for_requested_report):
+def _(Path, html, json, mo, os, quote, report_form, requests, resolve_repository, source_run, uuid, wait_for_requested_report):
     if report_form.value is None:
         result = mo.md("Choose a stakeholder and diseases, then select **Generate report**.")
     else:
@@ -171,28 +173,22 @@ def _(html, json, mo, os, report_form, requests, resolve_repository, source_run,
                             report_dir, report_run, _artifact = wait_for_requested_report(
                                 request_id, ref=ref, workflow=request_workflow,
                             )
-                            report_html = (report_dir / "report.html").read_text(encoding="utf-8")
+                            public_root = Path(os.getenv(
+                                "REPORT_PUBLIC_ROOT", "/app/.cache/github-artifact/requested-reports",
+                            )).resolve()
+                            relative = report_dir.resolve().relative_to(public_root).as_posix()
+                            public_base = os.getenv("REPORT_PUBLIC_BASE_URL", "http://127.0.0.1:2720").rstrip("/")
+                            report_url = f"{public_base}/{quote(relative)}/report.html"
                             preview = mo.Html(
                                 '<iframe title="Generated health report" '
                                 'style="width:100%; height:920px; border:1px solid #d0d7de; border-radius:8px;" '
-                                f'srcdoc="{html.escape(report_html, quote=True)}"></iframe>'
+                                f'src="{html.escape(report_url, quote=True)}"></iframe>'
                             )
-                            downloads = [
-                                mo.download(
-                                    data=report_html,
-                                    filename="health-report.html",
-                                    mimetype="text/html",
-                                    label="Download HTML report",
-                                )
-                            ]
+                            downloads = [f'<a href="{html.escape(report_url, quote=True)}" target="_blank">Open HTML report</a>']
                             pdf = report_dir / "report.pdf"
                             if pdf.is_file():
-                                downloads.append(mo.download(
-                                    data=pdf.read_bytes(),
-                                    filename="health-report.pdf",
-                                    mimetype="application/pdf",
-                                    label="Download PDF report",
-                                ))
+                                pdf_url = f"{public_base}/{quote(relative)}/report.pdf"
+                                downloads.append(f'<a href="{html.escape(pdf_url, quote=True)}" download>Download PDF report</a>')
                             result = mo.vstack([
                                 mo.callout(
                                     mo.md(
@@ -200,7 +196,7 @@ def _(html, json, mo, os, report_form, requests, resolve_repository, source_run,
                                         f"[View the GitHub run]({report_run['html_url']})."
                                     ), kind="success",
                                 ),
-                                mo.hstack(downloads, justify="start", gap=1),
+                                mo.Html(" &nbsp; | &nbsp; ".join(downloads)),
                                 preview,
                             ])
                         except (RuntimeError, requests.RequestException) as exc:
