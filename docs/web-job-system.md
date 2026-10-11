@@ -536,3 +536,45 @@ Limitations:
   pre-completion-persistence boundary.
 - Arbitrary publication interruption, host power loss, real renderer-tree
   containment and resource-budget enforcement remain separate work.
+
+## PID-1 single-job container entry point
+
+Recorded: 2026-10-11
+
+Implemented:
+- worker_once.py processes at most one queued job through run_one.
+- Requires Linux and PID 1 before initializing or claiming jobs.
+- Validates positive finite timeout/grace and positive queue capacity.
+- Rejects a symlink job root and a missing data directory.
+- Uses configured job-root directories for state, private workspaces,
+  publications and cache.
+- Does not expose a renderer override.
+- Outputs only job ID, state and sanitized error code, or idle state.
+- Returns 0 for idle/completed, 1 for a failed job, 2 for configuration
+  or launch-contract rejection, and 75 for competing worker ownership.
+- Unexpected infrastructure exceptions propagate rather than being
+  misclassified as terminal report failures.
+
+Launch contract:
+- Run directly as PID 1 in a dedicated private container PID namespace.
+- Do not launch beneath a surviving guardian or through docker exec.
+- Do not use host/shared PID mode.
+- HTTP/UI processes must be separate from the worker container.
+- Paths and numeric configuration are trusted operator settings.
+- PID 1 validation is a necessary check, not proof of all container settings.
+
+Evidence:
+- Report-service runtime probe showed Python PID 1, parent PID 0.
+- Nested/non-PID-1 launch rejected before database creation.
+- Platform gate, argument validation, directory validation, idle handling,
+  allowlisted output and competing ownership were tested.
+- Unexpected infrastructure failure propagation was tested.
+- 31 entry-point/worker/session tests passed in 4.16 seconds.
+- Complete regression suite: 256 passed in 24.84 seconds.
+
+Limitations:
+- Entry-point tests mock the launch gate where necessary to test CLI behavior.
+- Live rendering and forced termination through this entry point
+  remain separate verification gates.
+- No persistent loop, automatic restart policy, HTTP integration,
+  resource-budget enforcement or retention policy is implemented here.
