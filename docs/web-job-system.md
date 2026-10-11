@@ -485,3 +485,54 @@ Status:
 - Identity enforcement detects drift but does not pin the original snapshot.
 - Real renderer-tree containment, resource limits, artifact access and
   retention, and persistent worker service integration remain pending.
+
+## Publication-gap recovery with enforced identity
+
+Recorded: 2026-10-11
+Implementation checkpoint: b5a9140
+Documentation checkpoint at experiment start: 2a06428
+
+Experiment:
+- Workspace: results/web-publication-gap-identity-jZkUcF
+- Job ID: 3df05119e1e14d96821ba620e9b435e2
+- Copied the preserved publication-gap rehearsal into a fresh workspace.
+- Running job used the synthetic renderer's matching cache identity:
+  64 lowercase hexadecimal 'a' characters.
+- Waiting job used a separate identity and was not rendered.
+- Actual run_one operation used a synthetic valid four-file report.
+- Experiment-only store subclass paused before persisting completed,
+  after verified publication returned.
+- Guardian sent SIGKILL to the paused worker.
+- Original private workspace was preserved under a different name.
+
+Verified:
+- Publication succeeded under the enforced identity contract while
+  database state remained running.
+- Paused worker retained ownership and blocked premature reconciliation.
+- SIGKILL prevented completion persistence.
+- Restart restored completed from the published bundle without the
+  original private workspace.
+- All published files, including the publication manifest, retained
+  their hashes, sizes and modification times.
+- Waiting job record remained unchanged.
+- Recovery was idempotent.
+- Recovered completion persisted after database reopening.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database:
+  results/web-publication-gap-identity-jZkUcF/state/jobs.sqlite3
+- Published bundle:
+  results/web-publication-gap-identity-jZkUcF/published/3df05119e1e14d96821ba620e9b435e2
+- Pre-crash inventory, preserved private workspace, rehearsal scripts,
+  job identities and completion-pause marker remain in the workspace.
+
+Limitations:
+- Synthetic keys match rendered provenance but are not derived from
+  real snapshot, code and toolchain components in this rehearsal.
+- Successful real renderer-derived identity was verified separately
+  in results/web-worker-apua55.
+- Termination targets a controlled post-publication,
+  pre-completion-persistence boundary.
+- Arbitrary publication interruption, host power loss, real renderer-tree
+  containment and resource-budget enforcement remain separate work.
