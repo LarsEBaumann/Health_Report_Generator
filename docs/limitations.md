@@ -31,4 +31,4 @@ These apply to every audience. Reports state the ones relevant to reading the nu
 - **No project licence is stated yet** (see `data/README.md`); the source data carry their own terms (source attribution).
 - **Interactivity is client-side.** HTML tables are filterable and sortable and the Shiny app is reactive, but there is no hosted service. Sharing a folder does not deploy anything.
 - **Code layout is transitional.** Modules are not yet an installable package, and the optional Marimo interface is experimental. It depends on GitHub Actions and a user token, renders each request from scratch, and does not use the custom-report cache.
-- **Historical prototypes remain in the repository** (`example_output/`, `Health_Report_Generator-test/`, `design/`) and are not release evidence.
+- **Historical prototypes remain in the repository** (`example_output/`, `design/`) and are not release evidence. An earlier standalone prototype (`Health_Report_Generator-test/`) and a legacy dataset-selection config (`configs/report.yml`) were removed from `main`; both remain in tag `v1.0.0` and branch `release/v1.0.0`.

@@ -36,9 +36,7 @@ This map distinguishes the supported production workflow from optional, experime
 | Path | Role | Status |
 |---|---|---|
 | `scripts/health_pipeline/example_output/` | Outputs from an earlier prototype. | Historical; not release evidence |
-| `Health_Report_Generator-test/quarto/` | Standalone audience-report prototype with committed rendered files. | Historical prototype; not part of Snakemake |
 | `design/report-mockups.html` | Alternate editorial design exploration. | Historical design reference |
-| `configs/report.yml` | Small dataset-selection configuration from an earlier path. | Legacy; not consumed by the main Snakefile |
 | `docs/phase-3-data-migration.json` | Path-level hashes and scientific comparison for the retired `Data/` release. | Historical machine-readable audit record |
 | `docs/phase-4-legacy-removal.json` | Removal gate and deletion commit for the retired root. | Active audit record |
 
