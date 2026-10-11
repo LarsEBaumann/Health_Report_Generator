@@ -108,11 +108,21 @@ def render(bundle, prepared, output, quarto="quarto"):
         build = Path(directory)
         request, topics = stage(bundle, prepared, build)
         env = dict(os.environ)
+        runtime_home = build / "runtime-home"
+        for name in ("cache", "config", "data"):
+            (runtime_home / name).mkdir(parents=True, exist_ok=True)
         env.update({
             "HEALTH_RESULTS": str(build / "results"),
             "HEALTH_DATA_ROOT": str(build / "raw-not-included"),
             "HEALTH_REPORT_PROJECT": str(REPO),
             "HEALTH_TOPICS": topics,
+            # GitHub runs the container as an arbitrary non-root UID whose
+            # inherited home is /.  Quarto otherwise attempts to write logs
+            # below /.local and fails before it starts the Python kernel.
+            "HOME": str(runtime_home),
+            "XDG_CACHE_HOME": str(runtime_home / "cache"),
+            "XDG_CONFIG_HOME": str(runtime_home / "config"),
+            "XDG_DATA_HOME": str(runtime_home / "data"),
         })
         template = TEMPLATES[request["audience"]]
         subprocess.run([quarto, "render", template, "--to", "html"], cwd=build, env=env, check=True)
