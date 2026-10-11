@@ -1,0 +1,23 @@
+# Full reproducible release.  This deliberately uses the same locked request
+# environment as GitHub Actions: Python 3.11, R 4.3.2, Quarto and TinyTeX.
+services:
+  full-report:
+    build:
+      context: .
+      dockerfile: Dockerfile.request
+    platform: linux/amd64
+    working_dir: /workspace
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    volumes:
+      - .:/workspace
+    environment:
+      HOME: /tmp/report-home
+      XDG_CONFIG_HOME: /tmp/report-config
+      XDG_CACHE_HOME: /tmp/report-cache
+      XDG_DATA_HOME: /tmp/report-data
+      MPLCONFIGDIR: /tmp/report-matplotlib
+      TEXMFVAR: /tmp/report-tex-var
+      TEXMFCONFIG: /tmp/report-tex-config
+      HEALTH_REPORT_R_LIBRARY: /opt/health-report-r-library
+      R_LIBS_USER: /opt/health-report-r-library
+    command: ["snakemake", "--cores", "2"]
