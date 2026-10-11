@@ -438,3 +438,50 @@ Compatibility and limitations:
 - Successful real queued rendering under this stricter publication
   contract remains to be rerun.
 - Real renderer-tree containment remains a deployment requirement.
+
+## Real queued rendering with enforced identity
+
+Recorded: 2026-10-11
+Implementation checkpoint: b5a9140
+
+Experiment:
+- Workspace: results/web-worker-apua55
+- Request: existing public stakeholder configuration, validated through
+  analyse.load_config.
+- Job ID: c97084708ad2495dba40218f6e1355ca
+- Request key:
+  090520500c27f9ff479c7b2126e03861eba155b2f24f80372ffb55444f0f0cc9
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Fresh experiment-local database, private workspace, publication root
+  and report cache.
+- Reran the original real queued-report experiment without changing
+  its request-key derivation or verification logic.
+
+Verified:
+- Duplicate queued submission reused the active job.
+- Actual custom_report.py renderer completed through the supervisor.
+- Renderer log confirmed a fresh report-cache miss.
+- Rendered cache identity matched the queued request identity.
+- Publication accepted the real output under the enforced identity contract.
+- Published manifest and all 14 report-file hashes verified.
+- Completed state persisted after reopening SQLite.
+- Empty-queue operation did not rerender or alter completed output.
+- Working tree remained clean after the experiment.
+
+Retained evidence:
+- Database:
+  results/web-worker-apua55/state/jobs.sqlite3
+- Published report:
+  results/web-worker-apua55/published/c97084708ad2495dba40218f6e1355ca
+- Private render log:
+  results/web-worker-apua55/private/c97084708ad2495dba40218f6e1355ca/render.log
+
+Status:
+- Successful real queued rendering under the stricter identity contract
+  is now verified, superseding the earlier pending-rerun note.
+- Synthetic crash experiments recorded before b5a9140 remain historical
+  evidence for their recorded implementation checkpoints.
+- Identity enforcement detects drift but does not pin the original snapshot.
+- Real renderer-tree containment, resource limits, artifact access and
+  retention, and persistent worker service integration remain pending.
