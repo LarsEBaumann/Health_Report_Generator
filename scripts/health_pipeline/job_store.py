@@ -195,3 +195,14 @@ class JobStore:
                    WHERE state = 'running'"""
             )
             return [row["job_id"] for row in rows]
+
+    def running_jobs(self):
+        """Read interrupted candidates; reconciliation requires ownership."""
+        connection = self._connect()
+        try:
+            rows = connection.execute(
+                "SELECT * FROM jobs WHERE state = 'running' ORDER BY sequence"
+            ).fetchall()
+            return [self._record(row) for row in rows]
+        finally:
+            connection.close()

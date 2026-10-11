@@ -135,3 +135,45 @@ Limits:
 - Full standard-release rendering after the fix remains to be verified.
 - Atomic publication and publication/database reconciliation are pending.
 - Earlier cached HTML is not retroactively repaired.
+
+## Atomic publication and restart reconciliation
+
+Recorded: 2026-10-11
+
+Implemented:
+- Verify source bundle before copying.
+- Copy into private staging on the publication filesystem.
+- Verify copied inventory against the source.
+- Write a versioned publication manifest.
+- Synchronize files/directories and rename into the job destination.
+- Serialize cooperating publishers using a persistent root lock.
+- Reject conflicting existing destinations.
+- Verify repeat publication without overwriting matching output.
+- Independently validate published identity and file hashes.
+
+Startup reconciliation under worker ownership:
+- Valid published running job: restore completed without rerendering.
+- No published output: failed / WORKER_INTERRUPTED.
+- Invalid published output: failed / PUBLICATION_INVALID.
+- Preserve queued jobs, completed jobs and diagnostic artifacts.
+
+Evidence:
+- 10 initial publication tests passed.
+- Real researcher report publication and repeat publication passed.
+- Reopened SQLite state retained completion.
+- Published inventory matched all 14 source report files.
+- Real experiment: results/web-publication-yGT7c0.
+- 20 publication/recovery/session tests passed in 2.10 seconds.
+- Complete regression suite: 224 passed in 21.99 seconds.
+- Recovery tested without the original private source workspace.
+
+Limitations:
+- Restart tests simulate interrupted database state; they do not constitute
+  a forced crash of the complete rendering/container stack.
+- Publication requires trusted stable local storage and cooperative locking.
+- The filesystem and SQLite are not one combined atomic transaction;
+  the verified manifest enables reconciliation of the publication gap.
+- Untrusted clients must never choose internal identities or paths.
+- Staging, locks, database files and publication metadata are not public routes.
+- Real worker integration, container crash containment, resource budgets,
+  artifact access/retention and end-to-end load rehearsal remain pending.
