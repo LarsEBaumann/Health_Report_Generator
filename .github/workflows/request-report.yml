@@ -1,7 +1,7 @@
 name: Build requested health report
 on:
   push:
-    branches: [test]
+    branches: [test, integration/marimo-reporting]
   workflow_dispatch:
     inputs:
       request_id:
