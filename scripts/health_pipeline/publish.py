@@ -116,8 +116,12 @@ def render(bundle,output,fmt,quarto='quarto',provenance=None,provenance_out=None
         project = HERE.parents[1]
         env['HEALTH_REPORT_PROJECT'] = str(project)
         env['R_PROFILE_USER'] = str(project / '.Rprofile')
+        html_only = os.environ.get('HEALTH_REPORT_HTML_ONLY') == '1'
+        env['HEALTH_REPORT_PDF_AVAILABLE'] = '0' if html_only else '1'
         for document in ['report','methods']:
             command = [quarto,'render',f'{document}.qmd','--to',fmt]
+            if fmt == 'html' and html_only:
+                command += ['-M', 'format-links:false']
             if document == 'methods':
                 command += ['-P', 'download_prefix:data/']
             subprocess.run(command,cwd=tmp,check=True,env=env)

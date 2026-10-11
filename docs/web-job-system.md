@@ -1,0 +1,959 @@
+# SourcePRISM durable job-system checkpoint
+
+Recorded: 2026-10-11
+
+## Agreed architecture
+
+- Single Ubuntu host initially; laptop-first development.
+- SQLite database on persistent local disk.
+- One serialized report worker.
+- Maximum 20 waiting jobs plus one running job.
+- Cache-first report delivery and duplicate-request coalescing.
+- Future migration to an always-on server after resource/load testing.
+
+## Implemented foundation
+
+job_store.py:
+- Persistent job records and parameterized queries.
+- WAL mode and short immediate write transactions.
+- Atomic waiting-job admission.
+- Coalescing of identical queued/running internal requests.
+- Identity conflicts rejected.
+- FIFO claiming and a database constraint permitting one running job.
+- Guarded completed/failed transitions and sanitized error codes.
+
+worker_lock.py:
+- Cooperative Linux flock ownership.
+- Persistent lock file; never unlink it.
+- Lock ownership remains held until associated descriptors close.
+
+worker_session.py:
+- Shared lock path derived from the database path.
+- Ownership held throughout the worker session.
+- Interrupted running records become failed with WORKER_INTERRUPTED.
+- Queued and completed records remain unchanged.
+- No automatic requeue or replay during startup reconciliation.
+
+## Test evidence
+
+- 18 queue, ownership and reconciliation tests passed in 4.37 seconds.
+- Complete regression suite: 177 passed in 15.47 seconds.
+- Tests cover concurrent admission, duplicate coalescing, single claiming,
+  ownership exclusion, process-death lock release, persistence,
+  guarded transitions and conservative restart-state reconciliation.
+
+## Internal boundary
+
+The store accepts validated internal settings and a server-derived identity.
+It is not a public validation or authorization interface.
+Production request identity must include the applicable data, code,
+toolchain/schema and presentation versions.
+Deduplication must respect access policy.
+
+All workers touching the same pipeline state must share ownership.
+A different database must not be used to bypass pipeline serialization.
+
+## Not yet implemented or verified
+
+- Supervised rendering and descendant-process termination.
+- Protection against orphan render processes.
+- Atomic artifact publication and verification.
+- Publication/database crash-window reconciliation.
+- Completed-artifact cache lookup and permission checks.
+- HTTP API, frontend binding and user-facing errors.
+- Retention, expiration, disk budgets and rate limits.
+- Production volumes, resource limits and deployment.
+- Twenty-request end-to-end load rehearsal.
+
+The tests establish the foundation, not production readiness.
+
+## Subprocess supervision checkpoint
+
+Recorded: 2026-10-11
+
+Implemented:
+- Trusted argument-list execution without shell interpretation.
+- Non-interactive subprocess input.
+- New process session/group for supervised commands.
+- Explicit ownership descriptor passed to the direct child.
+- Exclusive creation of private logs with mode 0600.
+- Positive finite timeout and cleanup-grace validation.
+- Group termination followed by forced termination where necessary.
+- Cleanup of ordinary same-group descendants even after direct-child exit.
+- Preservation of nonzero exit codes and explicit timeout status.
+
+Evidence:
+- 14 supervisor unit/integration tests passed in 3.26 seconds.
+- Complete regression suite: 191 passed in 19.11 seconds.
+- Descendant cleanup tested for timeout and successful parent exit.
+- Direct-child ownership retention tested after parent descriptor closure.
+
+Outstanding safety boundaries:
+- Tests do not establish containment of descendants that create a new
+  session or close the ownership descriptor after supervisor death.
+- Worker-container lifecycle and forced-restart tests remain required.
+- Do not enable automatic real-render recovery until that boundary is tested.
+- Logs still need storage budgets/retention controls.
+- The 300-second timeout is provisional.
+- Real renderer integration and atomic artifact publication are pending.
+
+## Report-bundle verification and HTML-only downloads
+
+Recorded: 2026-10-11
+
+Implemented verification:
+- Required non-empty HTML and provenance artifacts.
+- Effective settings match the validated internal request.
+- Custom-report identifier and cache-key format checks.
+- Symlink and non-regular-entry rejection.
+- Explicit HTML href/src/poster reference checks.
+- Local resource containment and existence checks.
+- SHA-256 inventory of bundle files.
+
+A real custom report exposed missing PDF downloads in both Quarto's
+automatic alternate-format links and the shared navigation helper.
+The custom path now explicitly declares HTML-only generation.
+The publisher suppresses automatic format links in that mode, and the
+shared R navigation omits unavailable PDF links.
+Standard release PDF-link behavior is preserved by default.
+
+Evidence:
+- 13 synthetic bundle-verification tests passed.
+- 6 HTML-only download regression tests passed in 1.19 seconds.
+- Complete suite: 210 passed in 21.99 seconds.
+- Fresh researcher HTML-only bundle passed real-output verification.
+- Verified file count: 14.
+- Experiment: results/web-download-fix-zbYvfd.
+- Cache key:
+  b4bf4ba52d1490d0541cef10d9fe354b212724084cf7514c622580c5d8104962
+- Render duration was not supplied in the recorded output.
+
+Limits:
+- Explicit reference checks do not cover CSS URLs, JavaScript requests,
+  srcset, fragment targets or external resource availability.
+- This verifier does not independently recompute scientific results.
+- Full standard-release rendering after the fix remains to be verified.
+- Atomic publication and publication/database reconciliation are pending.
+- Earlier cached HTML is not retroactively repaired.
+
+## Atomic publication and restart reconciliation
+
+Recorded: 2026-10-11
+
+Implemented:
+- Verify source bundle before copying.
+- Copy into private staging on the publication filesystem.
+- Verify copied inventory against the source.
+- Write a versioned publication manifest.
+- Synchronize files/directories and rename into the job destination.
+- Serialize cooperating publishers using a persistent root lock.
+- Reject conflicting existing destinations.
+- Verify repeat publication without overwriting matching output.
+- Independently validate published identity and file hashes.
+
+Startup reconciliation under worker ownership:
+- Valid published running job: restore completed without rerendering.
+- No published output: failed / WORKER_INTERRUPTED.
+- Invalid published output: failed / PUBLICATION_INVALID.
+- Preserve queued jobs, completed jobs and diagnostic artifacts.
+
+Evidence:
+- 10 initial publication tests passed.
+- Real researcher report publication and repeat publication passed.
+- Reopened SQLite state retained completion.
+- Published inventory matched all 14 source report files.
+- Real experiment: results/web-publication-yGT7c0.
+- 20 publication/recovery/session tests passed in 2.10 seconds.
+- Complete regression suite: 224 passed in 21.99 seconds.
+- Recovery tested without the original private source workspace.
+
+Limitations:
+- Restart tests simulate interrupted database state; they do not constitute
+  a forced crash of the complete rendering/container stack.
+- Publication requires trusted stable local storage and cooperative locking.
+- The filesystem and SQLite are not one combined atomic transaction;
+  the verified manifest enables reconciliation of the publication gap.
+- Untrusted clients must never choose internal identities or paths.
+- Staging, locks, database files and publication metadata are not public routes.
+- Real worker integration, container crash containment, resource budgets,
+  artifact access/retention and end-to-end load rehearsal remain pending.
+
+## Single-job worker integration
+
+Recorded: 2026-10-11
+
+Implemented:
+- Acquire worker ownership and reconcile interrupted state.
+- Claim at most one queued job per operation.
+- Create a fresh private job workspace and request file.
+- Invoke the renderer through the existing process supervisor.
+- Pass the worker ownership descriptor to the supervised process.
+- Publish verified successful output before persisting completion.
+- Persist sanitized render timeout, render failure, invalid report
+  and publication conflict codes.
+- Leave unexpected infrastructure errors recoverable through startup
+  reconciliation rather than misclassifying published output as failed.
+
+Evidence:
+- Synthetic renderer uses the actual supervisor and publication code.
+- Successful publication and completion persisted after database reopening.
+- Renderer failure, timeout and invalid output were tested.
+- Empty queue did not launch a renderer.
+- Processing one job preserved the next queued job.
+- Simulated completion-persistence failure left verified publication
+  recoverable as completed.
+- Invalid timeout configuration did not claim a queued job.
+- 28 worker/publication/recovery/session tests passed in 4.46 seconds.
+- Complete regression suite: 232 passed in 24.76 seconds.
+
+Limitations:
+- This increment exposes an internal Python operation, not a worker CLI
+  or a persistent service loop.
+- Renderer overrides and filesystem paths are trusted internal
+  configuration and must not come from client requests.
+- Synthetic worker tests do not establish successful queued Quarto
+  rendering or real worker-container crash containment.
+- Resource budgets, log-size limits, artifact access/retention and
+  end-to-end load rehearsal remain pending.
+
+## Real queued-report experiment
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-worker-gofAxq
+- Request: existing public stakeholder configuration, validated through
+  analyse.load_config.
+- Job ID: eb162ed2c4904758896a37ad159315dc
+- Request key:
+  fdd6d59ce632c4755f595b5f4bbf90475b363347fe9ea87a5f0a533ec801ba86
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Fresh experiment-local database, private workspace, publication root
+  and report cache.
+
+Verified:
+- Duplicate submission while queued reused the active job.
+- run_one invoked the actual custom_report.py renderer through the
+  process supervisor.
+- Renderer log confirmed a report-cache miss.
+- Rendered cache identity matched the submitted request key.
+- Published manifest and all 14 report-file hashes verified.
+- Completed state persisted after reopening SQLite.
+- An empty-queue operation did not rerender, alter the completed record,
+  change the publication manifest or modify the render log.
+- Working tree remained clean after the experiment.
+
+Artifacts:
+- Database:
+  results/web-worker-gofAxq/state/jobs.sqlite3
+- Published report:
+  results/web-worker-gofAxq/published/eb162ed2c4904758896a37ad159315dc
+- Private render log:
+  results/web-worker-gofAxq/private/eb162ed2c4904758896a37ad159315dc/render.log
+
+Limitations:
+- This demonstrates successful real queued rendering, not forced
+  worker-container crash containment.
+- Identity equality was checked after rendering; snapshot pinning
+  and pre-completion identity enforcement remain separate work.
+- No HTTP interface, persistent worker service, resource-budget
+  enforcement or artifact-access policy was established by this experiment.
+
+## Whole-container crash rehearsal
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-crash-sd25Hl
+- Dedicated container: health-report-crash-web-crash-sd25Hl
+- Synthetic renderer with a sleeping descendant.
+- Fresh experiment-local SQLite database and private workspace.
+- One running job and one waiting job.
+- Only the dedicated experiment container received SIGKILL.
+- Container exit code reported by docker wait: 137.
+
+Verified:
+- Pre-termination process listing showed the worker, renderer and
+  descendant running in the dedicated container.
+- A second container could not acquire worker ownership or reconcile
+  the active running job.
+- After whole-container termination, a new container acquired ownership
+  against the same persisted database and filesystem.
+- The interrupted job became failed / WORKER_INTERRUPTED.
+- The waiting job remained queued.
+- No report was published for the interrupted job.
+- Repeated reconciliation left the terminal record unchanged.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database: results/web-crash-sd25Hl/state/jobs.sqlite3
+- Job identities: results/web-crash-sd25Hl/jobs.json
+- Synthetic scripts and readiness/PID markers in the experiment workspace.
+- Stopped dedicated container retained for inspection.
+
+Limitations:
+- This tests whole-container termination during synthetic rendering.
+- It does not test worker-process-only death with a surviving renderer.
+- It does not test a real Quarto render under forced termination.
+- It does not inject termination between publication and SQLite completion.
+- Inherited descriptors were deliberately retained by the synthetic
+  renderer and descendant; this is not evidence that every real
+  rendering descendant retains the worker descriptor.
+
+## Worker-process-only death rehearsal
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-parent-death-VI0wdB
+- Guardian remained alive inside the experiment container.
+- Synthetic renderer deliberately passed inherited descriptors to
+  its sleeping descendant.
+- Fresh database with one running job and one waiting job.
+- Worker, renderer and descendant were terminated separately.
+
+Verified:
+- Worker-only death left the renderer and descendant alive.
+- Surviving renderer tree prevented replacement-worker reconciliation.
+- After renderer termination, the surviving descendant still retained
+  worker ownership and prevented reconciliation.
+- Ownership became available after the final holder stopped.
+- Interrupted job became failed / WORKER_INTERRUPTED.
+- Waiting job remained queued.
+- No report was published.
+- Repeated reconciliation left the terminal record unchanged.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database: results/web-parent-death-VI0wdB/state/jobs.sqlite3
+- Job identities: results/web-parent-death-VI0wdB/jobs.json
+- Rehearsal, renderer and PID markers in the experiment workspace.
+
+Limitations:
+- Descriptor inheritance was deliberately enabled in the synthetic tree.
+- This does not establish descriptor retention throughout the real
+  Snakemake, Quarto or R process tree.
+- The actual renderer launch path still requires a separate containment
+  decision before deployment.
+- Forced termination after publication but before SQLite completion
+  remains a separate experiment.
+
+## Publication-completion gap crash rehearsal
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-publication-gap-jYlw3t
+- Job ID: 3712202d75c843acaa0ac51be4df1ce1
+- Actual run_one operation with a synthetic valid four-file report.
+- Experiment-only JobStore subclass paused before persisting completed,
+  after successful publication returned.
+- Guardian sent SIGKILL to the paused worker.
+- Original private workspace was renamed to private-preserved,
+  retaining evidence but making its original path unavailable.
+
+Verified:
+- Published bundle passed verification while database state was running.
+- Paused worker retained ownership and blocked reconciliation.
+- SIGKILL prevented the completion update.
+- Restart reconciliation restored completed from the published bundle
+  without the original private workspace.
+- Published report files and publication manifest retained their hashes,
+  sizes and modification times.
+- Waiting job record remained unchanged.
+- Repeated reconciliation was idempotent.
+- Recovered completion persisted after database reopening.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database:
+  results/web-publication-gap-jYlw3t/state/jobs.sqlite3
+- Published bundle:
+  results/web-publication-gap-jYlw3t/published/3712202d75c843acaa0ac51be4df1ce1
+- Pre-crash inventory:
+  results/web-publication-gap-jYlw3t/published-before.json
+- Original private workspace:
+  results/web-publication-gap-jYlw3t/private-preserved
+- Rehearsal scripts, job identities and completion-pause marker
+  retained in the experiment workspace.
+
+Limitations:
+- Termination occurred at a controlled post-publication,
+  pre-completion-persistence boundary.
+- This does not test arbitrary termination during copying, synchronization
+  or rename, or host power loss.
+- Synthetic report generation does not establish real renderer-tree
+  containment.
+- Resource limits, identity enforcement before completion, artifact access
+  and retention, and persistent service integration remain pending.
+
+## Rendered identity enforcement
+
+Recorded: 2026-10-11
+
+Publication contract:
+- Publication request_key must be a 64-character lowercase hexadecimal
+  renderer-derived identity.
+- Before staging or publication, the verified source bundle cache_key
+  must equal the queued request_key.
+- Existing publication verification requires equality between the
+  queued request_key, manifest cache_key and verified rendered cache_key.
+- A manifest request_key matching the job cannot conceal a mismatched
+  rendered identity.
+
+Worker and recovery behavior:
+- Source identity mismatch is rejected before publication.
+- Worker records failed / PUBLICATION_INVALID through existing handling.
+- Restart reconciliation does not restore completed for a publication
+  with mismatched rendered identity.
+- Invalid published artifacts remain available for diagnosis.
+
+Evidence:
+- Successful synthetic publication fixtures use matching identities.
+- Source mismatch was rejected without creating the publication root.
+- Invalid publication request-key formats were rejected.
+- A matching declared manifest request identity did not conceal a
+  different rendered cache identity.
+- Worker mismatch failed without publishing and retained private output.
+- Recovery mismatch failed without modifying the published artifacts.
+- 36 focused tests passed in 5.19 seconds.
+- Complete regression suite: 240 passed in 24.66 seconds.
+
+Compatibility and limitations:
+- JobStore remains a generic internal queue and accepts arbitrary keys;
+  jobs reaching report publication must use renderer-derived keys.
+- Earlier synthetic experiment scripts using arbitrary publication keys
+  require fixture updates before rerunning.
+- Earlier passing experiments remain historical evidence for their
+  recorded implementation checkpoints.
+- Identity enforcement detects drift; it does not pin the original
+  data snapshot or toolchain.
+- Effective custom report ID prefix consistency is not tightened
+  by this increment.
+- Successful real queued rendering under this stricter publication
+  contract remains to be rerun.
+- Real renderer-tree containment remains a deployment requirement.
+
+## Real queued rendering with enforced identity
+
+Recorded: 2026-10-11
+Implementation checkpoint: b5a9140
+
+Experiment:
+- Workspace: results/web-worker-apua55
+- Request: existing public stakeholder configuration, validated through
+  analyse.load_config.
+- Job ID: c97084708ad2495dba40218f6e1355ca
+- Request key:
+  090520500c27f9ff479c7b2126e03861eba155b2f24f80372ffb55444f0f0cc9
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Fresh experiment-local database, private workspace, publication root
+  and report cache.
+- Reran the original real queued-report experiment without changing
+  its request-key derivation or verification logic.
+
+Verified:
+- Duplicate queued submission reused the active job.
+- Actual custom_report.py renderer completed through the supervisor.
+- Renderer log confirmed a fresh report-cache miss.
+- Rendered cache identity matched the queued request identity.
+- Publication accepted the real output under the enforced identity contract.
+- Published manifest and all 14 report-file hashes verified.
+- Completed state persisted after reopening SQLite.
+- Empty-queue operation did not rerender or alter completed output.
+- Working tree remained clean after the experiment.
+
+Retained evidence:
+- Database:
+  results/web-worker-apua55/state/jobs.sqlite3
+- Published report:
+  results/web-worker-apua55/published/c97084708ad2495dba40218f6e1355ca
+- Private render log:
+  results/web-worker-apua55/private/c97084708ad2495dba40218f6e1355ca/render.log
+
+Status:
+- Successful real queued rendering under the stricter identity contract
+  is now verified, superseding the earlier pending-rerun note.
+- Synthetic crash experiments recorded before b5a9140 remain historical
+  evidence for their recorded implementation checkpoints.
+- Identity enforcement detects drift but does not pin the original snapshot.
+- Real renderer-tree containment, resource limits, artifact access and
+  retention, and persistent worker service integration remain pending.
+
+## Publication-gap recovery with enforced identity
+
+Recorded: 2026-10-11
+Implementation checkpoint: b5a9140
+Documentation checkpoint at experiment start: 2a06428
+
+Experiment:
+- Workspace: results/web-publication-gap-identity-jZkUcF
+- Job ID: 3df05119e1e14d96821ba620e9b435e2
+- Copied the preserved publication-gap rehearsal into a fresh workspace.
+- Running job used the synthetic renderer's matching cache identity:
+  64 lowercase hexadecimal 'a' characters.
+- Waiting job used a separate identity and was not rendered.
+- Actual run_one operation used a synthetic valid four-file report.
+- Experiment-only store subclass paused before persisting completed,
+  after verified publication returned.
+- Guardian sent SIGKILL to the paused worker.
+- Original private workspace was preserved under a different name.
+
+Verified:
+- Publication succeeded under the enforced identity contract while
+  database state remained running.
+- Paused worker retained ownership and blocked premature reconciliation.
+- SIGKILL prevented completion persistence.
+- Restart restored completed from the published bundle without the
+  original private workspace.
+- All published files, including the publication manifest, retained
+  their hashes, sizes and modification times.
+- Waiting job record remained unchanged.
+- Recovery was idempotent.
+- Recovered completion persisted after database reopening.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database:
+  results/web-publication-gap-identity-jZkUcF/state/jobs.sqlite3
+- Published bundle:
+  results/web-publication-gap-identity-jZkUcF/published/3df05119e1e14d96821ba620e9b435e2
+- Pre-crash inventory, preserved private workspace, rehearsal scripts,
+  job identities and completion-pause marker remain in the workspace.
+
+Limitations:
+- Synthetic keys match rendered provenance but are not derived from
+  real snapshot, code and toolchain components in this rehearsal.
+- Successful real renderer-derived identity was verified separately
+  in results/web-worker-apua55.
+- Termination targets a controlled post-publication,
+  pre-completion-persistence boundary.
+- Arbitrary publication interruption, host power loss, real renderer-tree
+  containment and resource-budget enforcement remain separate work.
+
+## PID-1 single-job container entry point
+
+Recorded: 2026-10-11
+
+Implemented:
+- worker_once.py processes at most one queued job through run_one.
+- Requires Linux and PID 1 before initializing or claiming jobs.
+- Validates positive finite timeout/grace and positive queue capacity.
+- Rejects a symlink job root and a missing data directory.
+- Uses configured job-root directories for state, private workspaces,
+  publications and cache.
+- Does not expose a renderer override.
+- Outputs only job ID, state and sanitized error code, or idle state.
+- Returns 0 for idle/completed, 1 for a failed job, 2 for configuration
+  or launch-contract rejection, and 75 for competing worker ownership.
+- Unexpected infrastructure exceptions propagate rather than being
+  misclassified as terminal report failures.
+
+Launch contract:
+- Run directly as PID 1 in a dedicated private container PID namespace.
+- Do not launch beneath a surviving guardian or through docker exec.
+- Do not use host/shared PID mode.
+- HTTP/UI processes must be separate from the worker container.
+- Paths and numeric configuration are trusted operator settings.
+- PID 1 validation is a necessary check, not proof of all container settings.
+
+Evidence:
+- Report-service runtime probe showed Python PID 1, parent PID 0.
+- Nested/non-PID-1 launch rejected before database creation.
+- Platform gate, argument validation, directory validation, idle handling,
+  allowlisted output and competing ownership were tested.
+- Unexpected infrastructure failure propagation was tested.
+- 31 entry-point/worker/session tests passed in 4.16 seconds.
+- Complete regression suite: 256 passed in 24.84 seconds.
+
+Limitations:
+- Entry-point tests mock the launch gate where necessary to test CLI behavior.
+- Live rendering and forced termination through this entry point
+  remain separate verification gates.
+- No persistent loop, automatic restart policy, HTTP integration,
+  resource-budget enforcement or retention policy is implemented here.
+
+## Real report through the PID-1 worker entry point
+
+Recorded: 2026-10-11
+Implementation checkpoint: 5956ca2
+
+Experiment:
+- Workspace: results/web-worker-cli-ogxhsk
+- Dedicated container: health-report-worker-web-worker-cli-ogxhsk
+- Job ID: f17e285dbedd4c0aa0e3b21302b0970c
+- Request key:
+  3df09c705ee190161998cc12d24317f639bf4b7bc28fbc1f2908ef3fda7471e0
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Validated public request with a fresh experiment-local database,
+  workspace, publication root and report cache.
+- Launched worker_once.py directly through the report service.
+
+Verified runtime:
+- Default private container PID namespace.
+- No separate init wrapper or configured entry-point wrapper.
+- Nonprivileged container.
+- PID-1 command matched the expected worker_once.py invocation.
+- Worker exit code: 0.
+
+Verified output:
+- Actual renderer completed a real report with a fresh cache miss.
+- Rendered cache identity matched the queued request identity.
+- Completed state persisted after database reopening.
+- Publication manifest and all 14 report-file hashes verified.
+- Container log contained only the approved job summary fields.
+- Working tree remained clean after the experiment.
+
+Retained evidence:
+- Container inspection: results/web-worker-cli-ogxhsk/container-inspect.json
+- Container log: results/web-worker-cli-ogxhsk/container.log
+- Experiment identity: results/web-worker-cli-ogxhsk/experiment.json
+- Database: results/web-worker-cli-ogxhsk/state/jobs.sqlite3
+- Published report:
+  results/web-worker-cli-ogxhsk/published/f17e285dbedd4c0aa0e3b21302b0970c
+- Stopped dedicated worker container retained for inspection.
+
+Limitations:
+- This verifies successful rendering through the actual PID-1 entry point.
+- Forced termination of this launch path during real rendering remains
+  a separate containment rehearsal.
+- PID-1 checks do not independently validate all deployment settings.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.
+
+## Actual PID-1 worker crash during real rendering
+
+Recorded: 2026-10-11
+Implementation checkpoint: 5956ca2
+Documentation checkpoint at experiment start: c9d4879
+
+Experiment:
+- Workspace: results/web-real-crash-Vv1LO0
+- Dedicated container: health-report-real-crash-web-real-crash-Vv1LO0
+- Running job: e688fd8b0aa44440a223deda6c6d886c
+- Waiting job: 7d4acd60f019495bb0517a8f6b65c661
+- Request key:
+  3df09c705ee190161998cc12d24317f639bf4b7bc28fbc1f2908ef3fda7471e0
+- Actual worker_once.py launched directly as PID 1.
+- Fresh queue and report cache with a validated public request.
+
+Verified before termination:
+- Private PID namespace, no init/entry-point wrapper, nonprivileged launch.
+- PID-1 command matched the actual worker entry point.
+- custom_report.py renderer observed as container PID 13.
+- Real Snakemake html descendant observed as container PID 22.
+- Replacement-worker reconciliation was blocked by active ownership.
+
+Termination and recovery:
+- Only the dedicated experiment container received SIGKILL.
+- Container exit code: 137.
+- Container was confirmed stopped before replacement reconciliation.
+- Replacement container acquired ownership against the same database.
+- No published bundle existed.
+- Running job became failed / WORKER_INTERRUPTED.
+- Waiting job record remained unchanged.
+- Reconciliation was idempotent.
+- Terminal state persisted after database reopening.
+- Experiment-owned temporary stakeholder configuration was preserved
+  outside the shared stakeholder directory.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Container configuration: container-inspect.json
+- Pre-termination process observation: processes-before-kill.json
+- Before/after job records and classification: recovery.json
+- Job identities: experiment.json
+- Private renderer log and container.log
+- Preserved temporary configuration: generated-stakeholder-preserved.json
+- All files above remain under results/web-real-crash-Vv1LO0.
+- Stopped dedicated container retained for inspection.
+
+Limitations:
+- Observed real rendering descendant was Snakemake; the rehearsal does
+  not establish termination specifically during Quarto or R execution.
+- Container termination was explicit; no host power-loss test was performed.
+- Process observation and termination were separate operations.
+- This does not establish ownership inheritance through every real
+  descendant or support nested/shared-PID worker launch modes.
+- Temporary stakeholder preservation was experiment cleanup, not an
+  implemented automatic production cleanup policy.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.
+
+## Private stakeholder configuration for custom renders
+
+Recorded: 2026-10-11
+
+Implemented:
+- Workflow accepts an optional stakeholder_dir setting.
+- Ordinary report generation retains the existing shared directory
+  as its default.
+- Workflow ID checks and analysis inputs use the configured directory.
+- Custom renders create generated stakeholder JSON and the workflow
+  override in a private temporary directory beneath the render workspace.
+- Custom renders pass that private directory to Snakemake.
+- Normal render success and failure remove the private configuration
+  directory.
+- Custom rendering no longer writes generated settings into the shared
+  stakeholder configuration directory.
+
+Evidence:
+- Mocked renderer launches verified the private JSON, workflow override,
+  output path, snapshot path and HTML-only environment.
+- Private configuration was removed after normal success and failure.
+- Shared stakeholder JSON files remained unchanged.
+- Snakemake dry runs loaded the default stakeholder directory.
+- Snakemake dry runs loaded a private stakeholder configuration without
+  a corresponding shared file.
+- Private stakeholder filename/ID mismatch was rejected.
+- 15 focused tests passed in 7.12 seconds.
+- Complete regression suite: 259 passed in 29.06 seconds.
+
+Limitations:
+- Dry runs establish workflow loading and job-graph construction,
+  not successful real rendering.
+- Successful real rendering and forced termination with private
+  stakeholder configuration remain separate verification gates.
+- Abrupt termination may leave private temporary files until container
+  teardown; this increment does not implement durable retention.
+- Historical shared-directory leftovers are not swept or deleted.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.
+
+## Real rendering with private stakeholder configuration
+
+Recorded: 2026-10-11
+Implementation checkpoint: 64ec658
+
+Experiment:
+- Workspace: results/web-private-config-Rejtz8
+- Job ID: 8a595573608144829a615507eeee2f00
+- Request key:
+  44680082474a4b5dd2c80142986722ddc7b8014a5fdb0a83865bb35fa59d80b5
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Validated public request with a fresh database and report cache.
+- Actual worker_once.py entry point launched directly as PID 1.
+- Shared stakeholder JSON inventory recorded before rendering.
+
+Verified:
+- Actual renderer completed a real report with a fresh cache miss.
+- Rendered cache identity matched the queued request identity.
+- Published manifest and all 14 report-file hashes verified.
+- Completed state persisted after database reopening.
+- Shared stakeholder JSON inventory, hashes, sizes and modification
+  times remained unchanged.
+- No generated stakeholder configuration remained in the shared directory.
+- Working tree remained clean after the experiment.
+
+Retained evidence:
+- Experiment identity: experiment.json
+- Shared configuration baseline: shared-config-before.json
+- Verification summary: verification.json
+- CLI summary: container.log
+- Database: state/jobs.sqlite3
+- Private renderer log:
+  private/8a595573608144829a615507eeee2f00/render.log
+- Published report:
+  published/8a595573608144829a615507eeee2f00
+- All artifacts above remain under results/web-private-config-Rejtz8.
+
+Status and limitations:
+- Successful real rendering with private stakeholder configuration
+  is now verified, superseding the earlier pending-real-render note.
+- Shared-directory verification compares before and after inventories;
+  it is not continuous monitoring during rendering.
+- Forced termination under this private-configuration implementation
+  remains a separate verification gate.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.
+
+## Real-render crash with private stakeholder configuration
+
+Recorded: 2026-10-11
+Implementation checkpoint: 64ec658
+Documentation checkpoint at experiment start: 02f0f06
+
+Experiment:
+- Workspace: results/web-private-config-crash-Y51hik
+- Dedicated container:
+  health-report-private-crash-web-private-config-crash-Y51hik
+- Running job: e5e27a16c23f4e0dbddc0ba9a12017c3
+- Waiting job: 5e2cd9734d5c4070879f4ae239935a78
+- Request key:
+  44680082474a4b5dd2c80142986722ddc7b8014a5fdb0a83865bb35fa59d80b5
+- Actual worker_once.py entry point launched as PID 1.
+- Validated public request with a fresh queue and report cache.
+- Shared stakeholder JSON inventory recorded before rendering.
+
+Verified during rendering:
+- Required private-PID, no-wrapper, nonprivileged launch settings.
+- custom_report.py observed as container PID 13.
+- Active Snakemake html process observed as container PID 22.
+- Snakemake workflow override used a private stakeholder directory:
+  /tmp/tmpiw_cfubp/stakeholder-d56c51hj
+- Generated custom_44680082474a settings matched the experiment request,
+  with the expected internal report ID.
+- Shared configuration inventory, hashes, sizes and modification times
+  matched the pre-render baseline at the observation point.
+- Active worker ownership blocked replacement reconciliation.
+
+Termination and recovery:
+- Only the dedicated experiment container received SIGKILL.
+- Container exit code: 137.
+- Shared configuration remained unchanged after termination.
+- No generated stakeholder file remained in the shared directory.
+- No shared-config move, deletion or cleanup was performed.
+- Replacement container acquired worker ownership.
+- No published bundle existed.
+- Interrupted job became failed / WORKER_INTERRUPTED.
+- Waiting job record remained unchanged.
+- Recovery was idempotent and terminal state persisted after reopening.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- experiment.json and shared-config-before.json
+- container-inspect.json and container.log
+- active-render-evidence.json, including the observed private settings
+  and Snakemake command
+- recovery.json and state/jobs.sqlite3
+- Private renderer log
+- All files above remain under results/web-private-config-crash-Y51hik.
+- Stopped dedicated container retained for inspection.
+
+Status and limitations:
+- Real-render interruption no longer required manual shared-stakeholder
+  cleanup at the tested boundary.
+- Inventory checks were before, during observation and after termination,
+  not continuous filesystem monitoring.
+- Observed rendering descendant was Snakemake; termination specifically
+  during Quarto or R execution was not established.
+- Private temporary files are not required to survive container removal.
+- Host power loss, resource-budget enforcement, persistent service
+  operation, artifact access and retention remain separate work.
+
+## Bounded worker configuration and measured real rendering
+
+Recorded: 2026-10-11
+Implementation checkpoint: 64ec658
+Documentation checkpoint at experiment start: e3c7123
+
+Configuration:
+- Dedicated launch file: compose.worker.yaml
+- Inherits the report service's build definition, runtime environment,
+  UID/GID mapping, working directory and project bind mount.
+- Requires HEALTH_REPORT_WORKER_IMAGE to select an existing tested image.
+- pull_policy: never; rehearsal launches also used --pull never.
+- Actual worker_once.py entry point launched directly as PID 1.
+- No configured entry-point wrapper or separate init wrapper.
+- Private container PID namespace, nonprivileged launch, no restart.
+- Initial CPU quota: 2 CPUs.
+- Hard memory limit: 4 GiB.
+- Total memory-plus-swap limit: 4 GiB; additional container swap disabled.
+- PID limit: 256, including threads counted by the controller.
+- /tmp: 1 GiB tmpfs with rw,nosuid,nodev,mode=1777.
+- OMP_NUM_THREADS, OPENBLAS_NUM_THREADS and MKL_NUM_THREADS: 2.
+- Docker json-file logs: max-size 10m, max-file 3.
+- Worker timeout: 600 seconds; supervisor grace: 1 second.
+- Job root defaults to /app/results/web-jobs and can be selected through
+  HEALTH_REPORT_JOB_ROOT.
+- Timeout can be selected through HEALTH_REPORT_WORKER_TIMEOUT.
+- These are provisional single-worker rehearsal budgets, not measured
+  production requirements.
+
+Runtime resource probe:
+- Retained container:
+  health-report-worker-resource-probe-1791740124-11298
+- Verified Python ran as PID 1.
+- Container-visible cpu.max: 200000 100000.
+- Container-visible memory.max: 4294967296.
+- Container-visible memory.swap.max: 0.
+- Container-visible pids.max: 256.
+- Verified /tmp capacity and configured thread environment.
+- Docker inspection matched the intended resource configuration.
+- Exit code: 0; OOMKilled: false.
+
+Real-render experiment:
+- Workspace: results/web-resource-budget-oefWtt
+- Dedicated container:
+  health-report-budget-web-resource-budget-oefWtt
+- Tested image: health_report_generator-report
+- Image ID:
+  sha256:a17cbf9837bd839e06caa3ee6ece96514dce3d2b0c3fc10d271de421fbf89ba3
+- Job ID: aa00541be70843bab1b666b652ef7427
+- Request key:
+  4c4204b6ab945a4f4d682ef7b7829eb101d81937a4b832d8461c4b8d85989ca2
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Validated public request for reporting window 2021-2025.
+- Fresh experiment-local queue, publication root and rendered-report cache.
+- Snapshot preparation used the renderer's canonical snapshot layout
+  and request-key calculation.
+- Actual worker launched through compose.worker.yaml.
+
+Verified:
+- All observed PID-1 commands matched the intended worker invocation.
+- Applied Docker configuration and observed cgroup limits matched budgets.
+- Actual rendering completed with a fresh rendered-report cache miss.
+- Rendered cache identity and identity components matched the queued job.
+- Completed state persisted after database reopening.
+- Publication verification and all 14 report-file hashes passed.
+- Shared stakeholder JSON inventory, hashes, sizes and modification times
+  remained unchanged.
+- Container log contained exactly the approved successful job summary.
+- Worker exit code: 0; OOMKilled: false.
+- Monitoring diagnostics were empty.
+- Only the intended new Compose file and documentation were introduced;
+  experiment artifacts remain under results/.
+
+Observed measurements:
+- Container elapsed time: 37.067 seconds.
+- Resource samples: 17.
+- Maximum observed kernel memory peak: 928616448 bytes.
+- Maximum sampled memory.current: 925716480 bytes.
+- Maximum sampled /tmp usage: 5459968 bytes.
+- Maximum sampled process/thread count: 26.
+- Observed memory max, oom, oom_kill and oom_group_kill counters: all zero.
+- Last observed CPU usage: 39411833 microseconds.
+- Last observed throttled CPU periods: 7 of 366 periods.
+- Last observed CPU throttled time: 258804 microseconds.
+
+Retained evidence:
+- experiment.json and validated-request.json
+- shared-config-before.json
+- state/jobs.sqlite3
+- cache/snapshot/snapshot.json and rendered cache entry
+- private/aa00541be70843bab1b666b652ef7427/render.log
+- Private report bundle and published report bundle
+- container-inspect-start.json and container-inspect.json
+- container.log and exit-code.txt
+- resource-samples.jsonl and monitor-errors.log
+- observed-elapsed-seconds.txt and verification.json
+- All files above remain under results/web-resource-budget-oefWtt.
+- Stopped dedicated worker and resource-probe containers retained.
+
+Status and limitations:
+- Resource-limit configuration and successful real rendering under those
+  limits are verified for this request and snapshot.
+- This supersedes earlier pending resource-budget verification notes only
+  for configuration enforcement and the tested successful-render path.
+- One public request was tested; no concurrency or production-sizing claim.
+- Sampling adds observation overhead.
+- Sampled temporary-storage and PID maxima may miss brief peaks.
+- The last observed kernel memory peak may omit final activity.
+- Shared configuration was checked before and after, not continuously.
+- No forced memory, PID or temporary-storage exhaustion was rehearsed.
+- This increment does not establish resource-exhaustion recovery,
+  whole-container OOM behavior or timeout behavior under these budgets.
+- /tmp limits do not bound bind-mounted database, cache, private renderer
+  logs or published-report growth.
+- Docker log rotation is separate from private render.log retention.
+- Persistent worker operation, artifact access, concurrency policy,
+  persistent-storage retention and host power loss remain separate work.

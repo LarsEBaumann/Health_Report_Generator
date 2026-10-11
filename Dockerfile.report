@@ -36,15 +36,9 @@ RUN uv pip install \
       -r /opt/build/requirements.lock.txt \
     && uv pip check --python /opt/health-report-venv/bin/python
 
-COPY scripts/health_pipeline/requirements.ui.lock.txt /opt/build/requirements.ui.lock.txt
-
-RUN uv pip install \
-      --python /opt/health-report-venv/bin/python \
-      -r /opt/build/requirements.ui.lock.txt \
-    && uv pip check --python /opt/health-report-venv/bin/python \
-    && for tool in snakemake pytest marimo; do \
-         command -v "$tool" >/dev/null || { echo "missing executable: $tool" >&2; exit 1; }; \
-       done \
+RUN for tool in snakemake pytest; do \
+      command -v "$tool" >/dev/null || { echo "missing executable: $tool" >&2; exit 1; }; \
+    done \
     && python -c "import pandas; assert pandas.__version__ == '2.2.3', pandas.__version__"
 
 RUN curl --fail --show-error --location \

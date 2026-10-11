@@ -1,0 +1,46 @@
+services:
+  worker:
+    extends:
+      file: compose.yaml
+      service: report
+
+    # Explicitly select an existing tested image; do not pull implicitly.
+    image: "${HEALTH_REPORT_WORKER_IMAGE:?Set HEALTH_REPORT_WORKER_IMAGE to an existing tested report image}"
+    pull_policy: never
+
+    # Launch directly as PID 1; do not add a separate init wrapper.
+    init: false
+    restart: "no"
+
+    # Initial rehearsal budgets; validate with measured real rendering.
+    cpus: 2.0
+    mem_limit: 4g
+    memswap_limit: 4g
+    pids_limit: 256
+
+    # Temporary rendering files are separate from persistent job artifacts.
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=1g,mode=1777
+
+    environment:
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    command:
+      - python
+      - /app/scripts/health_pipeline/worker_once.py
+      - --job-root
+      - "${HEALTH_REPORT_JOB_ROOT:-/app/results/web-jobs}"
+      - --data-root
+      - /app/data/reference
+      - --timeout
+      - "${HEALTH_REPORT_WORKER_TIMEOUT:-600}"
+      - --grace
+      - "1"

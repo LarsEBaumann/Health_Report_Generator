@@ -1,0 +1,15 @@
+# Reviewed 2026-10-11.
+# Historical documentation of content-addressed cache/request digests.
+# Each location was checked at its exact commit.
+# These hashes identify reports; they are not authentication credentials.
+# No whole-file, whole-commit, or rule-wide exclusions.
+
+02f0f06529d87f5c73b7be08539df54c81bd15e8:docs/web-job-system.md:generic-api-key:738
+e3c7123acc902a88278110ce20642d08d53d9522:docs/web-job-system.md:generic-api-key:790
+a4f77a02ec7ee8800ff5aa67c2f4148e5ea2c8cb:docs/web-job-system.md:generic-api-key:891
+99875e1038361ccbbd7e3aa35228144e178e4b69:docs/web-job-system.md:generic-api-key:642
+c9d4879c67c64cad0dca59eefc4efda46743d309:docs/web-job-system.md:generic-api-key:591
+2a06428f4b58ce152f99f24138da9f9c269e0d67:docs/web-job-system.md:generic-api-key:452
+662f7fc7a753f7e250a644ab1b332d792ac905ad:docs/web-job-system.md:generic-api-key:229
+51f4847feedbf2ac9f9d0114253a2be31408fe0e:docs/web-job-system.md:generic-api-key:127
+868198103381f89e2da7e9a3099e289c13c18247:docs/web-integration-baseline.md:generic-api-key:48

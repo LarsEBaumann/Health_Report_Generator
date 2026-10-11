@@ -5,6 +5,8 @@ quarto: quarto
 # One shared report source is rendered once per stakeholder parameter file in
 # scripts/health_pipeline/config/stakeholders/<id>.json. Add an audience by
 # adding a parameter file and listing its id here; do not copy the template.
+# Custom renders may override this with a private directory.
+stakeholder_dir: scripts/health_pipeline/config/stakeholders
 stakeholders:
   - researcher
   - health_institution
