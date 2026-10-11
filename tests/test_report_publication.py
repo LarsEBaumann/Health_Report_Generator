@@ -11,7 +11,7 @@ from report_publication import (
 )
 
 JOB_ID = "1" * 32
-KEY = "internal-versioned-key"
+KEY = "a" * 64
 
 
 @pytest.fixture
@@ -80,7 +80,7 @@ def test_identity_conflict_is_rejected(setup):
     source, root, settings = setup
     publish_bundle(source, root, JOB_ID, KEY, settings)
     with pytest.raises(PublicationConflict):
-        publish_bundle(source, root, JOB_ID, "different-key", settings)
+        publish_bundle(source, root, JOB_ID, "b" * 64, settings)
 
 
 @pytest.mark.parametrize("job_id", ["../outside", "", "x" * 32])
@@ -104,3 +104,29 @@ def test_concurrent_publication_is_serialized(setup):
         results = list(pool.map(attempt, range(2)))
     assert any(result == root / JOB_ID for result in results)
     read_publication(root / JOB_ID, JOB_ID, KEY, settings)
+
+
+def test_rendered_identity_mismatch_is_not_published(setup):
+    source, root, settings = setup
+    with pytest.raises(PublicationConflict):
+        publish_bundle(source, root, JOB_ID, "b" * 64, settings)
+    assert not root.exists()
+
+
+def test_matching_manifest_identity_cannot_hide_rendered_mismatch(setup):
+    source, root, settings = setup
+    destination = publish_bundle(source, root, JOB_ID, KEY, settings)
+    marker_path = destination / "publication.json"
+    marker = json.loads(marker_path.read_text())
+    marker["request_key"] = "b" * 64
+    marker_path.write_text(json.dumps(marker))
+    with pytest.raises(PublicationConflict):
+        read_publication(destination, JOB_ID, "b" * 64, settings)
+
+
+@pytest.mark.parametrize("key", ["", "internal-key", "x" * 64, "A" * 64])
+def test_invalid_publication_request_key_is_rejected(setup, key):
+    source, root, settings = setup
+    with pytest.raises(ValueError):
+        publish_bundle(source, root, JOB_ID, key, settings)
+    assert not root.exists()

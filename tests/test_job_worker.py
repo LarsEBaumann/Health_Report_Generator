@@ -61,7 +61,7 @@ else:
     return store, options
 
 
-def submit(store, mode="success", key="key"):
+def submit(store, mode="success", key="a" * 64):
     return store.submit(
         key, {"id": "public", "years": [2022, 2025], "fixture_mode": mode}
     )[0]
@@ -74,7 +74,7 @@ def test_success_publishes_and_persists(environment):
     assert result["state"] == "completed"
     assert result["error_code"] is None
     published = options["published_root"] / job["job_id"]
-    read_publication(published, job["job_id"], "key", job["request"])
+    read_publication(published, job["job_id"], "a" * 64, job["request"])
     assert JobStore(store.path).get(job["job_id"])["state"] == "completed"
     workspace = options["workspace_root"] / job["job_id"]
     assert json.loads((workspace / "request.json").read_text()) == job["request"]
@@ -107,8 +107,8 @@ def test_empty_queue_does_not_start_renderer(environment):
 
 def test_only_one_job_is_processed(environment):
     store, options = environment
-    first = submit(store, key="first")
-    second = submit(store, key="second")
+    first = submit(store, key="a" * 64)
+    second = submit(store, key="b" * 64)
     assert run_one(store, **options)["job_id"] == first["job_id"]
     assert store.get(second["job_id"])["state"] == "queued"
 
@@ -140,3 +140,16 @@ def test_invalid_budget_does_not_claim_job(environment):
     with pytest.raises(ValueError):
         run_one(store, **options)
     assert store.get(job["job_id"])["state"] == "queued"
+
+
+def test_worker_rejects_rendered_identity_mismatch(environment):
+    store, options = environment
+    job = submit(store, key="b" * 64)
+    result = run_one(store, **options)
+    assert result["state"] == "failed"
+    assert result["error_code"] == "PUBLICATION_INVALID"
+    assert not (options["published_root"] / job["job_id"]).exists()
+    assert (
+        options["workspace_root"] / job["job_id"] / "report"
+        / "request_provenance.json"
+    ).exists()

@@ -20,8 +20,11 @@ class PublicationConflict(ValueError):
 def _identity(job_id, request_key):
     if type(job_id) is not str or not re.fullmatch(r"[a-f0-9]{32}", job_id):
         raise ValueError("Invalid internal job identifier.")
-    if type(request_key) is not str or not request_key:
-        raise ValueError("Missing internal request identity.")
+    if (
+        type(request_key) is not str
+        or not re.fullmatch(r"[a-f0-9]{64}", request_key)
+    ):
+        raise ValueError("Invalid renderer-derived request identity.")
 
 
 def _sync_directory(path):
@@ -64,6 +67,7 @@ def read_publication(directory, job_id, request_key, expected_settings):
         verified["files"].pop(MANIFEST, None)
         if (
             marker.get("cache_key") != verified["cache_key"]
+            or verified["cache_key"] != request_key
             or marker.get("files") != verified["files"]
         ):
             raise PublicationConflict("Published inventory differs.")
@@ -79,6 +83,8 @@ def publish_bundle(source, published_root, job_id, request_key, settings):
     if (source / MANIFEST).exists():
         raise PublicationConflict("Source already contains publication metadata.")
     initial = verify_bundle(source, settings)
+    if initial["cache_key"] != request_key:
+        raise PublicationConflict("Rendered identity differs from queued identity.")
 
     root = Path(published_root)
     if root.is_symlink():

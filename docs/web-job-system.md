@@ -391,3 +391,50 @@ Limitations:
   containment.
 - Resource limits, identity enforcement before completion, artifact access
   and retention, and persistent service integration remain pending.
+
+## Rendered identity enforcement
+
+Recorded: 2026-10-11
+
+Publication contract:
+- Publication request_key must be a 64-character lowercase hexadecimal
+  renderer-derived identity.
+- Before staging or publication, the verified source bundle cache_key
+  must equal the queued request_key.
+- Existing publication verification requires equality between the
+  queued request_key, manifest cache_key and verified rendered cache_key.
+- A manifest request_key matching the job cannot conceal a mismatched
+  rendered identity.
+
+Worker and recovery behavior:
+- Source identity mismatch is rejected before publication.
+- Worker records failed / PUBLICATION_INVALID through existing handling.
+- Restart reconciliation does not restore completed for a publication
+  with mismatched rendered identity.
+- Invalid published artifacts remain available for diagnosis.
+
+Evidence:
+- Successful synthetic publication fixtures use matching identities.
+- Source mismatch was rejected without creating the publication root.
+- Invalid publication request-key formats were rejected.
+- A matching declared manifest request identity did not conceal a
+  different rendered cache identity.
+- Worker mismatch failed without publishing and retained private output.
+- Recovery mismatch failed without modifying the published artifacts.
+- 36 focused tests passed in 5.19 seconds.
+- Complete regression suite: 240 passed in 24.66 seconds.
+
+Compatibility and limitations:
+- JobStore remains a generic internal queue and accepts arbitrary keys;
+  jobs reaching report publication must use renderer-derived keys.
+- Earlier synthetic experiment scripts using arbitrary publication keys
+  require fixture updates before rerunning.
+- Earlier passing experiments remain historical evidence for their
+  recorded implementation checkpoints.
+- Identity enforcement detects drift; it does not pin the original
+  data snapshot or toolchain.
+- Effective custom report ID prefix consistency is not tightened
+  by this increment.
+- Successful real queued rendering under this stricter publication
+  contract remains to be rerun.
+- Real renderer-tree containment remains a deployment requirement.

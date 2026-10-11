@@ -30,9 +30,9 @@ def setup(tmp_path):
 
 def test_published_running_job_recovers_without_source(setup):
     store, source, root, settings = setup
-    job, _ = store.submit("key", settings)
+    job, _ = store.submit("a" * 64, settings)
     store.claim_next()
-    destination = publish_bundle(source, root, job["job_id"], "key", settings)
+    destination = publish_bundle(source, root, job["job_id"], "a" * 64, settings)
 
     # Simulate interruption before finish(); private workspace is unavailable.
     shutil.rmtree(source)
@@ -64,9 +64,9 @@ def test_missing_publication_fails_without_discarding_queue(setup):
 
 def test_invalid_publication_is_preserved_but_not_completed(setup):
     store, source, root, settings = setup
-    job, _ = store.submit("key", settings)
+    job, _ = store.submit("a" * 64, settings)
     store.claim_next()
-    destination = publish_bundle(source, root, job["job_id"], "key", settings)
+    destination = publish_bundle(source, root, job["job_id"], "a" * 64, settings)
     (destination / "methods.html").write_text("tampered")
 
     with worker_session(store, root) as session:
@@ -80,9 +80,9 @@ def test_invalid_publication_is_preserved_but_not_completed(setup):
 
 def test_existing_completed_job_is_untouched(setup):
     store, source, root, settings = setup
-    job, _ = store.submit("key", settings)
+    job, _ = store.submit("a" * 64, settings)
     store.claim_next()
-    publish_bundle(source, root, job["job_id"], "key", settings)
+    publish_bundle(source, root, job["job_id"], "a" * 64, settings)
     store.finish(job["job_id"], "completed")
     before = store.get(job["job_id"])
 
@@ -91,3 +91,35 @@ def test_existing_completed_job_is_untouched(setup):
         assert session["interrupted_job_ids"] == []
 
     assert store.get(job["job_id"]) == before
+
+
+def test_recovery_rejects_rendered_identity_mismatch(setup):
+    store, source, root, settings = setup
+    job, _ = store.submit("b" * 64, settings)
+    store.claim_next()
+
+    # Create a valid publication, then make its declared request identity
+    # agree with the job while leaving rendered provenance unchanged.
+    destination = publish_bundle(
+        source, root, job["job_id"], "a" * 64, settings
+    )
+    marker_path = destination / "publication.json"
+    marker = json.loads(marker_path.read_text())
+    marker["request_key"] = "b" * 64
+    marker_path.write_text(json.dumps(marker))
+    before = {
+        path.relative_to(destination).as_posix(): path.read_bytes()
+        for path in destination.rglob("*") if path.is_file()
+    }
+
+    with worker_session(store, root) as session:
+        assert session["recovered_job_ids"] == []
+        assert session["invalid_publication_job_ids"] == [job["job_id"]]
+
+    record = store.get(job["job_id"])
+    assert record["state"] == "failed"
+    assert record["error_code"] == "PUBLICATION_INVALID"
+    assert {
+        path.relative_to(destination).as_posix(): path.read_bytes()
+        for path in destination.rglob("*") if path.is_file()
+    } == before
