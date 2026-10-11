@@ -726,3 +726,51 @@ Limitations:
 - Historical shared-directory leftovers are not swept or deleted.
 - Resource-budget enforcement, persistent service operation, artifact
   access and retention remain pending.
+
+## Real rendering with private stakeholder configuration
+
+Recorded: 2026-10-11
+Implementation checkpoint: 64ec658
+
+Experiment:
+- Workspace: results/web-private-config-Rejtz8
+- Job ID: 8a595573608144829a615507eeee2f00
+- Request key:
+  44680082474a4b5dd2c80142986722ddc7b8014a5fdb0a83865bb35fa59d80b5
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Validated public request with a fresh database and report cache.
+- Actual worker_once.py entry point launched directly as PID 1.
+- Shared stakeholder JSON inventory recorded before rendering.
+
+Verified:
+- Actual renderer completed a real report with a fresh cache miss.
+- Rendered cache identity matched the queued request identity.
+- Published manifest and all 14 report-file hashes verified.
+- Completed state persisted after database reopening.
+- Shared stakeholder JSON inventory, hashes, sizes and modification
+  times remained unchanged.
+- No generated stakeholder configuration remained in the shared directory.
+- Working tree remained clean after the experiment.
+
+Retained evidence:
+- Experiment identity: experiment.json
+- Shared configuration baseline: shared-config-before.json
+- Verification summary: verification.json
+- CLI summary: container.log
+- Database: state/jobs.sqlite3
+- Private renderer log:
+  private/8a595573608144829a615507eeee2f00/render.log
+- Published report:
+  published/8a595573608144829a615507eeee2f00
+- All artifacts above remain under results/web-private-config-Rejtz8.
+
+Status and limitations:
+- Successful real rendering with private stakeholder configuration
+  is now verified, superseding the earlier pending-real-render note.
+- Shared-directory verification compares before and after inventories;
+  it is not continuous monitoring during rendering.
+- Forced termination under this private-configuration implementation
+  remains a separate verification gate.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.
