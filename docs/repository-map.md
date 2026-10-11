@@ -39,7 +39,7 @@ This map distinguishes the supported production workflow from optional, experime
 | `design/report-mockups.html` | Alternate editorial design exploration. | Historical design reference |
 | `docs/phase-3-data-migration.json` | Path-level hashes and scientific comparison for the retired `Data/` release. | Historical machine-readable audit record |
 | `docs/phase-4-legacy-removal.json` | Removal gate and deletion commit for the retired root. | Active audit record |
-
+| `docs/history.md` | Merged record of project phases 0 to 3. | Historical |
 Historical material must not be cited as proof that the current workflow built successfully. Supported release evidence is a successful current workflow run and its matching `results/release.json`.
 
 ## Canonical-data status

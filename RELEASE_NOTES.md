@@ -17,7 +17,7 @@ Reproducible, parameterised reporting of FOPH Infectious Diseases Dashboard data
 
 | Phase | Outcome |
 |---|---|
-| 0 Baseline | Reference behaviour, tests and dry run recorded (`docs/phase-0-baseline.md`) |
+| 0 Baseline | Reference behaviour, tests and dry run recorded (`docs/history.md`) |
 | 1 Safe hygiene | OS junk removed, documentation and contributor guide added |
 | 2 Environment alignment | One Python/R/Quarto/TinyTeX contract with CI checks |
 | 3 Canonical data | `data/reference/` made the single data root, with a migration manifest |
