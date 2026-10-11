@@ -12,7 +12,7 @@ authors:
     orcid: "https://orcid.org/0009-0007-1457-272X"
   - family-names: "Suthar"
     given-names: "Nisha"
-    repository-code: "https://github.com/LarsEBaumann/Health_Report_Generator"
+repository-code: "https://github.com/LarsEBaumann/Health_Report_Generator"
 abstract: >-
   A reproducible, parameterised reporting workflow that turns FOPH Infectious
   Diseases Dashboard exports into interactive HTML reports for researchers,
