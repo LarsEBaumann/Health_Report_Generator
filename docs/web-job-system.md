@@ -686,3 +686,43 @@ Limitations:
   implemented automatic production cleanup policy.
 - Resource-budget enforcement, persistent service operation, artifact
   access and retention remain pending.
+
+## Private stakeholder configuration for custom renders
+
+Recorded: 2026-10-11
+
+Implemented:
+- Workflow accepts an optional stakeholder_dir setting.
+- Ordinary report generation retains the existing shared directory
+  as its default.
+- Workflow ID checks and analysis inputs use the configured directory.
+- Custom renders create generated stakeholder JSON and the workflow
+  override in a private temporary directory beneath the render workspace.
+- Custom renders pass that private directory to Snakemake.
+- Normal render success and failure remove the private configuration
+  directory.
+- Custom rendering no longer writes generated settings into the shared
+  stakeholder configuration directory.
+
+Evidence:
+- Mocked renderer launches verified the private JSON, workflow override,
+  output path, snapshot path and HTML-only environment.
+- Private configuration was removed after normal success and failure.
+- Shared stakeholder JSON files remained unchanged.
+- Snakemake dry runs loaded the default stakeholder directory.
+- Snakemake dry runs loaded a private stakeholder configuration without
+  a corresponding shared file.
+- Private stakeholder filename/ID mismatch was rejected.
+- 15 focused tests passed in 7.12 seconds.
+- Complete regression suite: 259 passed in 29.06 seconds.
+
+Limitations:
+- Dry runs establish workflow loading and job-graph construction,
+  not successful real rendering.
+- Successful real rendering and forced termination with private
+  stakeholder configuration remain separate verification gates.
+- Abrupt termination may leave private temporary files until container
+  teardown; this increment does not implement durable retention.
+- Historical shared-directory leftovers are not swept or deleted.
+- Resource-budget enforcement, persistent service operation, artifact
+  access and retention remain pending.

@@ -68,33 +68,46 @@ def test_invalid_request_renders_nothing(setup):
     assert calls == []
 
 
-@pytest.fixture
-def stakeholder_dir(tmp_path, monkeypatch):
-    d = tmp_path / "stakeholders"
-    d.mkdir()
-    monkeypatch.setattr(cr, "STAKEHOLDER_DIR", d)
-    return d
 
-
-def test_temp_stakeholder_removed_after_success(stakeholder_dir, tmp_path, monkeypatch):
+@pytest.mark.parametrize("fail", [False, True])
+def test_private_stakeholder_removed_after_render(tmp_path, monkeypatch, fail):
     seen = {}
+    shared = ROOT / "scripts/health_pipeline/config/stakeholders"
+    before = {p.name: p.read_bytes() for p in shared.glob("*.json")}
 
     def fake_run(cmd, **kwargs):
-        seen["files"] = [p.name for p in stakeholder_dir.iterdir()]
-        seen["cmd"] = cmd
+        cfg_path = Path(cmd[-1])
+        config = json.loads(cfg_path.read_text())
+        private = Path(config["stakeholder_dir"])
+        seen["private"] = private
+        seen["config"] = config
+        assert private.parent == tmp_path
+        assert private != shared
+        assert cfg_path.parent == private
+        assert json.loads((private / "custom_abc123.json").read_text()) == {
+            "years": [2022, 2025], "id": "custom_abc123",
+        }
+        assert config["stakeholders"] == ["custom_abc123"]
+        assert config["out"] == str(tmp_path / "results")
+        assert config["snapshot_manifest"] == str(tmp_path / "m.json")
+        assert cmd[:2] == ["snakemake", "html"]
+        assert kwargs["env"]["HEALTH_REPORT_HTML_ONLY"] == "1"
+        if fail:
+            raise cr.subprocess.CalledProcessError(1, cmd)
 
     monkeypatch.setattr(cr.subprocess, "run", fake_run)
-    cr.snakemake_render({"years": [2022, 2025]}, "custom_abc123", tmp_path / "m.json", tmp_path / "results")
-    assert seen["files"] == ["custom_abc123.json"]
-    assert seen["cmd"][:2] == ["snakemake", "html"]
-    assert list(stakeholder_dir.iterdir()) == []
+    if fail:
+        with pytest.raises(cr.subprocess.CalledProcessError):
+            cr.snakemake_render(
+                {"years": [2022, 2025]}, "custom_abc123",
+                tmp_path / "m.json", tmp_path / "results",
+            )
+    else:
+        result = cr.snakemake_render(
+            {"years": [2022, 2025]}, "custom_abc123",
+            tmp_path / "m.json", tmp_path / "results",
+        )
+        assert result == tmp_path / "results/reports/custom_abc123"
 
-
-def test_temp_stakeholder_removed_after_failed_render(stakeholder_dir, tmp_path, monkeypatch):
-    def failing_run(cmd, **kwargs):
-        raise cr.subprocess.CalledProcessError(1, cmd)
-
-    monkeypatch.setattr(cr.subprocess, "run", failing_run)
-    with pytest.raises(cr.subprocess.CalledProcessError):
-        cr.snakemake_render({"years": [2022, 2025]}, "custom_abc123", tmp_path / "m.json", tmp_path / "results")
-    assert list(stakeholder_dir.iterdir()) == []
+    assert not seen["private"].exists()
+    assert {p.name: p.read_bytes() for p in shared.glob("*.json")} == before

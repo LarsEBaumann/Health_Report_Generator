@@ -16,28 +16,34 @@ import request_cache as rc
 from common import write_json
 
 ROOT = rc.ROOT
-STAKEHOLDER_DIR = ROOT / 'scripts/health_pipeline/config/stakeholders'
 
 
 def snakemake_render(request, rid, manifest_path, work_out):
-    """Render through the shared template; the request becomes a temporary audience."""
-    stakeholder_file = STAKEHOLDER_DIR / f'{rid}.json'
-    cfg_file = Path(work_out).parent / 'workflow_override.yaml'
-    cfg_file.write_text(
-        f'out: {json.dumps(str(work_out))}\n'
-        f'stakeholders: [{rid}]\n'
-        f'snapshot_manifest: {json.dumps(str(manifest_path))}\n'
-    )
-    try:
-        write_json(stakeholder_file, {**request, 'id': rid})
-        subprocess.run(
-            ['snakemake', 'html', '--cores', '2', '--configfile', str(cfg_file)],
-            cwd=ROOT, check=True,
-            env={**os.environ, 'HEALTH_REPORT_HTML_ONLY': '1'},
+    """Render with private audience settings, never shared generated config."""
+    work_out = Path(work_out).resolve()
+    manifest_path = Path(manifest_path).resolve()
+    with tempfile.TemporaryDirectory(
+        prefix="stakeholder-", dir=work_out.parent
+    ) as temporary:
+        stakeholder_dir = Path(temporary)
+        stakeholder_file = stakeholder_dir / f"{rid}.json"
+        cfg_file = stakeholder_dir / "workflow_override.yaml"
+        write_json(stakeholder_file, {**request, "id": rid})
+        cfg_file.write_text(
+            json.dumps({
+                "out": str(work_out),
+                "stakeholders": [rid],
+                "stakeholder_dir": str(stakeholder_dir),
+                "snapshot_manifest": str(manifest_path),
+            }, sort_keys=True, indent=2) + "\n",
+            encoding="utf-8",
         )
-    finally:
-        stakeholder_file.unlink(missing_ok=True)
-    return Path(work_out) / 'reports' / rid
+        subprocess.run(
+            ["snakemake", "html", "--cores", "2", "--configfile", str(cfg_file)],
+            cwd=ROOT, check=True,
+            env={**os.environ, "HEALTH_REPORT_HTML_ONLY": "1"},
+        )
+    return work_out / "reports" / rid
 
 
 def build_custom(request_path, data_root, out, cache, render=snakemake_render):

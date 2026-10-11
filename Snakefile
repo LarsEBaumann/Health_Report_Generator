@@ -10,10 +10,11 @@ OUT = config['out'].rstrip('/')
 STAKEHOLDERS = config['stakeholders']
 PYTHON = sys.executable
 QUARTO = config.get('quarto', 'quarto')
+STAKEHOLDER_DIR = Path(config.get('stakeholder_dir', f'{P}/config/stakeholders'))
+CONFIGS = {s: str(STAKEHOLDER_DIR / f'{s}.json') for s in STAKEHOLDERS}
 for s in STAKEHOLDERS:
-    if json.loads(Path(f'{P}/config/stakeholders/{s}.json').read_text())['id'] != s:
+    if json.loads(Path(CONFIGS[s]).read_text())['id'] != s:
         raise ValueError('Stakeholder filename and id must match')
-CONFIGS = {s: f'{P}/config/stakeholders/{s}.json' for s in STAKEHOLDERS}
 BUNDLE_NAMES = ['series.csv','metrics.csv','lineage.csv','selection.csv','sources.csv','checks.csv',
                 'snapshot.json','stakeholder.json','pathogen_class.csv','bundle.json']
 ANALYSIS = expand(OUT+'/reports/{s}/data/{n}',s=STAKEHOLDERS,n=BUNDLE_NAMES)
