@@ -50,6 +50,8 @@ For native setup, diagnostics, and reproduction checks, see
 [GETTING_STARTED.md](GETTING_STARTED.md).
 The optional fork-backed Marimo interface is a separate path described in
 [CONNECTOR_SETUP.md](CONNECTOR_SETUP.md); it is not required for local reports.
+It depends on GitHub Actions and a user token, and each request is rendered
+from scratch. It does not use the custom-report cache.
 
 ## What you get
 
@@ -74,7 +76,7 @@ docker compose run --rm report python scripts/health_pipeline/custom_report.py \
 
 The last line printed is either `cache miss: key=<sha256> -> <folder>` or `cache hit: key=<sha256> -> <folder>`.
 
-**Cache.** Finished reports are stored in `results/cache/custom_reports/`. The cache key is a SHA-256 over the request, the data snapshot id, the report code hash, the toolchain hash and the schema version. An identical request returns the stored report in seconds, with its original provenance and render time. A different request, a data refresh or a template change produces a new key and a new render. The cache is local to one machine and grows with each distinct request. You can delete `results/cache/` at any time; the next run simply renders again.
+**Cache.** Finished reports are stored in `results/cache/custom_reports/`. The cache key is a SHA-256 over the request, the data snapshot id, the report code hash, the toolchain hash and the schema version. An identical request returns the stored report in seconds, with its original provenance and render time. A different request, a data refresh or a template change produces a new key and a new render. The cache is local to one machine and grows with each distinct request. It is used by `custom_report.py` only, not by the optional Marimo interface. You can delete `results/cache/` at any time; the next run simply renders again.
 
 **Output.** The `--out` folder is replaced on every run and holds `report.html`, `methods.html`, `provenance.json` and `request_provenance.json`. In `provenance.json`, `filters` and `effective_parameters` record the years and other settings that were applied. `request_provenance.json` records `cache_key`, the key components (including `code_hash`) and `rendered_utc`.
 

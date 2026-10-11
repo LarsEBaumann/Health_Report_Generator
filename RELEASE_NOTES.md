@@ -38,7 +38,7 @@ Reproducible, parameterised reporting of FOPH Infectious Diseases Dashboard data
 - `scripts/health_pipeline/custom_report.py` builds one report from a request file through the shared template. See the README section "Custom reports" and `examples/request-2022-2025.json`.
 - Finished reports are cached under `results/cache/custom_reports/`. The key covers the request, snapshot id, code hash, toolchain hash and schema version, so a data or template change never serves a stale report.
 - Each custom report carries `provenance.json` and `request_provenance.json` (cache key, key components, render time).
-- Custom reports are not part of `results/release.json`. The cache is local to one machine and has no eviction.
+- Custom reports are not part of `results/release.json`. The cache is local to one machine and has no eviction. It is used by `custom_report.py` only, not by the optional Marimo interface.
 
 ### Known limitations
 
