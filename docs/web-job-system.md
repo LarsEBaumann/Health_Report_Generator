@@ -177,3 +177,41 @@ Limitations:
 - Staging, locks, database files and publication metadata are not public routes.
 - Real worker integration, container crash containment, resource budgets,
   artifact access/retention and end-to-end load rehearsal remain pending.
+
+## Single-job worker integration
+
+Recorded: 2026-10-11
+
+Implemented:
+- Acquire worker ownership and reconcile interrupted state.
+- Claim at most one queued job per operation.
+- Create a fresh private job workspace and request file.
+- Invoke the renderer through the existing process supervisor.
+- Pass the worker ownership descriptor to the supervised process.
+- Publish verified successful output before persisting completion.
+- Persist sanitized render timeout, render failure, invalid report
+  and publication conflict codes.
+- Leave unexpected infrastructure errors recoverable through startup
+  reconciliation rather than misclassifying published output as failed.
+
+Evidence:
+- Synthetic renderer uses the actual supervisor and publication code.
+- Successful publication and completion persisted after database reopening.
+- Renderer failure, timeout and invalid output were tested.
+- Empty queue did not launch a renderer.
+- Processing one job preserved the next queued job.
+- Simulated completion-persistence failure left verified publication
+  recoverable as completed.
+- Invalid timeout configuration did not claim a queued job.
+- 28 worker/publication/recovery/session tests passed in 4.46 seconds.
+- Complete regression suite: 232 passed in 24.76 seconds.
+
+Limitations:
+- This increment exposes an internal Python operation, not a worker CLI
+  or a persistent service loop.
+- Renderer overrides and filesystem paths are trusted internal
+  configuration and must not come from client requests.
+- Synthetic worker tests do not establish successful queued Quarto
+  rendering or real worker-container crash containment.
+- Resource budgets, log-size limits, artifact access/retention and
+  end-to-end load rehearsal remain pending.
