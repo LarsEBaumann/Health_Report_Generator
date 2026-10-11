@@ -215,3 +215,48 @@ Limitations:
   rendering or real worker-container crash containment.
 - Resource budgets, log-size limits, artifact access/retention and
   end-to-end load rehearsal remain pending.
+
+## Real queued-report experiment
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-worker-gofAxq
+- Request: existing public stakeholder configuration, validated through
+  analyse.load_config.
+- Job ID: eb162ed2c4904758896a37ad159315dc
+- Request key:
+  fdd6d59ce632c4755f595b5f4bbf90475b363347fe9ea87a5f0a533ec801ba86
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Fresh experiment-local database, private workspace, publication root
+  and report cache.
+
+Verified:
+- Duplicate submission while queued reused the active job.
+- run_one invoked the actual custom_report.py renderer through the
+  process supervisor.
+- Renderer log confirmed a report-cache miss.
+- Rendered cache identity matched the submitted request key.
+- Published manifest and all 14 report-file hashes verified.
+- Completed state persisted after reopening SQLite.
+- An empty-queue operation did not rerender, alter the completed record,
+  change the publication manifest or modify the render log.
+- Working tree remained clean after the experiment.
+
+Artifacts:
+- Database:
+  results/web-worker-gofAxq/state/jobs.sqlite3
+- Published report:
+  results/web-worker-gofAxq/published/eb162ed2c4904758896a37ad159315dc
+- Private render log:
+  results/web-worker-gofAxq/private/eb162ed2c4904758896a37ad159315dc/render.log
+
+Limitations:
+- This demonstrates successful real queued rendering, not forced
+  worker-container crash containment.
+- Identity equality was checked after rendering; snapshot pinning
+  and pre-completion identity enforcement remain separate work.
+- No HTTP interface, persistent worker service, resource-budget
+  enforcement or artifact-access policy was established by this experiment.
