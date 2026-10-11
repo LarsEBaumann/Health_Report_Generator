@@ -838,3 +838,122 @@ Status and limitations:
 - Private temporary files are not required to survive container removal.
 - Host power loss, resource-budget enforcement, persistent service
   operation, artifact access and retention remain separate work.
+
+## Bounded worker configuration and measured real rendering
+
+Recorded: 2026-10-11
+Implementation checkpoint: 64ec658
+Documentation checkpoint at experiment start: e3c7123
+
+Configuration:
+- Dedicated launch file: compose.worker.yaml
+- Inherits the report service's build definition, runtime environment,
+  UID/GID mapping, working directory and project bind mount.
+- Requires HEALTH_REPORT_WORKER_IMAGE to select an existing tested image.
+- pull_policy: never; rehearsal launches also used --pull never.
+- Actual worker_once.py entry point launched directly as PID 1.
+- No configured entry-point wrapper or separate init wrapper.
+- Private container PID namespace, nonprivileged launch, no restart.
+- Initial CPU quota: 2 CPUs.
+- Hard memory limit: 4 GiB.
+- Total memory-plus-swap limit: 4 GiB; additional container swap disabled.
+- PID limit: 256, including threads counted by the controller.
+- /tmp: 1 GiB tmpfs with rw,nosuid,nodev,mode=1777.
+- OMP_NUM_THREADS, OPENBLAS_NUM_THREADS and MKL_NUM_THREADS: 2.
+- Docker json-file logs: max-size 10m, max-file 3.
+- Worker timeout: 600 seconds; supervisor grace: 1 second.
+- Job root defaults to /app/results/web-jobs and can be selected through
+  HEALTH_REPORT_JOB_ROOT.
+- Timeout can be selected through HEALTH_REPORT_WORKER_TIMEOUT.
+- These are provisional single-worker rehearsal budgets, not measured
+  production requirements.
+
+Runtime resource probe:
+- Retained container:
+  health-report-worker-resource-probe-1791740124-11298
+- Verified Python ran as PID 1.
+- Container-visible cpu.max: 200000 100000.
+- Container-visible memory.max: 4294967296.
+- Container-visible memory.swap.max: 0.
+- Container-visible pids.max: 256.
+- Verified /tmp capacity and configured thread environment.
+- Docker inspection matched the intended resource configuration.
+- Exit code: 0; OOMKilled: false.
+
+Real-render experiment:
+- Workspace: results/web-resource-budget-oefWtt
+- Dedicated container:
+  health-report-budget-web-resource-budget-oefWtt
+- Tested image: health_report_generator-report
+- Image ID:
+  sha256:a17cbf9837bd839e06caa3ee6ece96514dce3d2b0c3fc10d271de421fbf89ba3
+- Job ID: aa00541be70843bab1b666b652ef7427
+- Request key:
+  4c4204b6ab945a4f4d682ef7b7829eb101d81937a4b832d8461c4b8d85989ca2
+- Snapshot ID:
+  d0709708a8057815801497701bfaa145017979f1ecace4508ae46237438573ee
+- Validated public request for reporting window 2021-2025.
+- Fresh experiment-local queue, publication root and rendered-report cache.
+- Snapshot preparation used the renderer's canonical snapshot layout
+  and request-key calculation.
+- Actual worker launched through compose.worker.yaml.
+
+Verified:
+- All observed PID-1 commands matched the intended worker invocation.
+- Applied Docker configuration and observed cgroup limits matched budgets.
+- Actual rendering completed with a fresh rendered-report cache miss.
+- Rendered cache identity and identity components matched the queued job.
+- Completed state persisted after database reopening.
+- Publication verification and all 14 report-file hashes passed.
+- Shared stakeholder JSON inventory, hashes, sizes and modification times
+  remained unchanged.
+- Container log contained exactly the approved successful job summary.
+- Worker exit code: 0; OOMKilled: false.
+- Monitoring diagnostics were empty.
+- Only the intended new Compose file and documentation were introduced;
+  experiment artifacts remain under results/.
+
+Observed measurements:
+- Container elapsed time: 37.067 seconds.
+- Resource samples: 17.
+- Maximum observed kernel memory peak: 928616448 bytes.
+- Maximum sampled memory.current: 925716480 bytes.
+- Maximum sampled /tmp usage: 5459968 bytes.
+- Maximum sampled process/thread count: 26.
+- Observed memory max, oom, oom_kill and oom_group_kill counters: all zero.
+- Last observed CPU usage: 39411833 microseconds.
+- Last observed throttled CPU periods: 7 of 366 periods.
+- Last observed CPU throttled time: 258804 microseconds.
+
+Retained evidence:
+- experiment.json and validated-request.json
+- shared-config-before.json
+- state/jobs.sqlite3
+- cache/snapshot/snapshot.json and rendered cache entry
+- private/aa00541be70843bab1b666b652ef7427/render.log
+- Private report bundle and published report bundle
+- container-inspect-start.json and container-inspect.json
+- container.log and exit-code.txt
+- resource-samples.jsonl and monitor-errors.log
+- observed-elapsed-seconds.txt and verification.json
+- All files above remain under results/web-resource-budget-oefWtt.
+- Stopped dedicated worker and resource-probe containers retained.
+
+Status and limitations:
+- Resource-limit configuration and successful real rendering under those
+  limits are verified for this request and snapshot.
+- This supersedes earlier pending resource-budget verification notes only
+  for configuration enforcement and the tested successful-render path.
+- One public request was tested; no concurrency or production-sizing claim.
+- Sampling adds observation overhead.
+- Sampled temporary-storage and PID maxima may miss brief peaks.
+- The last observed kernel memory peak may omit final activity.
+- Shared configuration was checked before and after, not continuously.
+- No forced memory, PID or temporary-storage exhaustion was rehearsed.
+- This increment does not establish resource-exhaustion recovery,
+  whole-container OOM behavior or timeout behavior under these budgets.
+- /tmp limits do not bound bind-mounted database, cache, private renderer
+  logs or published-report growth.
+- Docker log rotation is separate from private render.log retention.
+- Persistent worker operation, artifact access, concurrency policy,
+  persistent-storage retention and host power loss remain separate work.
