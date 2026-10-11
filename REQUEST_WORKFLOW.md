@@ -16,13 +16,14 @@ The example requests influenza mandatory surveillance and Lyme Sentinella, indep
 {
   "schema_version": "1.0",
   "request_id": "my-report-001",
+  "lineage_run_id": "123456789",
   "audience": "researcher",
   "datasets": ["INFLUENZA_oblig", "INFLUENZA_sentinella", "LYME_sentinella"],
   "formats": ["html", "pdf"]
 }
 ```
 
-Audience is `researcher`, `public_health_expert`, or `general_public`. Formats are `html` and/or `pdf`. Request IDs use letters, numbers, hyphens or underscores. Unknown fields, duplicate JSON keys and repeated dataset IDs are rejected. The schema is in `workflow/request.schema.json`.
+Audience is `researcher`, `health_institution`, or `public`, matching the Marimo interface. `lineage_run_id` records the upstream data-run reference selected by Marimo; the request workflow still fingerprints and verifies the snapshot it actually analyses. Formats are `html` and/or `pdf`. Request IDs use letters, numbers, hyphens or underscores. Unknown fields, duplicate JSON keys and repeated dataset IDs are rejected. The schema is in `workflow/request.schema.json`.
 
 Dataset IDs identify exports, not broad disease groups: mandatory influenza and Sentinella influenza remain separate. The generated `data/catalogue.csv` lists available IDs and source identities. Exact duplicate download folders ending in ` (1)`, ` (2)`, etc. resolve to the same ID only when their source identities agree; conflicting exports fail.
 
@@ -67,7 +68,7 @@ Keep the output directory between local runs. A fresh GitHub-hosted runner curre
 
 ## GitHub Actions handoff (Marimo colleague)
 
-The new `request-report.yml` workflow accepts one string input, `request_json`, containing the same JSON. It parses that input as data; it does not insert it into shell code. Dispatch the workflow with the intended branch as `ref`. GitHub requires a dispatchable workflow to exist on the default branch; adding it only on a test branch may not expose a Run workflow button until it is merged there.
+`request-report.yml` accepts Marimo's existing inputs: `request_id`, `lineage_run_id`, `audience`, and `dataset_ids_json`. It also accepts optional `formats_json`, defaulting to HTML and PDF. The workflow constructs and validates the internal request JSON as data; it does not insert user values into shell code. Dispatch the workflow with the intended branch as `ref`. GitHub requires a dispatchable workflow to exist on the default branch; adding it only on a test branch may not expose a Run workflow button until it is merged there.
 
 The artifact also includes the frozen raw snapshot, but excludes the prepared-data cache. After a successful run, download `requested-health-report-<run_id>` and locate `result.json`. Use its HTML path to display the report. Poll run completion before downloading; a submitted request is not a successful report. Keep tokens in the local Marimo server or another backend, never in static HTML or committed JSON.
 

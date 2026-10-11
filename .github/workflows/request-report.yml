@@ -4,9 +4,27 @@ on:
     branches: [test]
   workflow_dispatch:
     inputs:
-      request_json:
-        description: 'Request v1.0 JSON: schema_version, request_id, audience, datasets, formats'
+      request_id:
+        description: Unique Marimo request identifier
         required: true
+        type: string
+      lineage_run_id:
+        description: Marimo's selected upstream data-run identifier
+        required: true
+        type: string
+      audience:
+        description: Report audience selected in Marimo
+        required: true
+        type: choice
+        options: [researcher, health_institution, public]
+      dataset_ids_json:
+        description: JSON array of Marimo dataset IDs
+        required: true
+        type: string
+      formats_json:
+        description: JSON array of requested formats; Marimo may omit this field
+        required: false
+        default: '["html", "pdf"]'
         type: string
 permissions:
   contents: read
@@ -46,19 +64,30 @@ jobs:
           quarto --version
       - name: Validate request
         env:
-          REQUEST_JSON: ${{ inputs.request_json }}
           REQUEST_EVENT: ${{ github.event_name }}
+          REQUEST_ID: ${{ inputs.request_id }}
+          LINEAGE_RUN_ID: ${{ inputs.lineage_run_id }}
+          AUDIENCE: ${{ inputs.audience }}
+          DATASET_IDS_JSON: ${{ inputs.dataset_ids_json }}
+          FORMATS_JSON: ${{ inputs.formats_json }}
         run: |
           python - <<'PY'
-          import os, sys
+          import json, os, sys
           from pathlib import Path
           sys.path.insert(0, 'scripts/health_pipeline')
           from request_pipeline import read_request
           if os.environ['REQUEST_EVENT'] == 'push':
-              request_text = Path('examples/requests/public-health.json').read_text()
+              request = json.loads(Path('examples/requests/public-health.json').read_text())
           else:
-              request_text = os.environ['REQUEST_JSON']
-          Path('request.json').write_text(request_text)
+              request = {
+                  'schema_version': '1.0',
+                  'request_id': os.environ['REQUEST_ID'],
+                  'lineage_run_id': os.environ['LINEAGE_RUN_ID'],
+                  'audience': os.environ['AUDIENCE'],
+                  'datasets': json.loads(os.environ['DATASET_IDS_JSON']),
+                  'formats': json.loads(os.environ['FORMATS_JSON']),
+              }
+          Path('request.json').write_text(json.dumps(request, indent=2) + '\n')
           request = read_request('request.json')
           print('Audience:', request['audience'])
           print('Datasets:', ', '.join(request['datasets']))

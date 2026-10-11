@@ -147,14 +147,16 @@ def analyse_request(prepared, request_path, snapshot_path, dest):
     resolved, all_series, all_checks, coverage, source_rows = [], [], [], [], []
     seen = set()
     for name in request['datasets']:
-        candidates = cat[cat.dataset == name]
+        # Marimo supplies canonical dataset IDs; local JSON remains convenient
+        # with public folder IDs. Both resolve to exactly one checked export.
+        candidates = cat[(cat.dataset == name) | (cat.dataset_id == name)]
         if candidates.empty:
-            raise ValueError(f'Unknown dataset: {name}; inspect catalogue.csv')
+            raise ValueError(f'Unknown dataset ID: {name}; inspect catalogue.csv')
         if (candidates.status == 'quarantined').any():
             raise ValueError(f'{name}: quarantined input: ' + '; '.join(candidates.detail))
         ids = candidates.dataset_id.unique()
         if len(ids) != 1:
-            raise ValueError(f'{name}: ambiguous folder identifier; multiple distinct datasets')
+            raise ValueError(f'{name}: ambiguous dataset identifier; multiple distinct datasets')
         ds = ids[0]
         if ds in seen:
             raise ValueError(f'{name}: duplicates an already selected export; select it only once')

@@ -30,11 +30,11 @@ def request_project(tmp_path):
     return raw, tmp_path / 'prepared', tmp_path / 'request.json', tmp_path / 'bundle'
 
 
-def prepare(project, datasets=None, audience='public_health_expert'):
+def prepare(project, datasets=None, audience='health_institution'):
     raw, prepared, request, dest = project
     harmonise([str(raw), '--out', str(prepared)])
     seal_prepared(prepared)
-    request.write_text(json.dumps({'schema_version': '1.0', 'request_id': 'test', 'audience': audience,
+    request.write_text(json.dumps({'schema_version': '1.0', 'request_id': 'test', 'lineage_run_id': 'local-test', 'audience': audience,
                                   'datasets': datasets or ['alpha'], 'formats': ['html']}))
     return prepared, request, prepared / 'snapshot.json', dest
 
@@ -58,7 +58,7 @@ def test_audience_does_not_change_values(request_project):
     args = prepare(request_project)
     analyse_request(*args)
     first = (args[-1] / 'series.csv').read_bytes()
-    req = json.loads(args[1].read_text()); req['audience'] = 'general_public'
+    req = json.loads(args[1].read_text()); req['audience'] = 'public'
     args[1].write_text(json.dumps(req))
     analyse_request(*args)
     assert (args[-1] / 'series.csv').read_bytes() == first
@@ -75,7 +75,7 @@ def test_invalid_requests(request_project, field, value):
 
 
 def test_duplicate_json_fields(request_project):
-    p = request_project[2]; p.write_text('{"audience":"researcher","audience":"general_public"}')
+    p = request_project[2]; p.write_text('{"audience":"researcher","audience":"public"}')
     with pytest.raises(ValueError, match='Duplicate JSON'): read_request(p)
 
 
@@ -83,6 +83,16 @@ def test_unknown_dataset_not_silently_dropped(request_project):
     args = prepare(request_project, ['alpha', 'unknown'])
     with pytest.raises(ValueError, match='Unknown dataset'): analyse_request(*args)
     assert not (args[-1] / 'bundle.json').exists()
+
+
+def test_marimo_canonical_dataset_id_is_accepted(request_project):
+    args = prepare(request_project)
+    dataset_id = pd.read_csv(args[0] / 'datasets.csv').query("source_file == 'alpha/data.csv'").iloc[0].dataset_id
+    request = json.loads(args[1].read_text())
+    request['datasets'] = [dataset_id]
+    args[1].write_text(json.dumps(request))
+    analyse_request(*args)
+    assert pd.read_csv(args[-1] / 'selection.csv').iloc[0].dataset_id == dataset_id
 
 
 def test_unselected_quarantine_does_not_block(request_project):
@@ -227,7 +237,7 @@ def test_fresh_runner_reuses_preparation_for_new_selection(request_project, tmp_
     config.write_text(json.dumps({'data_root': str(raw), 'out': str(out)}))
     plan = cache_plan(config)
     request.write_text(json.dumps({'schema_version': '1.0', 'request_id': 'first',
-                                  'audience': 'public_health_expert', 'datasets': ['alpha'], 'formats': ['html']}))
+                                  'lineage_run_id': 'local-test', 'audience': 'health_institution', 'datasets': ['alpha'], 'formats': ['html']}))
     # Use repository paths for code; each output root has independent rule outputs.
     command = [sys.executable, '-m', 'snakemake', 'request_analyse', '--cores', '1',
                '--config', f'request_file={request}', f'snapshot_manifest={plan["snapshot"]}', f'out={out}']
