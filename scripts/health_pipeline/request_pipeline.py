@@ -6,6 +6,7 @@ import platform
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import os
 from datetime import datetime, timezone
@@ -246,7 +247,7 @@ def source_commit():
     return commit
 
 
-def render(bundle, fmt, output, quarto='quarto'):
+def render(bundle, fmt, output, quarto='quarto', prepared=None):
     bundle, output = Path(bundle), Path(output)
     manifest = json.loads((bundle / 'bundle.json').read_text())
     for n in BUNDLE_FILES:
@@ -255,7 +256,17 @@ def render(bundle, fmt, output, quarto='quarto'):
     request = read_request(bundle / 'request.json')
     if fmt not in request['formats']:
         raise ValueError(f'Format {fmt} was not requested')
+    if prepared is not None:
+        verify_prepared(prepared, manifest['snapshot_id'])
     commit = source_commit()
+    isha_html = request['audience'] in {'researcher', 'health_institution'} and fmt == 'html'
+    code_paths = [HERE / n for n in ['request_pipeline.py', 'harmonise.py', 'checks.py', 'inventory.py', 'common.py', 'templates/request_report.qmd', 'requirements.lock.txt']]
+    code_paths += [REPO / n for n in ['renv.lock', 'Snakefile', 'workflow/request.smk', 'workflow/request.schema.json']]
+    if isha_html:
+        if prepared is None:
+            raise ValueError('Isha HTML reports require the verified prepared-data directory')
+        code_paths.append(HERE / 'isha_report_adapter.py')
+        code_paths += sorted((REPO / 'reporting/isha/source').rglob('*'))
     provenance = {'schema_version': '1.0', 'request': request, 'snapshot_id': manifest['snapshot_id'],
                   'filters': json.loads((bundle / 'resolved_settings.json').read_text()),
                   'sources': pd.read_csv(bundle / 'sources.csv').fillna('').to_dict('records'),
@@ -264,39 +275,48 @@ def render(bundle, fmt, output, quarto='quarto'):
                                'python': platform.python_version(), 'pandas': pd.__version__,
                                'quarto': subprocess.check_output([quarto, '--version'], text=True).strip(),
                                'r': subprocess.check_output(['Rscript', '-e', 'cat(R.version.string)'], text=True).strip()},
-                  'code_sha256': {str(p.relative_to(REPO)): digest(p) for p in
-                                  [HERE / n for n in ['request_pipeline.py', 'harmonise.py', 'checks.py', 'inventory.py', 'common.py', 'templates/request_report.qmd', 'requirements.lock.txt']]
-                                  + [REPO / n for n in ['renv.lock', 'Snakefile', 'workflow/request.smk', 'workflow/request.schema.json']]},
+                  'renderer': 'isha_quarto_template' if isha_html else 'request_report_template',
+                  'code_sha256': {str(p.relative_to(REPO)): digest(p) for p in code_paths if p.is_file()},
                   'bundle_sha256': digest(bundle / 'bundle.json')}
-    with tempfile.TemporaryDirectory() as tmp:
-        tmp = Path(tmp)
-        for n in BUNDLE_FILES:
-            shutil.copyfile(bundle / n, tmp / n)
-        shutil.copyfile(HERE / 'templates/request_report.qmd', tmp / 'report.qmd')
-        write_json(tmp / 'provenance.json', provenance)
-        # HTML has a machine-readable embedded record; PDF has a JSON text appendix.
-        record = json.dumps(provenance, ensure_ascii=True).replace('<', '\\u003c')
-        (tmp / 'provenance.html').write_text('<script id="report-provenance" type="application/json">' + record + '</script>')
-        env = dict(os.environ, HEALTH_REPORT_PROJECT=str(REPO), R_PROFILE_USER=str(REPO / '.Rprofile'))
-        subprocess.run([quarto, 'render', 'report.qmd', '--to', fmt], cwd=tmp, env=env, check=True)
-        output.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(tmp / f'report.{fmt}', output)
-        write_json(output.with_suffix(f'.{fmt}.provenance.json'), provenance)
+    if isha_html:
+        subprocess.run([sys.executable, str(HERE / 'isha_report_adapter.py'),
+                        '--bundle', str(bundle), '--prepared', str(prepared), '--output', str(output),
+                        '--quarto', quarto], check=True)
+    else:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            for n in BUNDLE_FILES:
+                shutil.copyfile(bundle / n, tmp / n)
+            shutil.copyfile(HERE / 'templates/request_report.qmd', tmp / 'report.qmd')
+            write_json(tmp / 'provenance.json', provenance)
+            # HTML has a machine-readable embedded record; PDF has a JSON text appendix.
+            record = json.dumps(provenance, ensure_ascii=True).replace('<', '\\u003c')
+            (tmp / 'provenance.html').write_text('<script id="report-provenance" type="application/json">' + record + '</script>')
+            env = dict(os.environ, HEALTH_REPORT_PROJECT=str(REPO), R_PROFILE_USER=str(REPO / '.Rprofile'))
+            subprocess.run([quarto, 'render', 'report.qmd', '--to', fmt], cwd=tmp, env=env, check=True)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(tmp / f'report.{fmt}', output)
+    write_json(output.with_suffix(f'.{fmt}.provenance.json'), provenance)
 
 
 def release(dest, formats):
     dest = Path(dest)
     paths = [dest / f'report.{f}' for f in formats] + [dest / f'report.{f}.provenance.json' for f in formats]
+    paths += [dest / f'report.{f}.template-provenance.json' for f in formats]
     source = dest / 'render-source'
     source.mkdir(parents=True, exist_ok=True)
     for n in BUNDLE_FILES:
         shutil.copyfile(dest / 'data' / n, source / n)
-    shutil.copyfile(HERE / 'templates/request_report.qmd', source / 'report.qmd')
+    shutil.copyfile(HERE / 'templates/request_report.qmd', source / 'request_report.qmd')
+    request = json.loads((dest / 'data/request.json').read_text())
+    if request['audience'] in {'researcher', 'health_institution'}:
+        shutil.copytree(REPO / 'reporting/isha/source', source / 'isha', dirs_exist_ok=True)
+        shutil.copyfile(HERE / 'isha_report_adapter.py', source / 'isha_report_adapter.py')
     record = json.loads((dest / f'report.{formats[0]}.provenance.json').read_text())
     write_json(source / 'provenance.json', record)
     (source / 'provenance.html').write_text('<script id="report-provenance" type="application/json">' +
                                           json.dumps(record).replace('<', '\\u003c') + '</script>')
-    paths += sorted((dest / 'data').glob('*')) + sorted(source.glob('*'))
+    paths += sorted((dest / 'data').glob('*')) + sorted(p for p in source.rglob('*') if p.is_file())
     write_json(dest / 'result.json', {'status': 'success', 'request': json.loads((dest / 'data/request.json').read_text()),
                                     'artifacts': [{'path': p.relative_to(dest).as_posix(), 'sha256': digest(p)} for p in paths if p.is_file()]})
 
@@ -312,11 +332,12 @@ if __name__ == '__main__':
     p = sub.add_parser('render')
     for n in ['bundle', 'format', 'output']: p.add_argument('--' + n, required=True)
     p.add_argument('--quarto', default='quarto')
+    p.add_argument('--prepared')
     p = sub.add_parser('release'); p.add_argument('--dest', required=True); p.add_argument('--formats', nargs='+', required=True)
     args = ap.parse_args()
     if args.command == 'seal': seal_prepared(args.prepared)
     elif args.command == 'cache-plan': cache_plan(args.config)
     elif args.command == 'cache-check': verify_prepared(args.prepared, args.snapshot_id)
     elif args.command == 'analyse': analyse_request(args.prepared, args.request, args.snapshot, args.dest)
-    elif args.command == 'render': render(args.bundle, args.format, args.output, args.quarto)
+    elif args.command == 'render': render(args.bundle, args.format, args.output, args.quarto, args.prepared)
     else: release(args.dest, args.formats)

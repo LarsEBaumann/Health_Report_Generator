@@ -50,16 +50,18 @@ def verify_result(result_path, request):
     assert result['request'] == request
     assert json.loads((root / 'data/request.json').read_text()) == request
     listed = {a['path']: a['sha256'] for a in result['artifacts']}
+    provenance_by_format = {}
     for fmt in request['formats']:
         assert f'report.{fmt}' in listed
         assert f'report.{fmt}.provenance.json' in listed
         provenance = json.loads((root / f'report.{fmt}.provenance.json').read_text())
         assert provenance['request'] == request
+        provenance_by_format[fmt] = provenance
     for name, expected in listed.items():
         path = (root / name).resolve()
         assert path.is_relative_to(root.resolve()), name
         assert path.is_file() and sha(path) == expected, name
-    if 'html' in request['formats']:
+    if 'html' in request['formats'] and provenance_by_format['html']['renderer'] == 'request_report_template':
         html = (root / 'report.html').read_text()
         embedded = re.search(r'<script id="report-provenance" type="application/json">(.*?)</script>', html, re.S)
         assert embedded and json.loads(embedded[1])['request'] == request
@@ -103,7 +105,7 @@ def main():
     timings = {}
     _, timings['regression_tests_seconds'] = run([sys.executable, '-m', 'pytest', '-q'])
     request = json.loads((ROOT / 'examples/requests/public-health.json').read_text())
-    request.update(request_id='image-public-health', audience='public_health_expert', formats=['html'])
+    request.update(request_id='image-public-health', audience='public', formats=['html'])
     path = OUT / 'request.json'
     path.write_text(json.dumps(request))
     command = [sys.executable, '-m', 'snakemake', '--cores', '2', '--config',
@@ -121,6 +123,7 @@ def main():
     matches = list((OUT / 'requests').glob('image-researcher-*/result.json'))
     assert len(matches) == 1
     second = verify_result(matches[0], request)
+    assert (second / 'report.html.template-provenance.json').is_file()
     assert sha(first / 'data/series.csv') == sha(second / 'data/series.csv')
     current_seals = {str(p): (sha(p), p.stat().st_mtime_ns) for p in (OUT / 'cache/prepared').glob('*/prepared.json')}
     assert current_seals == seals, 'Audience-only change unnecessarily repeated preparation'

@@ -71,11 +71,11 @@ rule request_analyse:
     shell: '{PYTHON:q} {P}/request_pipeline.py analyse --prepared {params.prepared:q} --request {input.request:q} --snapshot {input.snapshot:q} --dest {params.dest:q}'
 
 rule request_render:
-    input: bundle=BUNDLE, code=[f'{P}/request_pipeline.py', f'{P}/templates/request_report.qmd', f'{P}/common.py'], env=ENVIRONMENT
+    input: bundle=BUNDLE, prepared=[f'{PREPARED}/{n}' for n in PREP_FILES + ['prepared.json']], code=[f'{P}/request_pipeline.py', f'{P}/isha_report_adapter.py', f'{P}/templates/request_report.qmd', f'{P}/common.py'] + [str(p) for p in sorted(Path('reporting/isha/source').rglob('*')) if p.is_file()], env=ENVIRONMENT
     output: report=DEST + '/report.{fmt}', provenance=DEST + '/report.{fmt}.provenance.json'
     wildcard_constraints: fmt='html|pdf'
-    params: bundle=DEST + '/data'
-    shell: '{PYTHON:q} {P}/request_pipeline.py render --bundle {params.bundle:q} --format {wildcards.fmt:q} --output {output.report:q} --quarto {QUARTO:q}'
+    params: bundle=DEST + '/data', prepared=PREPARED
+    shell: '{PYTHON:q} {P}/request_pipeline.py render --bundle {params.bundle:q} --format {wildcards.fmt:q} --output {output.report:q} --quarto {QUARTO:q} --prepared {params.prepared:q}'
 
 rule request_release:
     input: REPORTS, PROVENANCE, BUNDLE, f'{P}/request_pipeline.py'

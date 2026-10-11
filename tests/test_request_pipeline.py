@@ -95,6 +95,24 @@ def test_marimo_canonical_dataset_id_is_accepted(request_project):
     assert pd.read_csv(args[-1] / 'selection.csv').iloc[0].dataset_id == dataset_id
 
 
+def test_isha_adapter_stages_full_selected_data_without_changing_templates(request_project, tmp_path):
+    """The preserved QMD receives all dimensions, not the request's national-only series."""
+    from isha_report_adapter import stage, SOURCE
+    args = prepare(request_project, ['alpha', 'beta'], audience='health_institution')
+    analyse_request(*args)
+    build = tmp_path / 'isha-build'
+    request, topics = stage(args[-1], args[0], build)
+    staged = pd.read_csv(build / 'results' / 'harmonised.csv')
+    selected = pd.read_csv(args[-1] / 'selection.csv').dataset_id.astype(str).tolist()
+    expected = pd.read_parquet(args[0] / 'harmonised.parquet')
+    expected = expected[expected.dataset_id.isin(selected)]
+    assert len(staged) == len(expected)
+    assert request['audience'] == 'health_institution'
+    assert topics == 'same_topic'
+    assert (build / 'public_health.qmd').read_bytes() == (SOURCE / 'public_health.qmd').read_bytes()
+    assert '"same_topic"' in (build / 'helpers.py').read_text()
+
+
 def test_unselected_quarantine_does_not_block(request_project):
     (request_project[0] / 'beta/metadata.json').write_text('{broken')
     args = prepare(request_project)
