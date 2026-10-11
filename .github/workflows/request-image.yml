@@ -78,6 +78,19 @@ jobs:
           path: ${{ runner.temp }}/request-image-evidence/
           if-no-files-found: warn
           retention-days: 30
+      - name: Annotate the failed offline test
+        if: failure()
+        env:
+          EVIDENCE: ${{ runner.temp }}/request-image-evidence/offline-test.log
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          log = Path(os.environ['EVIDENCE'])
+          lines = log.read_text(errors='replace').splitlines()[-30:] if log.exists() else ['offline test log was not written']
+          for line in lines:
+              print('::error title=Request image offline test::' + line.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A'))
+          PY
       - name: Save successful container test evidence
         uses: actions/upload-artifact@v4
         with:
