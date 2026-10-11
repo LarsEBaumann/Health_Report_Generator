@@ -94,6 +94,9 @@ def stage(bundle: Path, prepared: Path, build: Path) -> tuple[dict, str]:
     template = TEMPLATES[request["audience"]]
     shutil.copyfile(SOURCE / template, build / template)
     shutil.copytree(SOURCE / "assets", build / "assets")
+    # helpers.py resolves map data relative to itself while Quarto renders in a
+    # temporary directory, so retain a direct copy beside the runtime helper.
+    shutil.copyfile(SOURCE / "assets" / "swiss_cantons.geojson", build / "swiss_cantons.geojson")
     _write_runtime_helpers(build, _disease_mapping(bundle, selected))
     topics = ",".join(_disease_mapping(bundle, selected))
     return request, topics

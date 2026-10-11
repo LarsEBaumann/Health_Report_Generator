@@ -110,6 +110,7 @@ def test_isha_adapter_stages_full_selected_data_without_changing_templates(reque
     assert request['audience'] == 'health_institution'
     assert topics == 'same_topic'
     assert (build / 'public_health.qmd').read_bytes() == (SOURCE / 'public_health.qmd').read_bytes()
+    assert (build / 'swiss_cantons.geojson').read_bytes() == (SOURCE / 'assets' / 'swiss_cantons.geojson').read_bytes()
     assert '"same_topic"' in (build / 'helpers.py').read_text()
 
 
