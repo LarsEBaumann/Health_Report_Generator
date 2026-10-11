@@ -5,7 +5,13 @@ type: software
 version: "1.0.0"
 date-released: "2026-10-11"
 authors:
-  - alias: "LarsEBaumann"
+  - family-names: "Baumann"
+    given-names: "Lars"
+  - family-names: "Ranganathan"
+    given-names: "Lavanya"
+    orcid: "https://orcid.org/0009-0007-1457-272X"
+  - family-names: "Suthar"
+    given-names: "Nisha"
 repository-code: "https://github.com/LarsEBaumann/Health_Report_Generator"
 abstract: >-
   A reproducible, parameterised reporting workflow that turns FOPH Infectious
