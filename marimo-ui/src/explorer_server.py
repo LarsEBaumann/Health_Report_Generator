@@ -25,12 +25,18 @@ from github_config import resolve_repository
 HERE = Path(__file__).resolve().parent
 PAGE = HERE / "explorer" / "page.html"
 PUBLIC_ROOT = Path(os.getenv("REPORT_PUBLIC_ROOT", "/app/.cache/github-artifact/requested-reports")).resolve()
+_PAYLOAD_CACHE = None
+_PAYLOAD_LOCK = threading.Lock()
 
 
 def _dataset_payload():
     """Build the page's small dashboard payload from the validated data bundle."""
-    bundle, run, artifact = download_latest_report()
-    series = pd.read_csv(bundle / "series.csv").fillna("")
+    global _PAYLOAD_CACHE
+    with _PAYLOAD_LOCK:
+        if _PAYLOAD_CACHE is not None:
+            return _PAYLOAD_CACHE
+        bundle, run, artifact = download_latest_report()
+        series = pd.read_csv(bundle / "series.csv").fillna("")
     selection = pd.read_csv(bundle / "selection.csv").fillna("")
     allowed = set(selection.loc[
         selection["status"].astype(str).str.lower().eq("included")
@@ -84,24 +90,42 @@ def _dataset_payload():
 
     total = len(selection)
     included = int(selection["status"].astype(str).str.lower().eq("included").sum())
-    return {
+    payload = {
         "years": years, "reference_year": reference, "geography": "Switzerland",
         "snapshot_id": str(run.get("head_sha", run.get("id", "validated snapshot"))),
         "diseases": diseases, "series": rows, "metrics": metrics,
-        "sources": {"used": len(diseases), "datasets": total, "rows": len(data), "published_from": "", "published_to": ""},
+        "sources": {"used": len(diseases), "datasets": total, "rows": len(data), "published_from": "", "published_to": str(run.get("updated_at", ""))[:10]},
         "selection": {"included": included, "excluded": total - included, "table": []},
         "checks": {"totals": {"PASS": 98, "WARN": 2, "SKIP": 0}, "by_check": [], "flagged": []},
         "parameters": {"Source run": str(run.get("run_number", run.get("id", ""))), "Artifact": str(artifact.get("name", "")), "Selection": "Chosen in Infection Data Explorer"},
         "exclusion_notes": {},
     }
+    _PAYLOAD_CACHE = payload
+    return payload
 
 
 def _audiences():
-    return [
-        {"id": "researcher", "name": "Researcher", "question": "Explore trends and download a fully traceable report.", "title": "Research overview", "layout": "Technical", "detail": "Full", "ready": True, "report": True, "outputs": ["headline", "group_totals", "group_index", "small_multiples", "change_table", "quality", "sources"], "tabs": [{"id": "overview", "name": "Overview", "icon": "chart"}, {"id": "trends", "name": "Trends", "icon": "trend"}, {"id": "changes", "name": "Changes", "icon": "list"}, {"id": "quality", "name": "Data quality", "icon": "quality"}]},
-        {"id": "health_institution", "name": "Health institution", "question": "Monitor the diseases and trends relevant to your service.", "title": "Public-health monitoring", "layout": "Operational", "detail": "Monitoring", "ready": True, "report": True, "outputs": ["headline", "group_totals", "small_multiples", "change_table", "quality", "sources"], "tabs": [{"id": "overview", "name": "Overview", "icon": "chart"}, {"id": "trends", "name": "Trends", "icon": "trend"}, {"id": "changes", "name": "Changes", "icon": "list"}, {"id": "quality", "name": "Data quality", "icon": "quality"}]},
-        {"id": "public", "name": "General public", "question": "See clear, plain-language trends for the diseases you choose.", "title": "Infectious-disease overview", "layout": "Public", "detail": "Plain language", "ready": True, "report": True, "outputs": ["headline", "group_totals", "small_multiples", "sources"], "tabs": [{"id": "overview", "name": "Overview", "icon": "chart"}, {"id": "trends", "name": "Trends", "icon": "trend"}, {"id": "quality", "name": "Sources", "icon": "quality"}]},
+    base = [
+        ("researcher", "Researcher", "Explore trends and download a fully traceable report.", "Research overview", "Technical", "Full"),
+        ("health_institution", "Health institution", "Monitor the diseases and trends relevant to your service.", "Public-health monitoring", "Operational", "Monitoring"),
+        ("public", "General public", "See clear, plain-language trends for the diseases you choose.", "Infectious-disease overview", "Public", "Plain language"),
     ]
+    if True:
+        return [{
+            "id": identifier, "name": name, "question": question, "title": title,
+            "layout": layout, "detail": detail, "ready": True, "report": True,
+            "outputs": [],
+            "tabs": (
+                [{"id": "overview", "name": "Overview", "icon": "chart", "panels": ["headline", "disease_table"]},
+                 {"id": "trends", "name": "Trends", "icon": "trend", "panels": ["group_index", "small_multiples"]},
+                 {"id": "changes", "name": "Changes", "icon": "list", "panels": ["priority_table", "change_table", "sensitivity"]},
+                 {"id": "quality", "name": "Data quality", "icon": "quality", "panels": ["quality", "sources", "parameters"]}]
+                if identifier != "public" else
+                [{"id": "overview", "name": "Overview", "icon": "chart", "panels": ["headline", "disease_table"]},
+                 {"id": "trends", "name": "Trends", "icon": "trend", "panels": ["small_multiples"]},
+                 {"id": "quality", "name": "Sources", "icon": "quality", "panels": ["sources", "parameters"]}]
+            ),
+        } for identifier, name, question, title, layout, detail in base]
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -132,7 +156,13 @@ class Handler(SimpleHTTPRequestHandler):
             if path == "/":
                 return self._page()
             if path == "/api/context":
-                return self._json({"audiences": _audiences(), "full_reports": [], "previous": []})
+                payload = _dataset_payload()
+                return self._json({
+                    "audiences": _audiences(),
+                    "filters": {"years": payload["years"], "classes": sorted({d["pathogen_class"] for d in payload["diseases"]})},
+                    "summary": {"diseases": len(payload["diseases"]), "datasets": payload["sources"]["datasets"], "year_from": payload["years"][0], "year_to": payload["years"][-1], "published_to": payload["sources"]["published_to"]},
+                    "full_reports": [], "previous": [],
+                })
             if path.startswith("/api/overview/"):
                 audience = unquote(path.rsplit("/", 1)[-1])
                 if audience not in {a["id"] for a in _audiences()}:
@@ -140,6 +170,8 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._json(_dataset_payload())
             if path.startswith("/api/figures/"):
                 return self._json({"figures": []})
+            if path.startswith("/api/sections/"):
+                return self._json({"sections": []})
             if path == "/static/plotly.js":
                 self.send_response(HTTPStatus.OK)
                 self.send_header("Content-Type", "application/javascript")
