@@ -2,7 +2,7 @@ name: Build and test request environment
 run-name: Request environment test — ${{ github.sha }}
 on:
   push:
-    branches: [test]
+    branches: [test, integration/marimo-reporting]
     paths:
       - 'Dockerfile.request'
       - 'Dockerfile.request.dockerignore'
@@ -21,7 +21,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build-test-publish:
-    if: github.ref == 'refs/heads/test'
+    if: github.ref == 'refs/heads/test' || github.ref == 'refs/heads/integration/marimo-reporting'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     permissions:
