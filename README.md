@@ -120,7 +120,7 @@ The reports describe officially notified cases, not all infections. They are des
 | Limitations | [docs/limitations.md](docs/limitations.md) |
 | Demo walkthrough | [docs/demo.md](docs/demo.md) |
 | Release notes and checklist | [RELEASE_NOTES.md](RELEASE_NOTES.md), [docs/release-checklist.md](docs/release-checklist.md) |
-| Repository map, phase records | [docs/repository-map.md](docs/repository-map.md), `docs/phase-*.md` |
+| Repository map, phase records | [docs/repository-map.md](docs/repository-map.md), [docs/history.md](docs/history.md), `docs/phase-*.md` |
 | Contributing | [CONTRIBUTING.md](CONTRIBUTING.md), [GETTING_STARTED.md](GETTING_STARTED.md) |
 | Optional Marimo interface | [CONNECTOR_SETUP.md](CONNECTOR_SETUP.md) |
 
