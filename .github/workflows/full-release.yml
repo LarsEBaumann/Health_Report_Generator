@@ -1,0 +1,58 @@
+name: Build full health-report release
+run-name: Full health-report release — ${{ github.sha }}
+
+on:
+  push:
+    branches: [integration/marimo-reporting, feat/marimo-artifact-display]
+    paths:
+      - 'Data/**'
+      - 'scripts/health_pipeline/**'
+      - 'reporting/isha/**'
+      - 'workflow/**'
+      - 'Snakefile'
+      - 'Dockerfile.request'
+      - 'Dockerfile.request.dockerignore'
+      - 'compose.full-report.yml'
+      - 'run.py'
+      - 'renv.lock'
+      - '.Rprofile'
+      - '.github/workflows/full-release.yml'
+  schedule:
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      cores:
+        description: Snakemake cores inside the container
+        required: false
+        default: '2'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: full-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  full-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run the complete release in Docker
+        env:
+          CORES: ${{ inputs.cores || '2' }}
+        run: python run.py release --cores "$CORES"
+      - name: Upload complete release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-health-release-${{ github.sha }}
+          path: |
+            results/reports/
+            results/release.json
+            results/checks.csv
+            results/datasets.csv
+            results/snapshots/
+          if-no-files-found: error
+          retention-days: 30

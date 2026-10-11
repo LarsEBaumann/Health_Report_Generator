@@ -29,6 +29,8 @@ python run.py release --cores 2
 
 This is the current-branch equivalent of the colleague’s `run.py release` command. It builds or reuses `Dockerfile.request`, then runs this branch’s `Snakefile` in the container. The resulting HTML, PDF and Shiny bundles are written to `results/`. On Apple Silicon, Docker runs the required Linux `amd64` image through its configured emulation.
 
+GitHub Actions runs the same command automatically when data, analysis, reporting, or Docker environment files change. It also runs weekly on Monday at 04:00 UTC and can be started manually from **Actions → Build full health-report release**. The complete release is uploaded as a GitHub artifact.
+
 ## Setup and run
 
 Run commands from the repository root. Python 3.11 and R 4.3.2 were used for validation.
