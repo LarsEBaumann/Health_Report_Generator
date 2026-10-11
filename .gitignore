@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.py[cod]
 .pytest_cache/
+.ruff_cache/
 .venv/
 .snakemake/
 results/
@@ -21,7 +22,5 @@ outputs/
 .cache/
 
 # Marimo session snapshots
-/src/__marimo__/session/
+/frontend/__marimo__/session/
 
-# Local build environments and generated files
-.venv-pipeline/

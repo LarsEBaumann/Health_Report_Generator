@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.11.6"
           cache: pip
-          cache-dependency-path: scripts/health_pipeline/requirements.lock.txt
+          cache-dependency-path: requirements.txt
       - name: Set up R
         uses: r-lib/actions/setup-r@f9a764fea8d5c63df6ef9a5c7795bf7deb5d7e05 # v2
         with:
@@ -40,11 +40,11 @@ jobs:
       - name: Restore R packages
         run: Rscript workflow/restore_r.R
       - name: Install locked Python dependencies
-        run: python -m pip install -r scripts/health_pipeline/requirements.lock.txt
+        run: python -m pip install -r requirements.txt
       - name: Test workflow code
         run: python -m pytest -q
       - name: Pull the latest IDD CSV and metadata exports
-        run: python -u src/sync_idd_exports.py
+        run: python -u frontend/sync_idd_exports.py
       - name: Commit changed source snapshots
         shell: bash
         run: |
@@ -74,9 +74,9 @@ jobs:
             exit "$status"
           }
       - name: Verify three audience outputs and provenance
-        run: python scripts/health_pipeline/check_outputs.py
+        run: python backend/check_outputs.py
       - name: Verify release hashes, provenance and rendered links
-        run: python scripts/health_pipeline/verify_release.py --out results
+        run: python backend/verify_release.py --out results
       - name: Check Shiny bundle
         run: Rscript tests/shiny_smoke.R results/reports/researcher/app
       - name: Upload successful versioned report bundle

@@ -29,11 +29,11 @@ COPY --from=uvbin /uv /uvx /usr/local/bin/
 RUN uv python install 3.11.6 \
     && uv venv --python 3.11.6 /opt/health-report-venv
 
-COPY scripts/health_pipeline/requirements.lock.txt /opt/build/requirements.lock.txt
+COPY requirements.txt /opt/build/requirements.txt
 
 RUN uv pip install \
       --python /opt/health-report-venv/bin/python \
-      -r /opt/build/requirements.lock.txt \
+      -r /opt/build/requirements.txt \
     && uv pip check --python /opt/health-report-venv/bin/python
 
 RUN curl --fail --show-error --location \

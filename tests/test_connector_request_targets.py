@@ -14,7 +14,7 @@ FORK = "example-user/example-fork"
 
 @pytest.fixture
 def connector_modules(monkeypatch):
-    monkeypatch.syspath_prepend(str(ROOT / "src"))
+    monkeypatch.syspath_prepend(str(ROOT / "frontend"))
     monkeypatch.setenv("GITHUB_REPOSITORY", FORK)
     monkeypatch.setenv("GITHUB_TOKEN", "test-token-not-a-real-secret")
     monkeypatch.setenv("GITHUB_OWNER", "wrong-owner")
@@ -56,11 +56,13 @@ def test_artifact_lookup_targets_configured_fork(
 
 def test_ui_dispatch_targets_configured_fork(connector_modules):
     config, _ = connector_modules
-    tree = ast.parse((ROOT / "src/ui.py").read_text())
+    tree = ast.parse((ROOT / "frontend/ui.py").read_text())
     cells = [
         node for node in tree.body
         if isinstance(node, ast.FunctionDef)
-        and "report_form" in {arg.arg for arg in node.args.args}
+        # The GitHub dispatch cell: the local-render cell also takes report_form,
+        # so resolve_repository is what identifies this one.
+        and {"report_form", "resolve_repository"} <= {arg.arg for arg in node.args.args}
     ]
     assert len(cells) == 1
 
@@ -69,7 +71,7 @@ def test_ui_dispatch_targets_configured_fork(connector_modules):
     module = ast.Module(body=[cell], type_ignores=[])
     ast.fix_missing_locations(module)
     namespace = {}
-    exec(compile(module, str(ROOT / "src/ui.py"), "exec"), namespace)
+    exec(compile(module, str(ROOT / "frontend/ui.py"), "exec"), namespace)
 
     calls = []
     messages = []

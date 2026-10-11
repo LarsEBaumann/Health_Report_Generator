@@ -3,7 +3,7 @@ import json
 import sys
 
 configfile: 'workflow/config.yaml'
-P = 'scripts/health_pipeline'
+P = 'backend'
 sys.path.insert(0, str(Path(P).resolve()))
 from common import digest, object_hash
 OUT = config['out'].rstrip('/')
@@ -27,10 +27,17 @@ PRESENTATION_CODE = [f'{P}/publish.py', f'{P}/common.py', SHARED_TEMPLATE, f'{P}
                      f'{P}/templates/methods.qmd']
 PROVENANCE = expand(OUT+'/reports/{s}/{name}',s=STAKEHOLDERS,name=['provenance.json','provenance.pdf.json'])
 DATA_ROOT = config['data_root'] if not config.get('snapshot_manifest') else ''
-ENVIRONMENT = [f'{P}/requirements.lock.txt', 'workflow/environment.yml', 'workflow/r-packages.tsv', 'renv.lock', '.Rprofile']
+ENVIRONMENT = ['requirements.txt', 'workflow/r-packages.tsv', 'renv.lock', '.Rprofile']
 
+# Defines QUARTO_SITE and the rules that build results/site from quarto/*.qmd; needs the
+# variables above. An empty quarto_reports in workflow/config.yaml disables that path.
+include: 'workflow/quarto.smk'
+
+# The include above contributes the first rule in the workflow, so the default target is
+# declared here rather than left to definition order.
 rule all:
-    input: HTML, PDF, APPS, PROVENANCE, OUT+'/release.json'
+    input: HTML, PDF, APPS, PROVENANCE, QUARTO_SITE, OUT+'/release.json'
+    default_target: True
 
 rule tables:
     input: ANALYSIS
@@ -102,7 +109,7 @@ rule package_shiny:
     shell: '{PYTHON:q} {P}/publish.py package --bundle {params.bundle:q} --output {params.dest:q}'
 
 rule release:
-    input: HTML, PDF, APPS, PROVENANCE, ANALYSIS, ENVIRONMENT, f'{P}/release.py', 'Snakefile', 'workflow/config.yaml', *[str(p) for p in Path('tests').glob('*') if p.is_file()], *[str(p) for p in Path(P).glob('*.py')]
+    input: HTML, PDF, APPS, PROVENANCE, QUARTO_SITE, ANALYSIS, ENVIRONMENT, f'{P}/release.py', 'Snakefile', 'workflow/config.yaml', *[str(p) for p in Path('tests').glob('*') if p.is_file()], *[str(p) for p in Path(P).glob('*.py')]
     output: OUT+'/release.json'
     params: out=OUT
     shell: '{PYTHON:q} {P}/release.py --out {params.out:q} --quarto {QUARTO:q}'

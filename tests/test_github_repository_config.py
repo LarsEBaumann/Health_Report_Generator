@@ -9,7 +9,7 @@ def resolver(monkeypatch):
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
-    monkeypatch.syspath_prepend(str(root / "src"))
+    monkeypatch.syspath_prepend(str(root / "frontend"))
     for name in ("GITHUB_REPOSITORY", "GITHUB_OWNER", "GITHUB_REPO"):
         monkeypatch.delenv(name, raising=False)
 

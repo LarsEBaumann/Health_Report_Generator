@@ -21,7 +21,7 @@ def project(tmp_path):
               'valueVariables':{'value':{},'pop':{}},'entryVariables':{'dataComplete':{}}}
         (p/'metadata.json').write_text(json.dumps(meta))
         pd.DataFrame([dict(valueCategory='cases',temporal=str(y),temporal_type='year',georegion='CHFL',georegion_type='CHFL',sex='all',value=(y-2009)*scale,pop=100000,dataComplete='TRUE') for y in YEARS]).to_csv(p/'data.csv',index=False)
-    template=Path(__file__).resolve().parents[1]/'scripts/health_pipeline/config/stakeholders/public_health_expert.json'
+    template=Path(__file__).resolve().parents[1]/'backend/config/stakeholders/public_health_expert.json'
     c=json.loads(template.read_text());c.update(id='test',exclude_from_group_totals=[],sensitivity_exclude=[],dimension_filters={})
     cfg.write_text(json.dumps(c));classes.write_text('topic,pathogen_class,label\nvirus,viral,Virus\nbacterium,bacterial,Bacterium\n')
     return raw,out,cfg,classes
@@ -177,7 +177,7 @@ def test_bundle_package_integrity(project):
 
 def test_checks_cli_exit_code(project):
     run(project);d=pd.read_parquet(project[1]/'harmonised.parquet');d.loc[0,'value']=-1;d.to_parquet(project[1]/'harmonised.parquet')
-    p=subprocess.run([sys.executable,str(Path(__file__).resolve().parents[1]/'scripts/health_pipeline/checks.py'),'--out',str(project[1])],capture_output=True)
+    p=subprocess.run([sys.executable,str(Path(__file__).resolve().parents[1]/'backend/checks.py'),'--out',str(project[1])],capture_output=True)
     assert p.returncode!=0
 @pytest.mark.parametrize("requested", [[], ["viral", "viral"], ["syndromic"]])
 def test_invalid_comparison_classes(project, requested):

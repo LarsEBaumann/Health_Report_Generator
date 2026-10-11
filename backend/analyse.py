@@ -17,7 +17,7 @@ LINEAGE_COLUMNS = ['metric_id','input_kind','input_id','source_file','source_row
 def load_config(path):
     c = json.loads(Path(path).read_text())
     import jsonschema
-    schema = json.loads((Path(__file__).resolve().parents[2] / 'workflow/config.schema.json').read_text())
+    schema = json.loads((Path(__file__).resolve().parents[1] / 'workflow/config.schema.json').read_text())
     try:
         jsonschema.validate(c, schema)
     except jsonschema.ValidationError as e:

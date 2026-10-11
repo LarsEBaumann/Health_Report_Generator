@@ -13,7 +13,7 @@ import render_selected
 from test_pipeline import project, run  # noqa: F401  (pytest fixture reuse)
 
 ROOT = Path(__file__).resolve().parents[1]
-P = ROOT / 'scripts/health_pipeline'
+P = ROOT / 'backend'
 STAKEHOLDERS = P / 'config/stakeholders'
 AUDIENCES = ['researcher', 'health_institution', 'public']
 # Keys allowed to differ between audiences: communication, not analysis.
@@ -60,7 +60,7 @@ def test_audiences_share_identical_analytic_parameters():
 
 
 def test_single_shared_report_source():
-    reports = sorted(p.name for p in P.rglob('*.qmd') if 'example_output' not in p.parts)
+    reports = sorted(p.name for p in P.rglob('*.qmd'))
     assert reports == ['methods.qmd', 'report_public_health_expert.qmd']
     snakefile = (ROOT / 'Snakefile').read_text()
     assert snakefile.count('report_public_health_expert.qmd') == 1  # declared once as SHARED_TEMPLATE

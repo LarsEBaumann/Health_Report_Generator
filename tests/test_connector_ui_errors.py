@@ -14,17 +14,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture
 def dispatch_cell(monkeypatch):
-    monkeypatch.syspath_prepend(str(ROOT / "src"))
+    monkeypatch.syspath_prepend(str(ROOT / "frontend"))
     monkeypatch.setenv("GITHUB_REPOSITORY", "example-user/example-fork")
     monkeypatch.setenv("GITHUB_TOKEN", "test-token-not-a-real-secret")
     monkeypatch.setenv("GITHUB_APP_REF", "main")
 
     resolver = importlib.import_module("github_config").resolve_repository
-    tree = ast.parse((ROOT / "src/ui.py").read_text())
+    tree = ast.parse((ROOT / "frontend/ui.py").read_text())
     cells = [
         node for node in tree.body
         if isinstance(node, ast.FunctionDef)
-        and "report_form" in {arg.arg for arg in node.args.args}
+        # The GitHub dispatch cell: the local-render cell also takes report_form,
+        # so resolve_repository is what identifies this one.
+        and {"report_form", "resolve_repository"} <= {arg.arg for arg in node.args.args}
     ]
     assert len(cells) == 1
 
@@ -33,7 +35,7 @@ def dispatch_cell(monkeypatch):
     module = ast.Module(body=[cell], type_ignores=[])
     ast.fix_missing_locations(module)
     namespace = {}
-    exec(compile(module, str(ROOT / "src/ui.py"), "exec"), namespace)
+    exec(compile(module, str(ROOT / "frontend/ui.py"), "exec"), namespace)
 
     def invoke(post):
         messages = []

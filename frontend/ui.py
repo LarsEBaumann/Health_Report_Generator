@@ -14,10 +14,12 @@ def _():
     import pandas as pd
     import requests
 
+    import local_build
     from artifact_download import download_latest_report
     from github_config import resolve_repository
 
-    return download_latest_report, json, mo, os, pd, requests, resolve_repository, uuid
+    return (download_latest_report, json, local_build, mo, os, pd, requests,
+            resolve_repository, uuid)
 
 
 @app.cell
@@ -42,9 +44,21 @@ def _(mo, resolve_repository):
 
 
 @app.cell
-def _(download_latest_report, pd):
+def _(download_latest_report, local_build, os, pd):
     try:
-        bundle_dir, source_run, source_artifact = download_latest_report()
+        _local = local_build.bundle()
+        if _local is not None:
+            # Built on this machine by `python run.py` / `snakemake tables`: no GitHub
+            # account, token or Actions run involved.
+            bundle_dir = _local
+            source_run, source_artifact = None, None
+            local_mode = True
+        else:
+            bundle_dir, source_run, source_artifact = download_latest_report()
+            local_mode = False
+        # The dispatch cell reads this; it cannot take new parameters without breaking the
+        # isolated execution its tests rely on.
+        os.environ["HEALTH_LOCAL_MODE"] = "1" if local_mode else ""
         series = pd.read_csv(bundle_dir / "series.csv").fillna("")
         selection = pd.read_csv(bundle_dir / "selection.csv").fillna("")
         required_series = {"dataset_id", "pathogen_class", "label"}
@@ -67,14 +81,16 @@ def _(download_latest_report, pd):
     except Exception as exc:
         source_run = None
         source_artifact = None
+        local_mode = False
+        bundle_dir = None
         datasets = pd.DataFrame(columns=["dataset_id", "pathogen_class", "label"])
         ready = False
         message = str(exc)
-    return datasets, message, ready, source_artifact, source_run
+    return bundle_dir, datasets, local_mode, message, ready, source_artifact, source_run
 
 
 @app.cell
-def _(datasets, message, mo, ready, source_artifact, source_run):
+def _(datasets, local_mode, message, mo, ready, source_artifact, source_run):
     audience_widget = mo.ui.dropdown(
         options={"Researcher": "researcher", "Public health": "health_institution", "General public": "public"},
         value="Researcher",
@@ -111,9 +127,18 @@ def _(datasets, message, mo, ready, source_artifact, source_run):
             viral=viral_widget,
         ),
         submit_button_label="Generate report",
-        submit_button_disabled=not ready or source_run is None,
+        submit_button_disabled=not ready or (source_run is None and not local_mode),
     )
-    if ready:
+    if ready and local_mode:
+        status = mo.callout(
+            mo.md(
+                f"**Local mode.** {len(datasets)} eligible datasets from the build on this "
+                "machine. Reports are rendered here with Quarto; no GitHub account, token "
+                "or Actions run is used."
+            ),
+            kind="success",
+        )
+    elif ready:
         status = mo.md(
             f"Data ready: {len(datasets)} eligible datasets from source run "
             f"`{source_run['run_number']}` (artifact `{source_artifact['name']}`)."
@@ -128,7 +153,10 @@ def _(datasets, message, mo, ready, source_artifact, source_run):
 
 @app.cell
 def _(json, mo, os, report_form, requests, resolve_repository, source_run, uuid):
-    if report_form.value is None:
+    if os.environ.get("HEALTH_LOCAL_MODE") == "1":
+        # Local mode renders in the cell below; GitHub credentials are irrelevant here.
+        result = None
+    elif report_form.value is None:
         result = mo.md("Choose a stakeholder and diseases, then select **Generate report**.")
     else:
         values = report_form.value
@@ -199,6 +227,32 @@ def _(json, mo, os, report_form, requests, resolve_repository, source_run, uuid)
                         kind="danger",
                     )
     result
+
+
+@app.cell
+def _(bundle_dir, local_build, local_mode, mo, report_form, uuid):
+    if not local_mode or report_form.value is None:
+        local_result = None
+    else:
+        _values = report_form.value
+        _ids = sorted(set(_values["bacterial"]) | set(_values["viral"]))
+        try:
+            _topics = local_build.topics_for(bundle_dir, _ids)
+            _report = local_build.render(_values["audience"], _topics, uuid.uuid4().hex[:8])
+            _labels = ", ".join(_topics)
+            local_result = mo.callout(
+                mo.md(
+                    f"**Report ready.** {len(_topics)} disease(s): {_labels}."
+                    f" Open `{_report.relative_to(local_build.PROJECT).as_posix()}`"
+                    " in your browser. It is a single self-contained file."
+                ),
+                kind="success",
+            )
+        except Exception as _error:
+            local_result = mo.callout(mo.md(f"Could not build the report: {_error}"),
+                                      kind="danger")
+    local_result
+    return
 
 
 if __name__ == "__main__":

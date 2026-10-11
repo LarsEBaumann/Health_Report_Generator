@@ -2,21 +2,36 @@
 name = "health-report-generator"
 version = "0.1.0"
 requires-python = ">=3.11.6,<3.12"
+# One environment runs everything: the Snakemake pipeline, the Quarto reports and the
+# Marimo interface. The pipeline's versions are pinned exactly, because the reports and
+# their provenance records are reproduced against them.
 dependencies = [
-    "marimo>=0.25.1",
-    "matplotlib>=3.11.2",
-    "pandas>=3.0.6",
+    # Workflow engine.
+    "snakemake==8.30.0",
+    # Analysis: harmonise.py writes Parquet, so pyarrow is required, not optional.
+    "pandas==2.2.3",
+    "pyarrow==19.0.1",
+    "jsonschema==4.23.0",
     "pyyaml>=6.0.3",
+    # Quarto reports: plotly draws the charts, and Quarto's `jupyter: python3` engine
+    # starts a kernel through ipykernel/nbclient.
+    "plotly==5.24.1",
+    "ipykernel==6.29.5",
+    "nbclient==0.8.0",
+    "nbformat==5.11.1",
+    # Optional Marimo interface and the IDD data utilities.
+    "marimo>=0.25.1",
     "requests>=2.34.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",
 ]
 
 [tool.ruff]
 # Lint only: the existing compact style is kept; `ruff format` is not enforced.
 target-version = "py311"
-extend-exclude = [
-    "Health_Report_Generator-test",
-    "scripts/health_pipeline/example_output",
-]
 
 [tool.ruff.lint]
 # Syntax errors, undefined names, unused imports/variables and other pyflakes defects.

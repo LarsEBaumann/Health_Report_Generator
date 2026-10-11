@@ -28,14 +28,14 @@ For a complete release check, also run:
 
 ```sh
 snakemake --cores 2
-python scripts/health_pipeline/check_outputs.py
-python scripts/health_pipeline/verify_release.py --out results
+python backend/check_outputs.py
+python backend/verify_release.py --out results
 Rscript tests/shiny_smoke.R results/reports/researcher/app
 Rscript tests/dashboard_smoke.R results/reports/researcher/app
 bash scripts/ci/secret_scan.sh .   # Linux x86_64; downloads pinned gitleaks
 ```
 
-These mirror the CI jobs `fast`, `full` and `secrets`; see `docs/phase-6-ci-hardening.md`.
+These mirror the CI jobs `fast`, `full` and `secrets`.
 
 A complete rendering check requires the pinned R, Quarto, and TinyTeX environment described in the root README.
 

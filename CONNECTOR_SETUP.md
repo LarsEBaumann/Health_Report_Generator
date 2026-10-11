@@ -1,7 +1,7 @@
 # Optional GitHub-backed Marimo interface
 
 This interface is separate from local report generation.
-For credential-free local reports, follow README.md or GETTING_STARTED.md.
+For credential-free local reports, follow README.md or HOW_TO_RUN.md.
 
 The interface downloads a versioned artifact from a configured GitHub
 repository, presents eligible datasets, and requests a selected report
@@ -84,7 +84,7 @@ Do not distribute the original author's token.
 ## 4. Build and start the optional UI
 
 Docker and Docker Compose must be installed and accessible.
-The UI service uses the original Dockerfile and its locked uv environment.
+The UI service uses the same image as the report service.
 It does not use the report pipeline's Python environment.
 
 ```bash
@@ -98,7 +98,7 @@ docker compose --profile ui run --rm \
   sh -lc 'mkdir -p /tmp/report-home/.config /tmp/report-home/.cache /tmp/report-home/.local/share &&
   export HOME=/tmp/report-home XDG_CONFIG_HOME=/tmp/report-home/.config XDG_CACHE_HOME=/tmp/report-home/.cache XDG_DATA_HOME=/tmp/report-home/.local/share &&
   uv sync --locked &&
-  uv run marimo run src/ui.py --host 0.0.0.0 --port 2718 --show-tracebacks'
+  uv run marimo run frontend/ui.py --host 0.0.0.0 --port 2718 --show-tracebacks'
 ```
 
 Open http://127.0.0.1:2718 and keep the terminal running.

@@ -21,8 +21,7 @@ def test_python_contract_is_aligned():
     validated = CONTRACT["python"]["validated"]
     project = tomllib.loads(text("pyproject.toml"))
     assert project["project"]["requires-python"] == supported
-    assert f"python={validated}" in text("workflow/environment.yml")
-    assert f"FROM python:{validated}-slim" in text("Dockerfile")
+    assert f"uv python install {validated}" in text("Dockerfile")
     for workflow in WORKFLOWS:
         assert f'python-version: "{validated}"' in text(workflow).replace("'", '"')
 
@@ -30,7 +29,6 @@ def test_python_contract_is_aligned():
 def test_r_and_quarto_contract_is_aligned():
     r_version = CONTRACT["r"]["validated"]
     quarto_version = CONTRACT["quarto"]["validated"]
-    assert f"r-base={r_version}" in text("workflow/environment.yml")
     assert f"ARG QUARTO_VERSION={quarto_version}" in text("Dockerfile")
     for workflow in WORKFLOWS:
         content = text(workflow).replace("'", '"')
@@ -68,13 +66,13 @@ def test_workflow_branch_refs_are_main():
         content = text(workflow)
         assert "ref: main" in content
         assert "ref: connector" not in content
-    assert 'os.getenv("GITHUB_APP_REF", "main")' in text("src/ui.py")
-    assert 'os.getenv("GITHUB_APP_REF", "connector")' not in text("src/ui.py")
+    assert 'os.getenv("GITHUB_APP_REF", "main")' in text("frontend/ui.py")
+    assert 'os.getenv("GITHUB_APP_REF", "connector")' not in text("frontend/ui.py")
     assert "`connector` branch" not in text("CONNECTOR_SETUP.md")
 
 
 def test_documentation_names_authoritative_contract():
-    for path in ("README.md", "GETTING_STARTED.md"):
+    for path in ("README.md", "HOW_TO_RUN.md"):
         assert "workflow/toolchain.json" in text(path)
 
 
@@ -88,7 +86,7 @@ def test_canonical_data_root_is_used_everywhere_active():
     for workflow in WORKFLOWS:
         content = text(workflow)
         assert "data_root=Data" not in content
-    migration = json.loads(text("docs/phase-3-data-migration.json"))
+    migration = json.loads(text("workflow/phase-3-data-migration.json"))
     assert migration["canonical_root"] == "data/reference"
     assert migration["legacy_root"] == "Data"
     assert migration["unmapped_legacy_directories"] == 0
@@ -96,9 +94,11 @@ def test_canonical_data_root_is_used_everywhere_active():
 
 
 def test_legacy_data_root_remains_removed_and_auditable():
-    assert not (ROOT / "Data").exists()
-    migration = json.loads(text("docs/phase-3-data-migration.json"))
-    removal = json.loads(text("docs/phase-4-legacy-removal.json"))
+    # Compared against the real directory names: on a case-insensitive filesystem
+    # (Windows, macOS) the canonical `data/` would make a path test for `Data` succeed.
+    assert "Data" not in {entry.name for entry in ROOT.iterdir()}
+    migration = json.loads(text("workflow/phase-3-data-migration.json"))
+    removal = json.loads(text("workflow/phase-4-legacy-removal.json"))
     assert removal["action"] == "remove_frozen_legacy_data_root"
     assert removal["canonical_root"] == migration["canonical_root"] == "data/reference"
     assert removal["legacy_root"] == migration["legacy_root"] == "Data"

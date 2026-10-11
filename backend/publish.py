@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from common import digest, write_json
 HERE=Path(__file__).resolve().parent
-PROJECT=HERE.parents[1]
+PROJECT=HERE.parent
 TEMPLATE='report_public_health_expert.qmd'
 PROVENANCE_SCHEMA='health-report-provenance/1.0'
 FILTER_KEYS=['period_type','years','reference_year','index_base_year','geography','measures_preferred','compare_by',
@@ -74,7 +74,7 @@ def build_provenance(bundle,fmt,quarto='quarto',data_root=None,workflow_config=N
         'schema':PROVENANCE_SCHEMA,
         'rendered_at_utc':datetime.now(timezone.utc).isoformat(timespec='seconds'),
         'output':{'format':fmt,'documents':[f'report.{fmt}',f'methods.{fmt}'],
-                  'shared_template':f'scripts/health_pipeline/{TEMPLATE}','shared_template_sha256':digest(HERE/TEMPLATE),
+                  'shared_template':f'backend/{TEMPLATE}','shared_template_sha256':digest(HERE/TEMPLATE),
                   'presentation_helpers_sha256':{n:digest(HERE/'templates'/n) for n in ['report_helpers.R','audience_reports.R','methods.qmd','dashboard.css']}},
         'stakeholder':{'id':cfg['id'],'title':cfg['title'],'question':cfg['question'],'presentation':cfg.get('presentation'),
                        'outputs':cfg['outputs'],'parameters_sha256':digest(bundle/'stakeholder.json')},
@@ -96,7 +96,7 @@ def build_provenance(bundle,fmt,quarto='quarto',data_root=None,workflow_config=N
                     'quarto':_command([quarto,'--version']),'R':(_command(['Rscript','--version']) or '').splitlines()[-1:] or None,
                     'toolchain_contract':'workflow/toolchain.json','toolchain_contract_sha256':digest(toolchain) if toolchain.is_file() else None,
                     'r_lockfile_sha256':digest(PROJECT/'renv.lock') if (PROJECT/'renv.lock').is_file() else None,
-                    'python_lockfile_sha256':digest(HERE/'requirements.lock.txt')},
+                    'python_lockfile_sha256':digest(PROJECT/'requirements.txt')},
         'code':{'git_commit':git_commit,'git_worktree_clean':None if git_status is None else git_status=='',
                 'workflow_config':workflow_config},
     }
@@ -113,7 +113,7 @@ def render(bundle,output,fmt,quarto='quarto',provenance=None,provenance_out=None
             # The template embeds this record in HTML as application/json.
             write_json(Path(tmp)/'provenance.json',provenance)
         env = os.environ.copy()
-        project = HERE.parents[1]
+        project = HERE.parent
         env['HEALTH_REPORT_PROJECT'] = str(project)
         env['R_PROFILE_USER'] = str(project / '.Rprofile')
         for document in ['report','methods']:

@@ -25,12 +25,12 @@ def test_main_and_selected_workflow_audiences_match():
 
 def test_selected_renderer_and_presentation_profiles_match():
     profiles = json.loads(
-        (ROOT / "scripts/health_pipeline/config/audience_presentations.json")
+        (ROOT / "backend/config/audience_presentations.json")
         .read_text()
     )["profiles"]
 
     tree = ast.parse(
-        (ROOT / "scripts/health_pipeline/render_selected.py").read_text()
+        (ROOT / "backend/render_selected.py").read_text()
     )
     assignments = [
         node for node in tree.body
@@ -48,7 +48,7 @@ def test_selected_renderer_and_presentation_profiles_match():
 
 
 def test_ui_audience_dropdown_matches():
-    tree = ast.parse((ROOT / "src/ui.py").read_text())
+    tree = ast.parse((ROOT / "frontend/ui.py").read_text())
     mappings = []
 
     for node in ast.walk(tree):

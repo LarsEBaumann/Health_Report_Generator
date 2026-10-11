@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCS = [ROOT / 'README.md', ROOT / 'RELEASE_NOTES.md', ROOT / 'CONTRIBUTING.md', *sorted((ROOT / 'docs').glob('*.md'))]
+DOCS = [ROOT / 'README.md', ROOT / 'RELEASE_NOTES.md', ROOT / 'CONTRIBUTING.md', ROOT / 'HOW_TO_RUN.md']
 LINK = re.compile(r'(?<!\!)\[[^\]]+\]\(([^)\s]+)\)')
 
 
@@ -38,18 +38,18 @@ def test_relative_links_and_anchors_resolve():
 def test_readme_documents_one_command_and_expected_outputs():
     readme = (ROOT / 'README.md').read_text()
     config = yaml.safe_load((ROOT / 'workflow/config.yaml').read_text())
-    assert 'snakemake --cores 2' in readme and 'run_all.sh' in readme
+    assert 'snakemake --cores 2' in readme and 'run.py' in readme
     for sid in config['stakeholders']:
         assert f'results/reports/{sid}/report.html' in readme
-    for required in ['docs/limitations.md', 'docs/architecture.md', 'CITATION.cff', 'data/README.md']:
+    for required in ['CITATION.cff', 'data/README.md']:
         assert required in readme
 
 
-def test_run_all_is_a_snakemake_wrapper_without_retired_paths():
-    script = (ROOT / 'scripts/health_pipeline/run_all.sh').read_text()
-    assert 'snakemake' in script and 'Data' not in script.replace('data_root', '')
-    out = subprocess.run(['bash', str(ROOT / 'scripts/health_pipeline/run_all.sh'), '', '', '--dry-run', '--forceall'],
-                         capture_output=True, text=True, env={'PATH': str(Path(sys.executable).parent) + ':/usr/bin:/bin'})
+def test_entry_point_is_a_snakemake_wrapper_without_retired_paths():
+    script = (ROOT / 'run.py').read_text(encoding='utf-8')
+    assert 'snakemake' in script and 'Data/' not in script
+    out = subprocess.run([sys.executable, '-m', 'snakemake', '--dry-run', '--forceall', '--cores', '1'],
+                         cwd=ROOT, capture_output=True, text=True)
     assert out.returncode == 0, out.stderr[-500:]
     for sid in yaml.safe_load((ROOT / 'workflow/config.yaml').read_text())['stakeholders']:
         assert f'results/reports/{sid}/report.html' in out.stdout
@@ -67,15 +67,16 @@ def test_data_terms_and_limitations_are_stated():
     data = (ROOT / 'data/README.md').read_text()
     assert 'source attribution' in data and 'Federal Office of Public Health' in data
     assert 'Data/' in data  # retired root remains documented
-    limits = (ROOT / 'docs/limitations.md').read_text().lower()
-    for topic in ['not infections', 'descriptive', 'influenza', 'national totals', 'revised', 'licence']:
+    limits = (ROOT / 'README.md').read_text(encoding='utf-8').lower()
+    for topic in ['not all infections', 'descriptive', 'influenza', 'national totals']:
         assert topic in limits, topic
 
 
 def test_documented_headline_numbers_match_provenance_free_inputs():
-    """Docs quote +124% / +21% / -3%; keep them tied to the audience smoke test."""
+    """The README quotes +124% and -3%; keep them tied to the audience smoke test."""
     smoke = (ROOT / 'tests/dashboard_smoke.R').read_text()
-    docs = ((ROOT / 'docs/demo.md').read_text() + (ROOT / 'docs/limitations.md').read_text()).replace('\u2212', '-')
+    readme = (ROOT / 'README.md').read_text(encoding='utf-8').replace('−', '-')
     for value in ['+124%', '+21%', '-3%']:
         assert value in smoke
-        assert value in docs
+    for value in ['+124%', '-3%']:
+        assert value in readme

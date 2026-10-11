@@ -7,8 +7,6 @@ data/raw
 data/processed
 outputs
 
-# Local build environments and generated files
-.venv-pipeline
 .r-library
 .r-bootstrap
 .snakemake
