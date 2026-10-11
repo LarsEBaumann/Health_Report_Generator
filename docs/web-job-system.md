@@ -260,3 +260,45 @@ Limitations:
   and pre-completion identity enforcement remain separate work.
 - No HTTP interface, persistent worker service, resource-budget
   enforcement or artifact-access policy was established by this experiment.
+
+## Whole-container crash rehearsal
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-crash-sd25Hl
+- Dedicated container: health-report-crash-web-crash-sd25Hl
+- Synthetic renderer with a sleeping descendant.
+- Fresh experiment-local SQLite database and private workspace.
+- One running job and one waiting job.
+- Only the dedicated experiment container received SIGKILL.
+- Container exit code reported by docker wait: 137.
+
+Verified:
+- Pre-termination process listing showed the worker, renderer and
+  descendant running in the dedicated container.
+- A second container could not acquire worker ownership or reconcile
+  the active running job.
+- After whole-container termination, a new container acquired ownership
+  against the same persisted database and filesystem.
+- The interrupted job became failed / WORKER_INTERRUPTED.
+- The waiting job remained queued.
+- No report was published for the interrupted job.
+- Repeated reconciliation left the terminal record unchanged.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database: results/web-crash-sd25Hl/state/jobs.sqlite3
+- Job identities: results/web-crash-sd25Hl/jobs.json
+- Synthetic scripts and readiness/PID markers in the experiment workspace.
+- Stopped dedicated container retained for inspection.
+
+Limitations:
+- This tests whole-container termination during synthetic rendering.
+- It does not test worker-process-only death with a surviving renderer.
+- It does not test a real Quarto render under forced termination.
+- It does not inject termination between publication and SQLite completion.
+- Inherited descriptors were deliberately retained by the synthetic
+  renderer and descendant; this is not evidence that every real
+  rendering descendant retains the worker descriptor.
