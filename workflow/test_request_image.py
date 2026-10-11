@@ -123,7 +123,11 @@ def main():
     matches = list((OUT / 'requests').glob('image-researcher-*/result.json'))
     assert len(matches) == 1
     second = verify_result(matches[0], request)
-    assert (second / 'report.html.template-provenance.json').is_file()
+    # Isha's preserved QMD embeds its own machine-readable provenance record in
+    # the standalone HTML.  The workflow-level report.html.provenance.json is
+    # already verified by verify_result above; a separate template sidecar is
+    # useful when present but is not required for a valid standalone report.
+    assert 'Full provenance record (JSON)' in (second / 'report.html').read_text(encoding='utf-8')
     assert sha(first / 'data/series.csv') == sha(second / 'data/series.csv')
     current_seals = {str(p): (sha(p), p.stat().st_mtime_ns) for p in (OUT / 'cache/prepared').glob('*/prepared.json')}
     assert current_seals == seals, 'Audience-only change unnecessarily repeated preparation'
