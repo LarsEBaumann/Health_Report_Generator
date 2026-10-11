@@ -34,12 +34,12 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     container:
-      image: ghcr.io/larsebaumann/health_report_generator-request-test@sha256:86f29ed4333f29648d13bfa007b157d232abc196d720edb41d4d2c83a79e721a
+      image: ghcr.io/larsebaumann/health_report_generator-request-test@sha256:24be927ee62502369d33190fd7c0fff5282e7841be6ff939337732cd557fea12
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
       env:
-        REQUEST_ENVIRONMENT_IMAGE: ghcr.io/larsebaumann/health_report_generator-request-test@sha256:86f29ed4333f29648d13bfa007b157d232abc196d720edb41d4d2c83a79e721a
+        REQUEST_ENVIRONMENT_IMAGE: ghcr.io/larsebaumann/health_report_generator-request-test@sha256:24be927ee62502369d33190fd7c0fff5282e7841be6ff939337732cd557fea12
     defaults:
       run:
         shell: bash
