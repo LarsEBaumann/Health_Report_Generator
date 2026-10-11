@@ -1,0 +1,68 @@
+# SourcePRISM durable job-system checkpoint
+
+Recorded: 2026-10-11
+
+## Agreed architecture
+
+- Single Ubuntu host initially; laptop-first development.
+- SQLite database on persistent local disk.
+- One serialized report worker.
+- Maximum 20 waiting jobs plus one running job.
+- Cache-first report delivery and duplicate-request coalescing.
+- Future migration to an always-on server after resource/load testing.
+
+## Implemented foundation
+
+job_store.py:
+- Persistent job records and parameterized queries.
+- WAL mode and short immediate write transactions.
+- Atomic waiting-job admission.
+- Coalescing of identical queued/running internal requests.
+- Identity conflicts rejected.
+- FIFO claiming and a database constraint permitting one running job.
+- Guarded completed/failed transitions and sanitized error codes.
+
+worker_lock.py:
+- Cooperative Linux flock ownership.
+- Persistent lock file; never unlink it.
+- Lock ownership remains held until associated descriptors close.
+
+worker_session.py:
+- Shared lock path derived from the database path.
+- Ownership held throughout the worker session.
+- Interrupted running records become failed with WORKER_INTERRUPTED.
+- Queued and completed records remain unchanged.
+- No automatic requeue or replay during startup reconciliation.
+
+## Test evidence
+
+- 18 queue, ownership and reconciliation tests passed in 4.37 seconds.
+- Complete regression suite: 177 passed in 15.47 seconds.
+- Tests cover concurrent admission, duplicate coalescing, single claiming,
+  ownership exclusion, process-death lock release, persistence,
+  guarded transitions and conservative restart-state reconciliation.
+
+## Internal boundary
+
+The store accepts validated internal settings and a server-derived identity.
+It is not a public validation or authorization interface.
+Production request identity must include the applicable data, code,
+toolchain/schema and presentation versions.
+Deduplication must respect access policy.
+
+All workers touching the same pipeline state must share ownership.
+A different database must not be used to bypass pipeline serialization.
+
+## Not yet implemented or verified
+
+- Supervised rendering and descendant-process termination.
+- Protection against orphan render processes.
+- Atomic artifact publication and verification.
+- Publication/database crash-window reconciliation.
+- Completed-artifact cache lookup and permission checks.
+- HTTP API, frontend binding and user-facing errors.
+- Retention, expiration, disk budgets and rate limits.
+- Production volumes, resource limits and deployment.
+- Twenty-request end-to-end load rehearsal.
+
+The tests establish the foundation, not production readiness.
