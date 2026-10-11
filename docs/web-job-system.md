@@ -341,3 +341,53 @@ Limitations:
   decision before deployment.
 - Forced termination after publication but before SQLite completion
   remains a separate experiment.
+
+## Publication-completion gap crash rehearsal
+
+Recorded: 2026-10-11
+Implementation checkpoint: 1468ebc
+
+Experiment:
+- Workspace: results/web-publication-gap-jYlw3t
+- Job ID: 3712202d75c843acaa0ac51be4df1ce1
+- Actual run_one operation with a synthetic valid four-file report.
+- Experiment-only JobStore subclass paused before persisting completed,
+  after successful publication returned.
+- Guardian sent SIGKILL to the paused worker.
+- Original private workspace was renamed to private-preserved,
+  retaining evidence but making its original path unavailable.
+
+Verified:
+- Published bundle passed verification while database state was running.
+- Paused worker retained ownership and blocked reconciliation.
+- SIGKILL prevented the completion update.
+- Restart reconciliation restored completed from the published bundle
+  without the original private workspace.
+- Published report files and publication manifest retained their hashes,
+  sizes and modification times.
+- Waiting job record remained unchanged.
+- Repeated reconciliation was idempotent.
+- Recovered completion persisted after database reopening.
+- Working tree remained clean after the rehearsal.
+
+Retained evidence:
+- Database:
+  results/web-publication-gap-jYlw3t/state/jobs.sqlite3
+- Published bundle:
+  results/web-publication-gap-jYlw3t/published/3712202d75c843acaa0ac51be4df1ce1
+- Pre-crash inventory:
+  results/web-publication-gap-jYlw3t/published-before.json
+- Original private workspace:
+  results/web-publication-gap-jYlw3t/private-preserved
+- Rehearsal scripts, job identities and completion-pause marker
+  retained in the experiment workspace.
+
+Limitations:
+- Termination occurred at a controlled post-publication,
+  pre-completion-persistence boundary.
+- This does not test arbitrary termination during copying, synchronization
+  or rename, or host power loss.
+- Synthetic report generation does not establish real renderer-tree
+  containment.
+- Resource limits, identity enforcement before completion, artifact access
+  and retention, and persistent service integration remain pending.
