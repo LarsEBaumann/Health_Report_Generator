@@ -18,6 +18,33 @@ services:
       GITHUB_REPO: ${GITHUB_REPO:-Health_Report_Generator}
       GITHUB_APP_REF: ${GITHUB_APP_REF:-main}
       GITHUB_BRANCH: ${GITHUB_BRANCH:-main}
-      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-update-lyme-data.yml}
+      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-validate.yml}
       GITHUB_REQUEST_WORKFLOW: ${GITHUB_REQUEST_WORKFLOW:-request-report.yml}
+      REPORT_PUBLIC_ROOT: ${REPORT_PUBLIC_ROOT:-/app/.cache/github-artifact/requested-reports}
+      REPORT_PUBLIC_BASE_URL: ${REPORT_PUBLIC_BASE_URL:-http://127.0.0.1:2720}
     command: ["sh", "-lc", "mkdir -p /tmp/ui-home/.config /tmp/ui-home/.cache && export HOME=/tmp/ui-home XDG_CONFIG_HOME=/tmp/ui-home/.config XDG_CACHE_HOME=/tmp/ui-home/.cache && uv sync --locked && uv run marimo run src/ui.py --host 0.0.0.0 --port 2718"]
+
+  explorer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    volumes:
+      - .:/app
+      - ./.cache/uv:/tmp/uv-cache
+    ports:
+      - "2718:2718"
+    environment:
+      UV_CACHE_DIR: /tmp/uv-cache
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_REPOSITORY: ${GITHUB_REPOSITORY:-}
+      GITHUB_OWNER: ${GITHUB_OWNER:-LarsEBaumann}
+      GITHUB_REPO: ${GITHUB_REPO:-Health_Report_Generator}
+      GITHUB_APP_REF: ${GITHUB_APP_REF:-main}
+      GITHUB_BRANCH: ${GITHUB_BRANCH:-main}
+      GITHUB_WORKFLOW: ${GITHUB_WORKFLOW:-validate.yml}
+      GITHUB_REQUEST_WORKFLOW: ${GITHUB_REQUEST_WORKFLOW:-request-report.yml}
+      REPORT_PUBLIC_ROOT: ${REPORT_PUBLIC_ROOT:-/app/.cache/github-artifact/requested-reports}
+      EXPLORER_PORT: 2718
+    command: ["sh", "-lc", "mkdir -p /tmp/explorer-home/.config /tmp/explorer-home/.cache && export HOME=/tmp/explorer-home XDG_CONFIG_HOME=/tmp/explorer-home/.config XDG_CACHE_HOME=/tmp/explorer-home/.cache && uv sync --locked && uv run python src/explorer_server.py"]

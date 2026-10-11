@@ -15,9 +15,21 @@ Use [REQUEST_WORKFLOW.md](REQUEST_WORKFLOW.md) for the JSON-driven workflow agre
 snakemake --cores 2 --config request_file=examples/requests/public-health.json
 ```
 
-This route has its own documented selection rules, selected-dataset checks, prepared-data cache and `result.json` artifact manifest. The audience-specific design is an initial shared template. Marimo integration and broader dataset adapters remain separate work.
+This route has its own documented selection rules, selected-dataset checks, prepared-data cache and `result.json` artifact manifest. It is available through both the compact Marimo form and the visual Infection Data Explorer; see [marimo-ui/README.md](marimo-ui/README.md). Broader dataset adapters remain separate work.
 
 **The remaining instructions describe the original demo route**, which is still used when `request_file` is omitted, including its viral/bacterial comparisons and optional Shiny package.
+
+## Full release in Docker
+
+Build all standard stakeholder outputs inside the locked Docker environment:
+
+```sh
+python run.py release --cores 2
+```
+
+This is the current-branch equivalent of the colleague’s `run.py release` command. It builds or reuses `Dockerfile.request`, then runs this branch’s `Snakefile` in the container. The resulting HTML/PDF reports for researcher, health institution and public audiences, plus the legacy Shiny bundle, are written to `results/`. On Apple Silicon, Docker runs the required Linux `amd64` image through its configured emulation.
+
+GitHub Actions runs the same command automatically when data, analysis, reporting, or Docker environment files change. It also runs weekly on Monday at 04:00 UTC and can be started manually from **Actions → Build full health-report release**. The complete release is uploaded as a GitHub artifact.
 
 ## Setup and run
 

@@ -6,18 +6,21 @@ app = marimo.App(width="medium")
 
 @app.cell
 def _():
+    import html
     import json
     import os
     import uuid
+    from pathlib import Path
+    from urllib.parse import quote
 
     import marimo as mo
     import pandas as pd
     import requests
 
-    from artifact_download import download_latest_report
+    from artifact_download import download_latest_report, wait_for_requested_report
     from github_config import resolve_repository
 
-    return download_latest_report, json, mo, os, pd, requests, resolve_repository, uuid
+    return Path, download_latest_report, html, json, mo, os, pd, quote, requests, resolve_repository, uuid, wait_for_requested_report
 
 
 @app.cell
@@ -127,7 +130,7 @@ def _(datasets, message, mo, ready, source_artifact, source_run):
 
 
 @app.cell
-def _(json, mo, os, report_form, requests, resolve_repository, source_run, uuid):
+def _(Path, html, json, mo, os, quote, report_form, requests, resolve_repository, source_run, uuid, wait_for_requested_report):
     if report_form.value is None:
         result = mo.md("Choose a stakeholder and diseases, then select **Generate report**.")
     else:
@@ -165,14 +168,44 @@ def _(json, mo, os, report_form, requests, resolve_repository, source_run, uuid)
                         timeout=30,
                     )
                     if response.status_code in (200, 204):
-                        result = mo.callout(
-                            mo.md(
-                                f"Report request `{request_id}` queued using source run "
-                                f"`{source_run['run_number']}`. Check [GitHub Actions]"
-                                f"(https://github.com/{owner}/{repo}/actions/workflows/{request_workflow}) "
-                                "for completion and the requested-health-report artifact."
-                            ), kind="success"
-                        )
+                        action_url = f"https://github.com/{owner}/{repo}/actions/workflows/{request_workflow}"
+                        try:
+                            report_dir, report_run, _artifact = wait_for_requested_report(
+                                request_id, ref=ref, workflow=request_workflow,
+                            )
+                            public_root = Path(os.getenv(
+                                "REPORT_PUBLIC_ROOT", "/app/.cache/github-artifact/requested-reports",
+                            )).resolve()
+                            relative = report_dir.resolve().relative_to(public_root).as_posix()
+                            public_base = os.getenv("REPORT_PUBLIC_BASE_URL", "http://127.0.0.1:2720").rstrip("/")
+                            report_url = f"{public_base}/{quote(relative)}/report.html"
+                            preview = mo.Html(
+                                '<iframe title="Generated health report" '
+                                'style="width:100%; height:920px; border:1px solid #d0d7de; border-radius:8px;" '
+                                f'src="{html.escape(report_url, quote=True)}"></iframe>'
+                            )
+                            downloads = [f'<a href="{html.escape(report_url, quote=True)}" target="_blank">Open HTML report</a>']
+                            pdf = report_dir / "report.pdf"
+                            if pdf.is_file():
+                                pdf_url = f"{public_base}/{quote(relative)}/report.pdf"
+                                downloads.append(f'<a href="{html.escape(pdf_url, quote=True)}" download>Download PDF report</a>')
+                            result = mo.vstack([
+                                mo.callout(
+                                    mo.md(
+                                        f"Report request `{request_id}` completed successfully. "
+                                        f"[View the GitHub run]({report_run['html_url']})."
+                                    ), kind="success",
+                                ),
+                                mo.Html(" &nbsp; | &nbsp; ".join(downloads)),
+                                preview,
+                            ])
+                        except (RuntimeError, requests.RequestException) as exc:
+                            result = mo.callout(
+                                mo.md(
+                                    f"Report request `{request_id}` was submitted, but the report is not ready to display yet: {exc} "
+                                    f"[Open GitHub Actions]({action_url})."
+                                ), kind="warn",
+                            )
                     else:
                         result = mo.callout(
                             mo.md(
