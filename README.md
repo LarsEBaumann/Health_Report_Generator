@@ -1,134 +1,272 @@
-# Reproducible infectious-disease reports
+# Health Report Generator
 
-This workflow archives a local data release, validates it, calculates stakeholder metrics once, and produces a Quarto HTML report, PDF report, and R Shiny application using the same CSV tables.
+This project turns one checked snapshot of Swiss infectious-disease data into
+reports for three audiences:
+
+- **Researcher** — a detailed report with source tables and provenance.
+- **Health institution** — a monitoring report for public-health work.
+- **General public** — a plain-language report.
+
+A report request records the audience and selected datasets. Snakemake then
+prepares the data, applies checks, creates the selected analysis tables, and
+renders HTML and PDF reports. Every formal report includes provenance: the data
+snapshot, filters, checksums, software environment, and render time.
+
+This branch also includes two local interfaces that can start a report request
+through GitHub Actions and display the completed HTML report.
+
+## Before you start
+
+You need:
+
+1. Git.
+2. Docker Desktop, open and running.
+3. Python 3.10 or later, only to start the Docker release command.
+4. For the local interfaces only: a GitHub fine-grained access token with
+   **Actions: Read and write** permission for the repository you will use.
+
+The full release runs Python, R, Quarto, TinyTeX and Snakemake inside Docker.
+You do not need to install those tools on your computer for that route.
+
+## First test: build every report locally
+
+### 1. Clone the repository
+
+If you are testing the shared repository:
+
+```sh
+git clone https://github.com/LarsEBaumann/Health_Report_Generator.git
+cd Health_Report_Generator
+git checkout integration/marimo-reporting
+```
+
+If you are testing your own fork, replace `YOUR-ACCOUNT` below. Your fork must
+contain the `integration/marimo-reporting` branch.
+
+```sh
+git clone https://github.com/YOUR-ACCOUNT/Health_Report_Generator.git
+cd Health_Report_Generator
+git checkout integration/marimo-reporting
+```
+
+### 2. Confirm Docker is running
+
+```sh
+docker --version
+docker compose version
+```
+
+If either command fails, open Docker Desktop, wait until the engine is running,
+and try again.
+
+### 3. Run the complete release
+
+From the repository root:
+
+```sh
+export LOCAL_UID="$(id -u)"
+export LOCAL_GID="$(id -g)"
+python3 run.py release --cores 2
+```
+
+The first run builds the Docker image and can take several minutes. Later runs
+reuse the image unless its dependencies change.
+
+A successful run writes results to `results/`:
 
 ```text
-Data/ -> snapshot + hashes -> harmonised.parquet -> blocking quality checks
-  -> stakeholder analysis -> report CSVs + lineage -> Quarto HTML / PDF + Shiny bundle
+results/reports/public_health_expert/                 legacy report and Shiny bundle
+results/requests/full-release-researcher-*/           researcher HTML and PDF
+results/requests/full-release-health_institution-*/   health-institution HTML and PDF
+results/requests/full-release-public-*/               public HTML and PDF
+results/checks.csv                                    data-quality checks
+results/release.json                                  release metadata
+results/snapshots/<snapshot-id>/manifest.json         source snapshot record
 ```
 
-## New: request-driven dataset trends
-
-Use [REQUEST_WORKFLOW.md](REQUEST_WORKFLOW.md) for the JSON-driven workflow agreed after the demo. It reports trends for exactly the selected exports, supports all three audience identifiers, and renders requested HTML/PDF formats from a shared QMD:
+Open an HTML report in your browser, for example:
 
 ```sh
-snakemake --cores 2 --config request_file=examples/requests/public-health.json
+open results/requests/full-release-public-*/report.html
 ```
 
-This route has its own documented selection rules, selected-dataset checks, prepared-data cache and `result.json` artifact manifest. It is available through both the compact Marimo form and the visual Infection Data Explorer; see [marimo-ui/README.md](marimo-ui/README.md). Broader dataset adapters remain separate work.
+On Linux, use your file manager or `xdg-open` instead of `open`.
 
-**The remaining instructions describe the original demo route**, which is still used when `request_file` is omitted, including its viral/bacterial comparisons and optional Shiny package.
+## Test a selected report through GitHub Actions
 
-## Full release in Docker
+This route is used by both local interfaces. It is useful when a person chooses
+one audience and one or more datasets.
 
-Build all standard stakeholder outputs inside the locked Docker environment:
+### 1. Set your repository values
+
+From `marimo-ui/`, run the following. Replace the values in capitals with the
+repository and branch you are testing.
 
 ```sh
-python run.py release --cores 2
+cd marimo-ui
+
+export GITHUB_REPOSITORY='YOUR-ACCOUNT/Health_Report_Generator'
+export GITHUB_APP_REF='integration/marimo-reporting'
+export GITHUB_BRANCH='integration/marimo-reporting'
+export GITHUB_WORKFLOW='validate.yml'
+export GITHUB_REQUEST_WORKFLOW='request-report.yml'
 ```
 
-This is the current-branch equivalent of the colleague’s `run.py release` command. It builds or reuses `Dockerfile.request`, then runs this branch’s `Snakefile` in the container. The resulting HTML/PDF reports for researcher, health institution and public audiences, plus the legacy Shiny bundle, are written to `results/`. On Apple Silicon, Docker runs the required Linux `amd64` image through its configured emulation.
+What each setting means:
 
-GitHub Actions runs the same command automatically when data, analysis, reporting, or Docker environment files change. It also runs weekly on Monday at 04:00 UTC and can be started manually from **Actions → Build full health-report release**. The complete release is uploaded as a GitHub artifact.
+| Variable | What to enter |
+|---|---|
+| `GITHUB_REPOSITORY` | `owner/repository`, for example `LarsEBaumann/Health_Report_Generator` or your fork. |
+| `GITHUB_APP_REF` | The branch that contains `request-report.yml`; use `integration/marimo-reporting` for this branch. |
+| `GITHUB_BRANCH` | The branch containing a successful `validate.yml` run and its data artifact; normally the same branch. |
+| `GITHUB_WORKFLOW` | `validate.yml`. Do not change it unless the validation workflow has been renamed. |
+| `GITHUB_REQUEST_WORKFLOW` | `request-report.yml`. Do not change it unless the request workflow has been renamed. |
 
-## Setup and run
-
-Run commands from the repository root. Python 3.11 and R 4.3.2 were used for validation.
+For the shared repository, the first line is:
 
 ```sh
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r scripts/health_pipeline/requirements.lock.txt
-Rscript workflow/restore_r.R
+export GITHUB_REPOSITORY='LarsEBaumann/Health_Report_Generator'
 ```
 
-Install Quarto (tested with **1.3.353**) and its PDF engine (`quarto install tinytex`; tested with **TinyTeX v2026.10**). Place `quarto` on PATH, or supply its path below. These are explicit installation steps; ordinary builds never fetch new data or install packages deliberately. Quarto's automatic TeX package installation is disabled in the template so PDF builds fail clearly if their TeX environment is incomplete.
+### 2. Add your GitHub token to this Terminal session
+
+Create a **fine-grained personal access token** in GitHub with access to the
+repository and **Actions: Read and write** permission. Paste it privately when
+prompted:
 
 ```sh
-snakemake --cores 2
-# On this Mac, when Quarto is bundled with RStudio:
-snakemake --cores 2 --config quarto=/Applications/RStudio.app/Contents/Resources/app/quarto/bin/quarto
+printf 'GitHub token: '
+stty -echo
+IFS= read -r GITHUB_TOKEN
+stty echo
+printf '\n'
+export GITHUB_TOKEN
 ```
 
-Optional targets: `snakemake tables --cores 1`, `snakemake html --cores 1`, `snakemake pdf --cores 1`, `snakemake shiny --cores 1`.
+The token will not appear while you type. Do not put it in a file, commit it,
+or paste it into chat.
 
-`bash scripts/health_pipeline/run_all.sh Data results` is a compatibility wrapper around Snakemake. Set `QUARTO` to override the renderer path. The former Python-generated HTML is replaced by the shared QMD to avoid duplicate statistical logic.
+### 3. Make sure validation data are available
 
-Outputs for the default stakeholder:
+The interfaces read the newest successful artifact from `validate.yml` before
+they show dataset choices.
 
-- `results/reports/public_health_expert/report.html`
-- `results/reports/public_health_expert/report.pdf`
-- `results/reports/public_health_expert/data/`: CSVs, configuration and integrity manifest
-- `results/reports/public_health_expert/app/`: portable QMD, Shiny app and the same data
-- `results/release.json`: artifact hashes, code hashes, Git state and actual environment versions
-- `results/snapshots/<snapshot_id>/`: archived original CSVs and metadata
+In GitHub, open **Actions** and check for a successful **Validate and build
+reports** run on `integration/marimo-reporting`. If there is none, run that
+workflow first and wait for it to finish.
 
-Launch Shiny from the repository root:
+## Run the compact Marimo form
+
+Keep the environment variables and token from the previous section in the same
+Terminal window. From `marimo-ui/`:
 
 ```sh
-Rscript -e 'shiny::runApp("results/reports/public_health_expert/app")'
+docker compose --profile ui run --rm \
+  -p 127.0.0.1:2718:2718 \
+  -p 127.0.0.1:2720:8000 ui \
+  sh -lc 'mkdir -p /tmp/report-home/.config /tmp/report-home/.cache /tmp/report-home/.local/share /app/.cache/github-artifact/requested-reports &&
+  (python -m http.server 8000 --directory /app/.cache/github-artifact/requested-reports >/tmp/report-static.log 2>&1 &) &&
+  export HOME=/tmp/report-home XDG_CONFIG_HOME=/tmp/report-home/.config XDG_CACHE_HOME=/tmp/report-home/.cache XDG_DATA_HOME=/tmp/report-home/.local/share &&
+  uv sync --locked &&
+  uv run marimo run src/ui.py --host 0.0.0.0 --port 2718 --show-tracebacks'
 ```
 
-The portable app folder also contains `report.qmd`. From that folder, `quarto render report.qmd --to html` or `--to pdf` renders the same analysis. Shiny is a running R application; it is not a third static export of the PDF/HTML template. Sharing the folder does not deploy a public service.
+Open [http://127.0.0.1:2718](http://127.0.0.1:2718).
 
-## Reproduce a specific archived release
+Choose an audience, choose one or more diseases, then select **Generate
+report**. The interface starts a GitHub Actions run, waits for it to finish,
+downloads the matching artifact, and shows the report.
+
+## Run Infection Data Explorer
+
+Use a second Terminal window. Set the same variables and token again, then run:
 
 ```sh
-snakemake --cores 2 --config \
-  snapshot_manifest=results/snapshots/REPLACE_WITH_SNAPSHOT_ID/manifest.json \
-  out=reproduced
+cd /path/to/Health_Report_Generator/marimo-ui
+
+docker compose --profile explorer run --rm \
+  -p 127.0.0.1:2721:2718 explorer
 ```
 
-This mode verifies and reads only that archived snapshot, without requiring the original `Data/` tree or any API. Retain the snapshot **and** code/config/environment versions with the report. Hashes cannot recover deleted data. Paths inside a snapshot and its lineage are relative, so the archive can move between computers. Original source record numbers count CSV records (header = 1), not physical lines in multiline CSV fields.
+Open [http://127.0.0.1:2721](http://127.0.0.1:2721).
 
-For an update, place a new release in `Data/` and run the ordinary workflow. It creates a new content-addressed archive rather than replacing the old snapshot. Remote API acquisition is deliberately separate: no endpoint, authentication, or download specification was supplied. The included weekly CI job rebuilds the committed data; it does **not** claim to fetch newer surveillance data.
+The Explorer provides audience cards, data overview pages, disease selection,
+and an embedded report after GitHub Actions has completed.
 
-## Scientific and quality policy
+The message printed in the Terminal may say port `2718`. That is the port
+inside Docker. In your browser, use `2721` because it is the port mapped on
+your computer.
 
-- A subgroup is never inferred to be a total because it has one distinct value.
-- Missing/malformed metadata and undescribed columns are quarantined; quarantine blocks the release until resolved.
-- Deduplication requires identical data **and metadata** bytes. Same data with conflicting metadata is a blocking conflict.
-- Counts must be numeric, finite, nonnegative and uniquely keyed. Year/month reconciliation uses a documented 2% tolerance only for complete compatible count series. Canton checks require exactly 26 Swiss cantons and a **CH** national total, never CHFL; tolerance is 5%. Nonapplicable checks are `SKIP`, not `PASS`.
-- Every selected series requires the reference year, index base year, and every requested reporting year, confirmed `dataComplete`, and a positive population denominator. An annual total is preferred; otherwise exactly 12 distinct months and one consistent denominator are required.
-- Duplicate candidate exports for the same disease/source are rejected, not summed. Different systems follow the explicit `source_priority`; every choice is recorded.
-- Geography is explicit (`CH` or `CHFL`); the workflow never silently substitutes one for the other.
-- Group membership is fixed across all displayed years. Groups sum mandatory case notifications only by default, excluding sentinel estimates. COVID-19 and AIDS are excluded from group sums; AIDS is a disease stage related to HIV. Influenza exclusion is a separate sensitivity comparison. These are editable, documented analytic policies, not hidden harmonisation rules.
-- The COVID-19 positive-test case definition is an explicit, reasoned dimension filter. COVID-19 still lacks a 2019 baseline, so it is excluded from this default complete-baseline comparison. To study it, use an appropriate later reference period rather than substituting zero.
-- Rates are calculated from the exported counts and population, and can differ slightly from a publisher's rate calculated using unrounded figures. Relative changes are descriptive, not significance tests or causal claims.
-- `checks.py` exits nonzero on critical failures. Analysis verifies a content-bound success marker; rendering verifies the analysis bundle. Editing an input or output cannot silently reuse an old validation result.
+### If a port is already in use
 
-The strict defaults may exclude more series than the previous prototype. Inspect `selection.csv` before interpreting a report. The default input release produces 12 eligible disease series; CH-only sentinel series and COVID-19 without a 2019 baseline are among the exclusions.
-
-## Stakeholders and data contract
-
-Copy a stakeholder JSON, set a unique `id`, and add the filename stem to `workflow/config.yaml`. Filename stem and ID must match. Only supported settings pass `workflow/config.schema.json`; unsupported geographies, periods, classes, sections, and unknown keys fail clearly. Change presentation sections with `outputs`. Arbitrary new analyses require code plus tests, not an ignored configuration field.
-
-See [SCHEMA.md](scripts/health_pipeline/SCHEMA.md) for table keys, types and calculation lineage. `pathogen_class.csv` remains a curated lookup: review classifications and the note column before adding topics. Unclassified datasets are explicitly excluded, never relabelled as syndromic. The current classifications were supplied by the team; no scientific reviewer approval is invented.
-
-## Tests and release discipline
+Stop the existing service with `Ctrl+C`, or choose another host port. For
+example:
 
 ```sh
-python -m pytest -q
-Rscript tests/shiny_smoke.R results/reports/public_health_expert/app
-snakemake --dry-run --cores 1
+docker compose --profile explorer run --rm \
+  -p 127.0.0.1:2722:2718 explorer
 ```
 
-Tests cover subgroup safety, incomplete months/years/baselines, denominators, source completeness, metadata conflicts, overlapping exports, nonzero CLI failures, stale gates, snapshot relocation/tampering, deterministic tables, and independent reconstruction of every fixture metric from raw records and formula inputs. The final dry run should say no work is needed after a successful unchanged build.
+Then open [http://127.0.0.1:2722](http://127.0.0.1:2722).
 
-CI runs tests, builds all outputs, checks Shiny server outputs, and uploads a release bundle only after success. It does not deploy or overwrite a production site. A failed local build may leave older reports on disk; treat only a successfully completed build and its matching `release.json` as a release. Preserve previously uploaded successful artifacts independently of a new build.
+## What happens after a request
 
-The Python lock pins transitive packages; `renv.lock` records R dependencies. The R setup script restores those into `.r-library/`; `.Rprofile` and the renderer use that isolated library. A pre-existing global R installation can also run the workflow, and its actual versions are recorded, but use the restored library for reproduction. `workflow/environment.yml` describes the base Python/R environment, not a platform-specific binary lock. Reproducing identical metric tables is tested; bit-identical PDF bytes across platforms/toolchain versions are not claimed. Quarto and TeX versions are recorded in release metadata. Upgrade locks intentionally and rerun tests; `workflow/write_r_lock.R` records the current R dependency set when explicitly invoked.
+1. The interface sends a validated request to GitHub Actions.
+2. The Action checks the request and finds the checked source snapshot.
+3. It restores prepared data from cache when the snapshot and environment
+   match. Otherwise it prepares the data once and saves the checked cache.
+4. Snakemake analyses only the selected datasets.
+5. Quarto renders HTML and PDF outputs.
+6. GitHub Actions uploads a `requested-health-report-<run-id>` artifact.
+7. The local interface downloads that artifact and displays its HTML report.
 
-Legacy files in `scripts/health_pipeline/example_output/` are historical examples, not results from this workflow. Existing untracked files and raw datasets are not modified by the implementation.
+The first request for a snapshot can take longer because data preparation is
+needed. A later request with a different audience or disease selection can
+reuse the prepared data, but it still creates a fresh analysis and report.
 
-## Demo dashboard and companion report
+## Check that a test worked
 
-The findings report now uses the approved visual dashboard with **ggplot2** charts, summary cards, case-count bars, percentage change from the baseline, and a disease comparison plot. Supporting numbers are in an expandable table with descriptive column headings. Every chart and table has a source/method note.
+For either interface:
 
-Open `results/reports/public_health_expert/report.html` for the demo. Use **Methods & sources** to open `methods.html`; the navigation also links to their PDF versions (`report.pdf` and `methods.pdf`). Audit files are available from the methods report. Keep the entire stakeholder folder together when sharing it so report and download links work.
+1. Choose an audience and at least one disease.
+2. Confirm that a new **Build requested health report** run appears in GitHub
+   Actions.
+3. Wait for the run to show a green tick.
+4. Confirm that the HTML report opens in the interface.
+5. Open the HTML report in a separate browser tab and download the PDF.
+6. Check that the report names the audience and datasets you chose.
+7. Open the report provenance or `result.json` in the artifact and confirm it
+   records the request ID, snapshot, filters, checksums, and render time.
 
-Shiny uses the same ggplot2 helpers and keeps Findings, Methods & sources, and Explore a disease on separate tabs. No disease-selection or statistical calculation was moved into the presentation layer. The chart formerly labelled an index now shows percentage change from the baseline (index minus 100); zero is the baseline level.
+## Important limits
 
-After pulling these changes, run `Rscript workflow/restore_r.R` to restore the updated lock including ggplot2. Then run Snakemake normally. Rendering each format builds both companion reports, and a rendering error stops the pair from being published by the renderer.
+- The current request workflow supports the infectious-disease data structure
+  included in this repository. It is not yet a general analyser for any CSV.
+- The current local disease pickers show included viral and bacterial datasets.
+  Other source types need a reviewed adapter before they can be selected and
+  reported as case trends.
+- A selected report is descriptive. It does not make causal claims or estimate
+  all infections.
+- The Shiny app is part of the legacy full release. It is not yet generated for
+  every selected request.
+- GitHub Actions artifacts are retained for 30 days. Download formal outputs
+  and supporting files if they must be retained longer.
 
-The alternate editorial briefing is preserved in `design/report-mockups.html` for later iteration. The dashboard is the active production design.
+## Troubleshooting
+
+| Problem | What to check |
+|---|---|
+| `docker: command not found` | Install Docker Desktop, open it, then restart Terminal. |
+| Port already allocated | Stop the old container or choose a different host port as shown above. |
+| The interface says it cannot load report data | Confirm `GITHUB_REPOSITORY`, `GITHUB_BRANCH`, token permissions, and a successful `validate.yml` artifact. |
+| GitHub rejects the request | Confirm `GITHUB_APP_REF` names a branch containing `request-report.yml`, and that Actions are enabled. |
+| A fork fails to read the request image | Confirm that the fork can read the pinned GitHub Container Registry image used by `request-report.yml`. |
+| The report request is slow | Check the Action log. The first request may be preparing data; later matching requests should report a cache hit. |
+| The report does not appear after an Action succeeds | Open the matching Action artifact and look for `result.json` and `report.html`. |
+
+## Further documentation
+
+- [GETTING_STARTED.md](GETTING_STARTED.md) — native environment and detailed reproduction checks.
+- [REQUEST_WORKFLOW.md](REQUEST_WORKFLOW.md) — request JSON schema, selection rules, and output structure.
+- [marimo-ui/README.md](marimo-ui/README.md) — short reference for the two local interfaces.
+- [REQUEST_IMAGE.md](REQUEST_IMAGE.md) — locked Docker request environment and its tests.
