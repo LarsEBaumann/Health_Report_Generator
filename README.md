@@ -12,8 +12,8 @@ prepares the data, applies checks, creates the selected analysis tables, and
 renders HTML and PDF reports. Every formal report includes provenance: the data
 snapshot, filters, checksums, software environment, and render time.
 
-This branch also includes two local interfaces that can start a report request
-through GitHub Actions and display the completed HTML report.
+The project also includes two optional local interfaces. They can start a
+report request through GitHub Actions and display the completed HTML report.
 
 ## Before you start
 
@@ -28,7 +28,31 @@ You need:
 The full release runs Python, R, Quarto, TinyTeX and Snakemake inside Docker.
 You do not need to install those tools on your computer for that route.
 
-## First test: build every report locally
+## Decide what to run
+
+Start with the route that matches your purpose.
+
+| Your aim | What to run | What you need |
+|---|---|---|
+| Generate all three standard reports and check that the project works | **Complete local release** | Git, Docker Desktop, Python 3.10+ |
+| Create one report for a chosen audience and disease selection | **One local interface** | Git, Docker Desktop, GitHub token, GitHub Actions access |
+| Develop or inspect the pipeline itself | **Native development route** | The additional setup in `GETTING_STARTED.md` |
+
+For a first use, run the complete local release. It is self-contained and does
+not require a GitHub token. Use an interface only when you want to create a
+report from a specific audience and disease choice.
+
+### Choose an interface
+
+You only need to run one interface at a time. Both create the same type of
+selected report through the same GitHub Actions and Snakemake process.
+
+| Choose this interface when you want to… | Interface |
+|---|---|
+| Test a request quickly, create one report with few steps, or diagnose an Actions problem | **Compact Marimo form** |
+| Browse the available data, show the project to someone, or give a non-technical user a guided starting point | **Infection Data Explorer** |
+
+## Generate every standard report locally
 
 ### 1. Clone the repository
 
@@ -48,6 +72,9 @@ git clone https://github.com/YOUR-ACCOUNT/Health_Report_Generator.git
 cd Health_Report_Generator
 git checkout integration/marimo-reporting
 ```
+
+This guide uses `integration/marimo-reporting` because it is the current
+release-candidate branch. After the branch is merged, replace it with `main`.
 
 ### 2. Confirm Docker is running
 
@@ -92,10 +119,10 @@ open results/requests/full-release-public-*/report.html
 
 On Linux, use your file manager or `xdg-open` instead of `open`.
 
-## Test a selected report through GitHub Actions
+## Create one selected report through GitHub Actions
 
-This route is used by both local interfaces. It is useful when a person chooses
-one audience and one or more datasets.
+Use this optional route when a person chooses one audience and one or more
+datasets. The compact form and the Explorer both use these same settings.
 
 ### 1. Set your repository values
 
@@ -147,7 +174,6 @@ The token will not appear while you type. Do not put it in a file, commit it,
 or paste it into chat.
 
 ### 3. Make sure validation data are available
-
 The interfaces read the newest successful artifact from `validate.yml` before
 they show dataset choices.
 
